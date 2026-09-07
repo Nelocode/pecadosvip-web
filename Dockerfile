@@ -2,9 +2,10 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# The wordpress build requires some files from the root lib and compliance directories
+# The wordpress build requires some files from the root directories
 COPY lib/ ./lib/
 COPY compliance/ ./compliance/
+COPY assets/ ./assets/
 
 # Install dependencies for the build
 COPY wordpress/package.json ./wordpress/
