@@ -2,17 +2,14 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# The wordpress build requires some files from the root directories
-COPY lib/ ./lib/
-COPY compliance/ ./compliance/
-COPY assets/ ./assets/
+# We use COPY . . because .dockerignore already correctly filters out 
+# everything except the necessary source directories (app, lib, assets, compliance, wordpress, etc.)
+COPY . .
 
 # Install dependencies for the build
-COPY wordpress/package.json ./wordpress/
 RUN cd wordpress && npm install
 
 # Build the theme and plugin
-COPY wordpress/ ./wordpress/
 RUN cd wordpress && npm run build
 
 # Final WordPress Image
