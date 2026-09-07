@@ -25,7 +25,10 @@
 !lib
 !lib/**
 !public
+!public/
 !public/**
+!wordpress
+!wordpress/**
 
 # Public beta media is served from a closed catalog. Only the exact selected
 # derivatives referenced by that catalog enter the build context; masters,
@@ -165,3 +168,4 @@
 **/*.p12
 **/*.pem
 **/*.pfx
+
