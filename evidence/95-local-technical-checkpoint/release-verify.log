@@ -1,0 +1,261 @@
+command: pnpm run release:verify
+candidateCommit: 15d56f0e5812a06e03dea781487f7553ce010a5c
+startedAtUtc: 2026-08-27T22:19:33.7392418Z
+finishedAtUtc: 2026-08-27T22:20:36.3994739Z
+exitCode: 0
+--- stdout ---
+✔ document language and keyboard bypass target stay explicit (16.309ms)
+✔ site header and footer remain outside the main landmark (10.2386ms)
+✔ navigation and profile cards expose current location and unique link purpose (1.0917ms)
+✔ catalog filters are grouped, instructed and explicitly labelled (0.9704ms)
+✔ contact choices are a named list and unavailable entries are plain status text (0.848ms)
+✔ city sections, disclosure controls and profile data have accessible names (1.166ms)
+✔ focus, target-size, reduced-motion and core contrast contracts remain present (2.7302ms)
+✔ forced-colors keeps focus, boundaries and controls perceivable (0.7321ms)
+✔ analytics stays closed while disabled or without granted consent (8.0322ms)
+✔ a valid city view is projected through an exact allowlist (1.1199ms)
+✔ unknown fields and contact payload data are rejected (3.9974ms)
+✔ profile filters record names and buckets but never filter values (0.8389ms)
+✔ optional city is projected without helper metadata (2.6801ms)
+✔ invalid enum values and unsafe page numbers fail closed (0.5191ms)
+✔ consent changes are not accepted as analytics events (0.3661ms)
+✔ changing getters are read once and cannot swap validated values for PII (0.8787ms)
+✔ hostile proxies fail closed instead of escaping the analytics boundary (0.9074ms)
+✔ analytics consent gates require own exact properties (1.1196ms)
+✔ contact remains disabled unless contact and privacy gates are both approved (3.8405ms)
+✔ approved contact configuration keeps only supported sanitized schemes (1.9217ms)
+✔ unsafe or ambiguous contact destinations are omitted fail closed (0.6888ms)
+✔ a fully evidenced snapshot satisfies draft and release validation (28.162ms)
+✔ validation rejects duplicate slugs, minors and media without rights evidence (2.8092ms)
+✔ route generation supports more than eight profiles without a hardcoded ceiling (3.0213ms)
+✔ draft, hidden, archived and unapproved profiles never enter public route sets (2.283ms)
+✔ validation rejects unsafe media, measurements and runtime references (2.7912ms)
+✔ every route is non-indexable when the global release gate is closed (34.4017ms)
+✔ favicon fallback returns a local non-script image without a 404 (127.2272ms)
+✔ editor permissions are conservative while admin owns publish and archive (2.6105ms)
+✔ archive is recoverable and increments the revision (1.6009ms)
+✔ duplicate creates an unpublished record requiring fresh approval (3.3663ms)
+✔ publishing fails closed when required evidence is incomplete (5.0771ms)
+✔ invalid direct transitions fail closed (1.1986ms)
+✔ round-trips CMS state and media through a versioned integrity manifest (2616.6815ms)
+✔ rejects tampering before creating a restore destination (722.1985ms)
+✔ rejects manifest traversal and unexpected payload paths (445.7558ms)
+✔ rejects a manifest whose aggregate restore budget is excessive (231.9192ms)
+✔ requires an empty destination unless overwrite is explicit (426.1166ms)
+✔ rejects filesystem roots, relative paths and production execution (17.6455ms)
+✔ rejects symbolic links in source trees when the platform permits them (74.7247ms)
+✔ serves a noindex local shell with defensive browser headers and no embedded token (263.1015ms)
+✔ derives actor and role from the server-side token mapping and enforces exact origin (286.1553ms)
+✔ projects sensitive evidence fields by local operator role (92.3086ms)
+✔ executes the local CMS vertical and preserves revisions, replay state and audit after restart (248.4475ms)
+✔ audits media, links it to a profile, reorders it and restores it without physical deletion (724.4981ms)
+✔ accepts bounded MP4 locally, serves it only with a valid token and attaches a video reference (271.5038ms)
+✔ refuses production, non-loopback binding and weak local credentials (9.4462ms)
+✔ exclusive-create contention preserves foreign locks and finally releases owned locks (31.9107ms)
+✔ a child process cannot overwrite state while another process owns the lock (1346.6502ms)
+✔ backup and candidate export fail closed when their CMS snapshot is contended (1250.9026ms)
+✔ backup also fails closed while a media-store snapshot lock is held (112.1494ms)
+✔ stores validated media atomically with an opaque key and defensive records (308.4063ms)
+✔ rejects a mismatched signature and missing opaque rights evidence (57.4125ms)
+✔ normalizes image orientation, dimensions and metadata into bounded WebP variants (2720.8882ms)
+✔ rejects over-dimensioned images before committing any media record (21.4518ms)
+✔ stores a bounded non-fragmented MP4 after structural container validation (52.5236ms)
+✔ rejects malformed and fragmented MP4 containers (35.4975ms)
+✔ archive is recoverable metadata and never physically deletes media (143.955ms)
+✔ detects content tampering instead of returning a trusted record (53.2447ms)
+✔ rejects oversized local metadata before parsing it (47.5634ms)
+✔ serializes concurrent writes and rejects filesystem roots (261.0377ms)
+✔ refuses direct construction in production (0.9297ms)
+✔ rejects replayed media mutation request IDs across records (64.641ms)
+✔ two store instances cannot commit the same request ID twice (72.5996ms)
+✔ cross-instance mutations preserve the item quota boundary (5818.3073ms)
+✔ validates the immutable 87 baseline and exact local 95 projection (119.8202ms)
+✔ rejects unknown fields at every closed-schema level sampled (40.6886ms)
+✔ rejects duplicate criterion IDs, evidence IDs and evidence references (21.3572ms)
+✔ rejects dimension and criterion sums that do not equal the fixed rubric (154.5126ms)
+✔ rejects non-atomic, inconsistent and unknown criterion states (80.6897ms)
+✔ rejects missing, escaping and non-normalized evidence paths (12.1867ms)
+✔ calculates score and preserves 2/20 plus public and legal NO-GO separately (100.7163ms)
+✔ creates a versioned envelope in a nested directory and persists defensive clones (74.1155ms)
+✔ survives restart with optimistic revisions, audit sequence and replay protection intact (143.3373ms)
+✔ same-process instances reload the latest file and reject stale revisions (128.4511ms)
+✔ failed persistence does not publish memory state or consume the request ID (404.894ms)
+✔ archive remains recoverable in the file and no physical-delete API is exposed (165.334ms)
+✔ reorder, evidence, approval, publication and duplication all persist through the domain contract (175.8399ms)
+✔ malformed JSON, unsupported versions, invalid state and missing state fail closed (164.9721ms)
+✔ same-path reentrancy is rejected while a mutation holds the local file lock (36.0837ms)
+✔ production mode is refused even if a caller labels the adapter development-only (609.3975ms)
+✔ legal documents stay unavailable while the aggregate release is blocked (7.0926ms)
+✔ a complete release exposes direct footer-ready links for every legal document (5.9896ms)
+✔ only known approved legal documents are projected after release (3.4056ms)
+✔ public profile queries fail closed while the aggregate release is blocked (12.5262ms)
+✔ public queries filter and paginate an unbounded profile collection (5.286ms)
+✔ invalid runtime filters return no data (0.7591ms)
+✔ URL search parameters parse only one canonical value per supported key (1.7279ms)
+✔ browser GET forms may submit unused filters as empty values (0.9178ms)
+✔ URL search parameters reject duplicates, unknown keys and ambiguous integers (1.0311ms)
+✔ runtime numeric filters reject unsafe integers (0.6212ms)
+✔ hidden records stay private without blocking an otherwise complete release (70.7169ms)
+✔ public detail omits internal IDs, approvals, evidence and rights metadata (4.9234ms)
+✔ exports a hashed local-review artifact without internal CMS fields (332.942ms)
+✔ is byte-for-byte deterministic across equivalent source ordering (746.0092ms)
+✔ CLI creates only a local-review candidate and reports its content hash (974.4515ms)
+✔ fails closed for an empty persistent CMS state and creates no artifact (93.7281ms)
+✔ reports incomplete external gates without writing a partial destination (87.2001ms)
+✔ rejects local workbench media references even when the general release gate passes (106.5868ms)
+✔ rejects existing, overlapping and oversized paths without replacing data (74.6815ms)
+✔ rejects malformed state, symlink sources and production execution (551.3221ms)
+✔ creates a deterministic CycloneDX graph with hashes and dependency scopes (55.2317ms)
+✔ SBOM generation fails closed when a graph target is absent (1.6502ms)
+✔ SBOM CLI writes reproducible bytes and a matching SHA-256 (1491.1612ms)
+✔ build artifact validator produces a stable passing hash inventory (132.8345ms)
+✔ build artifact validator rejects forbidden files and missing runtime files (209.9022ms)
+✔ build artifact validator enforces every byte and file-count budget (113.1191ms)
+✔ release CLIs reject output paths that alias protected inputs (722.4217ms)
+✔ build artifact validator rejects symbolic links without following them (175.126ms)
+✔ build artifact CLI writes the report outside the validated tree (435.6523ms)
+✔ build artifact CLI exits non-zero but preserves a deterministic failure report (746.265ms)
+✔ release gate passes only for a complete evidenced snapshot (14.9434ms)
+✔ release gate exposes every material external dependency (1.7557ms)
+✔ assertReleaseReady throws instead of silently publishing an unsafe snapshot (2.0874ms)
+✔ release rejects reserved origins, unsafe contacts and missing analytics consent (1.1117ms)
+✔ release rejects protocol-relative and traversal-shaped media URLs (2.6419ms)
+✔ create is fail-closed, cloned and audited without personal content in the log (11.0684ms)
+✔ unknown runtime roles, duplicate IDs, slugs and request replays fail closed (8.9691ms)
+✔ optimistic revision rejects stale writes without changing data or audit (1.5534ms)
+✔ publishing requires admin plus fresh complete evidence and approval (7.6731ms)
+✔ publication fails without canonical references or with non-boolean evidence (1.6702ms)
+✔ canonical publication validation rejects references and domain invariants atomically (1.7959ms)
+✔ duplicate removes personal evidence and does not share mutable structures (2.9863ms)
+✔ archive is recoverable only by admin and restore renews approvals (1.8701ms)
+✔ hidden to draft is audited as return-to-draft rather than restore (10.3165ms)
+✔ media reorder requires an exact permutation and records one atomic revision (2.1712ms)
+✔ runtime snapshot contains only unapproved draft cities and no profiles or services (15.0053ms)
+✔ runtime publication, route indexability and sitemap fail closed (4.1857ms)
+✔ blocked release suppresses approved contact destinations (1.8044ms)
+✔ approved destinations remain available only after the aggregate release gate (23.3946ms)
+✔ blocked release renders only the holding state in production (2.243ms)
+✔ blocked release cannot be bypassed by process environment flags (0.998ms)
+✔ complete release renders the public experience in production (2.6801ms)
+✔ every implemented public content route wires the runtime visibility boundary (8.5418ms)
+✔ callers receive isolated runtime snapshots (5.6456ms)
+✔ the public runtime config fails closed with defensive response headers (8.699ms)
+✔ indexing and structured data are disabled without a confirmed origin (5.3532ms)
+✔ unsafe, local and reserved origins are rejected (0.7511ms)
+✔ both explicit approvals are required before indexing is enabled (1.1929ms)
+✔ metadata omits canonical and social URLs when the content route is not publishable (3.6931ms)
+✔ metadata emits canonical only when environment and content route gates pass (0.9461ms)
+✔ preview requires the explicit flag and a development loopback request (3.3823ms)
+✔ preview fixtures are defensive, visibly synthetic and make no network reference (3.1246ms)
+✔ route is noindex, guarded before fixtures and reuses the production ProfileCard without contact (1.692ms)
+ℹ tests 144
+ℹ suites 0
+ℹ pass 144
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11428.7664
+
+  vinext build  (Vite 8.0.13)
+
+[1/5] analyze client references...
+[2Ktransforming...✓ 254 modules transformed.
+rendering chunks...
+✓ built in 1.44s
+[2/5] analyze server references...
+[2Ktransforming...✓ 120 modules transformed.
+rendering chunks...
+✓ built in 527ms
+[3/5] build rsc environment...
+[2Ktransforming...✓ 253 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 1.63s
+[4/5] build client environment...
+[2Ktransforming...✓ 161 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 1.67s
+[5/5] build ssr environment...
+[2Ktransforming...✓ 126 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 1.24s
+[0m
+  Route (app)
+  ┌ ? /                       
+  ├ ? /barcelona              
+  ├ ? /contacto               
+  ├ λ /favicon.ico            
+  ├ ƒ /legal/:document        
+  ├ ? /madrid                 
+  ├ ? /perfiles               
+  ├ ƒ /perfiles/:slug         
+  └ ƒ /preview-local-sintetico
+
+  λ API  ƒ Dynamic  ? Unknown
+
+  ? Some routes could not be classified. vinext currently uses static analysis
+    and cannot detect dynamic API usage (headers(), cookies(), etc.) at build time.
+    Automatic classification will be improved in a future release.
+
+  Build complete. Run `vinext start` to start the production server.
+
+{
+  "ok": true,
+  "baselineScore": 87,
+  "declaredScore": 95,
+  "targetScore": 95,
+  "denominator": 100,
+  "earnedCriteria": 28,
+  "pendingCriteria": 3,
+  "evidenceCount": 38,
+  "dimensions": {
+    "inventory_evidence": {
+      "maximum": 15,
+      "baseline": 14,
+      "declared": 15,
+      "target": 15
+    },
+    "architecture": {
+      "maximum": 10,
+      "baseline": 9,
+      "declared": 9,
+      "target": 9
+    },
+    "implementation_integration": {
+      "maximum": 45,
+      "baseline": 38,
+      "declared": 42,
+      "target": 42
+    },
+    "qa_corrections": {
+      "maximum": 25,
+      "baseline": 22,
+      "declared": 24,
+      "target": 24
+    },
+    "packaging_handoff": {
+      "maximum": 5,
+      "baseline": 4,
+      "declared": 5,
+      "target": 5
+    }
+  }
+}
+{"result":"cyclonedx-sbom-created","output":"output/release/sbom.cdx.json","componentCount":612,"dependencyNodeCount":613,"sha256":"cff0df3643a8c2674bc6650c8d660dff94aa6066dbfe8c65659b09409560cd7a"}
+{"result":"build-artifact-valid","report":"output/release/build-artifact-report.json","reportSha256":"bfd9119e134fbf89b87ac0bf150d7f44867d3795b53226819c60e46be37b53a9","fileCount":90,"javascriptBytes":1258299,"mediaBytes":1134198,"stylesheetBytes":72674,"totalBytes":2490408,"violationCount":0}
+{"schema":"pecadosvip.production-holding-smoke","version":1,"result":"PASS","productionActivation":false,"origin":"http://127.0.0.1:52052","holdingRoutes":[{"path":"/","status":200,"holding":true},{"path":"/madrid","status":200,"holding":true},{"path":"/barcelona","status":200,"holding":true},{"path":"/perfiles","status":200,"holding":true},{"path":"/perfiles/no-existe","status":200,"holding":true},{"path":"/contacto","status":200,"holding":true}],"blockedRoutes":[{"path":"/legal/privacidad","status":404},{"path":"/preview-local-sintetico","status":404}],"robotsDisallowAll":true,"sitemapUrlCount":0,"limits":["Local loopback production build only; no deployed runtime was tested.","This smoke proves the fail-closed holding boundary, not legal approval, UAT or production readiness."]}
+
+--- stderr ---
+$ pnpm run validate && pnpm run score:validate && pnpm run release:sbom && pnpm run release:artifact && pnpm run smoke:production
+$ pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build
+$ eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern output --ignore-pattern .playwright-cli
+$ tsc --noEmit
+$ node --experimental-strip-types --test tests/accessibility-contract.test.ts tests/analytics.test.ts tests/contact-config.test.ts tests/content-contract.test.ts tests/favicon-route.test.ts tests/lifecycle.test.ts tests/local-backup.test.ts tests/local-cms-workbench.test.ts tests/local-file-lock.test.ts tests/local-media-store.test.ts tests/local-scorecard.test.ts tests/persistent-repository.test.ts tests/public-legal.test.ts tests/public-profiles.test.ts tests/publication-candidate.test.ts tests/release-artifacts.test.ts tests/release-gates.test.ts tests/repository.test.ts tests/runtime-publication.test.ts tests/security-headers.test.ts tests/seo-safety.test.ts tests/synthetic-preview.test.ts
+$ vinext build
+$ node --experimental-strip-types scripts/validate-local-scorecard.ts
+$ node --experimental-strip-types scripts/generate-sbom.ts
+$ node --experimental-strip-types scripts/validate-build-artifact.ts
+$ node --experimental-strip-types scripts/production-holding-smoke.ts

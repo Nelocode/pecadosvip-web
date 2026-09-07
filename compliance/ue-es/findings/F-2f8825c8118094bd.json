@@ -1,0 +1,86 @@
+{
+  "finding_id": "F-2f8825c8118094bd",
+  "audit_id": "A-PECADOSVIP-20260827",
+  "asset": "pecadosvip-web-delivery",
+  "environment": "local repository snapshot; no deployed URL",
+  "release": null,
+  "logical_location": "distance contracting and consumer information",
+  "url_or_path": "ARCHITECTURE.md",
+  "line": 7,
+  "role": "prospective customer",
+  "locale": "es",
+  "browser": null,
+  "viewport": null,
+  "observed_at": "2026-08-27T14:15:00Z",
+  "domain": "consumer",
+  "control_id": "CONS-PRECONTRACT-001",
+  "control_version": "1.0.0",
+  "applicability_status": "UNCERTAIN",
+  "applicability_reason": "The target appears consumer-facing, but the moment and medium of contract formation are unknown.",
+  "expected": "The operator documents whether distance-contract rules apply and, if so, provides accurate precontractual information and durable confirmation before the consumer is bound.",
+  "observed": "The current phase excludes online checkout/payment but plans direct channels; no service terms, prices, trader identity, cancellation, withdrawal or complaint model is approved.",
+  "method": "Client-document and architecture review against the consolidated TRLGDCU scope and precontractual provisions.",
+  "preconditions": [
+    "The present UI must not create a payment obligation."
+  ],
+  "limitations": [
+    "No actual Telegram, WhatsApp or phone operating script or contract was provided."
+  ],
+  "tool_status": "SUCCEEDED",
+  "tool_error": null,
+  "result": "INCONCLUSIVE",
+  "evidence": [
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "INPUT_MANIFEST.csv",
+      "manifest_entry": "Puntos_a_confirmar_PecadosVip.docx",
+      "source_path": "Requerimientos_Cliente/Puntos_a_confirmar_PecadosVip.docx",
+      "sha256": "3f7b924f76a32f7f2a8841d40050d8808bc190c9eb1beb006110119832c60cfa",
+      "redacted": false,
+      "access": "RESTRICTED",
+      "captured_at": "2026-08-27T14:10:00Z"
+    },
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "ARCHITECTURE.md",
+      "sha256": "f3aa824f3c3ddd9de9fcf7ccc5aa7ab88e3a84525276c0d20e0072ba9d9a33e7",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T19:35:37Z"
+    }
+  ],
+  "impact": "A future contact channel could bind consumers without required identity, price, conditions, confirmation or remedy information.",
+  "prevalence": "Every enabled reservation/contact channel and its operating process.",
+  "reproducibility": "REPRODUCED_TWICE",
+  "technical_severity": "MEDIUM",
+  "confidence": "HIGH",
+  "priority": "P0 before enabling contact",
+  "legal_relevance": "MATERIAL_REVIEW_REQUIRED",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Spanish consumer regime for B2C and distance contracts within scope.",
+      "instrument_id": "ES-TRLGDCU-1-2007",
+      "instrument": "Real Decreto Legislativo 1/2007 (TRLGDCU)",
+      "identifier": "BOE-A-2007-20555",
+      "provision": "arts. 8, 20-21, 59-62 and 92-113",
+      "version": "BOE consolidated text",
+      "effective_as_of": "2026-08-27",
+      "official_url": "https://www.boe.es/eli/es/rdlg/2007/11/16/1/con",
+      "applicability_reason": "The planned flow may coordinate a service with individuals at a distance.",
+      "verified_at": "2026-08-27",
+      "verification_method": "Official BOE consolidated text and client-flow comparison."
+    }
+  ],
+  "review_status": "REQUIRES_LEGAL_COUNSEL",
+  "false_positive_analysis": "No online checkout, payment or active endpoint exists, so there is no observed binding web button; off-site formation remains unresolved.",
+  "counterevidence": [
+    "The client explicitly excluded online booking and payment from this phase."
+  ],
+  "remediation_minimum": "Map offer, acceptance, payment, cancellation, confirmation and complaints across every channel; have counsel determine applicable information and withdrawal rules; implement only the approved model.",
+  "additional_hardening": "Add a channel-level release checklist and preserve durable evidence of the consumer information version shown.",
+  "suggested_owner": "Client operations and legal counsel",
+  "effort": "External decision plus implementation",
+  "retest": "Run a staging journey through each approved channel without payment and compare every information point to the approved contract map.",
+  "residual_risk": "Unknown until the commercial process is defined; keep all channels fail-closed."
+}

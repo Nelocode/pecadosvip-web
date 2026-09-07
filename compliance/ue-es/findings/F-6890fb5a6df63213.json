@@ -1,0 +1,78 @@
+{
+  "finding_id": "F-6890fb5a6df63213",
+  "audit_id": "A-PECADOSVIP-20260827",
+  "asset": "pecadosvip-web-delivery",
+  "environment": "local repository snapshot; no deployed URL",
+  "release": null,
+  "logical_location": "deployed terminal technology inventory",
+  "url_or_path": "package.json",
+  "line": null,
+  "role": "anonymous visitor",
+  "locale": "es",
+  "browser": null,
+  "viewport": null,
+  "observed_at": "2026-08-27T15:20:00Z",
+  "domain": "cookies and terminal storage",
+  "control_id": "COOKIE-LSSI-CONSENT-001",
+  "control_version": "1.0.0",
+  "applicability_status": "PENDING_VERIFICATION",
+  "applicability_reason": "Static source review found no enabled nonessential SDK, but hosting, CDN, media, forms and analytics can add terminal technologies only observable in the deployed runtime.",
+  "expected": "A deployed per-state inventory identifies every cookie, storage entry, request and third party; nonessential technologies remain blocked until any required consent and withdrawal controls are valid.",
+  "observed": "The repository keeps analytics disabled and browser smoke saw zero external resources on the tested local page. No deployed URL or four-state runtime inventory exists.",
+  "method": "Static dependency/code review and local browser resource smoke; deployed-runtime collection was not possible.",
+  "preconditions": [
+    "No production hosting, CDN, form, media or analytics provider is configured."
+  ],
+  "limitations": [
+    "Local code cannot reveal technologies injected by future infrastructure or providers."
+  ],
+  "tool_status": "NOT_RUN",
+  "tool_error": null,
+  "result": "NOT_TESTED",
+  "not_tested_reason": "There is no deployed runtime on which to inventory cookies, local/session storage, pixels and third-party requests across consent states.",
+  "evidence": [
+    {
+      "kind": "OTHER",
+      "path_or_url": "package.json",
+      "sha256": "837f26b3ee814ef488f8a413ebab6130a9522bd79f08113323277d274b50b8be",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T19:35:37Z"
+    }
+  ],
+  "impact": "Undetected nonessential technologies could store or access terminal information before a valid user choice and make withdrawal ineffective.",
+  "prevalence": "Every deployed route and every hosting, CDN, media, form, messaging and analytics integration.",
+  "reproducibility": "NOT_APPLICABLE",
+  "technical_severity": "MEDIUM",
+  "confidence": "HIGH",
+  "priority": "P0 before deployment or provider activation",
+  "legal_relevance": "MATERIAL_REVIEW_REQUIRED",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Regulates storage of or access to information in a recipient's terminal equipment within scope, subject to statutory conditions and exceptions.",
+      "instrument_id": "ES-LSSI-34-2002",
+      "instrument": "Ley 34/2002, de servicios de la sociedad de la información y de comercio electrónico",
+      "identifier": "BOE-A-2002-13758",
+      "provision": "art. 22.2",
+      "version": "BOE consolidated text; last update observed 2025-01-23",
+      "effective_as_of": "2026-08-27",
+      "official_url": "https://www.boe.es/eli/es/l/2002/07/11/34/con",
+      "applicability_reason": "The final deployed web stack may store or access terminal information; current absence cannot be inferred from source alone.",
+      "verified_at": "2026-08-27",
+      "verification_method": "Official BOE consolidated text."
+    }
+  ],
+  "review_status": "REQUIRES_HUMAN_REVIEW",
+  "false_positive_analysis": "Zero external resources in the local smoke and no enabled analytics are counterevidence to current source-level tracking, but not to future provider injection.",
+  "counterevidence": [
+    "Analytics is disabled by default.",
+    "The tested local home page loaded zero external resources."
+  ],
+  "remediation_minimum": "After infrastructure and providers are selected, capture an inventory in no-choice, reject, accept and withdraw states; classify each technology and keep nonessential access blocked until the approved mechanism allows it.",
+  "additional_hardening": "Automate a network/storage diff in release QA and rerun it after every provider or tag change.",
+  "suggested_owner": "Privacy owner, frontend engineering and infrastructure",
+  "effort": "Low to medium after a staging runtime exists",
+  "retest": "Capture cookies, storage and requests in all approved consent states on the exact deployed release.",
+  "residual_risk": "NO-GO for tracking or provider activation until the deployed inventory and consent behaviour are verified."
+}

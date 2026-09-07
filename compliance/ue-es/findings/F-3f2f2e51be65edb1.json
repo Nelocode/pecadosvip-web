@@ -1,0 +1,76 @@
+{
+  "finding_id": "F-3f2f2e51be65edb1",
+  "audit_id": "A-PECADOSVIP-20260827",
+  "asset": "pecadosvip-web-delivery",
+  "environment": "local repository snapshot; no deployed URL",
+  "release": null,
+  "logical_location": "operator identity and LSSI disclosures",
+  "url_or_path": "LEGAL_INPUTS_REQUIRED.md",
+  "line": 5,
+  "role": "anonymous visitor",
+  "locale": "es",
+  "browser": null,
+  "viewport": null,
+  "observed_at": "2026-08-27T14:15:00Z",
+  "domain": "governance-lssi",
+  "control_id": "GOV-APPLICABILITY-001",
+  "control_version": "1.0.0",
+  "applicability_status": "UNCERTAIN",
+  "applicability_reason": "LSSI provider disclosure is material if the site is a Spanish-targeted information-society service; operator and establishment facts are missing.",
+  "expected": "The release contains approved, permanent, easy, direct and free access to the applicable provider identity and registration information.",
+  "observed": "The repository has no approved operator name, tax identifier, address, registry data, sector authorisation or legal notice.",
+  "method": "Static repository and client-document review; official BOE source check.",
+  "preconditions": [
+    "No operator identity was inferred from project-management roles."
+  ],
+  "limitations": [
+    "No corporate records, domain ownership record or final legal service classification were supplied."
+  ],
+  "tool_status": "SUCCEEDED",
+  "tool_error": null,
+  "result": "INCONCLUSIVE",
+  "evidence": [
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "LEGAL_INPUTS_REQUIRED.md",
+      "sha256": "61874a4a251077882f9e6a5ea6fd2d2ccac22c7c5105e035243ea666ec7aea5b",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T14:15:00Z"
+    }
+  ],
+  "impact": "A public commercial site could omit mandatory provider disclosures or publish invented/wrong identity data.",
+  "prevalence": "Release-wide legal footer and legal notice.",
+  "reproducibility": "REPRODUCED_TWICE",
+  "technical_severity": "HIGH",
+  "confidence": "HIGH",
+  "priority": "P0 release blocker",
+  "legal_relevance": "MATERIAL_REVIEW_REQUIRED",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Spanish provider-information duties within LSSI scope.",
+      "instrument_id": "ES-LSSI-34-2002",
+      "instrument": "Ley 34/2002, LSSI-CE",
+      "identifier": "BOE-A-2002-13758",
+      "provision": "arts. 1-5 and 10",
+      "version": "BOE consolidated text; last update observed 2025-01-23",
+      "effective_as_of": "2026-08-27",
+      "official_url": "https://www.boe.es/eli/es/l/2002/07/11/34/con",
+      "applicability_reason": "The project plans a public Spanish commercial contact site; operator scope still requires confirmation.",
+      "verified_at": "2026-08-27",
+      "verification_method": "Official BOE consolidated text and applicability review."
+    }
+  ],
+  "review_status": "REQUIRES_LEGAL_COUNSEL",
+  "false_positive_analysis": "A legal notice cannot be assessed for substantive accuracy because no operator facts were provided; absence is nevertheless a release blocker in the planned scope.",
+  "counterevidence": [
+    "The site is not deployed and remains disallow-all/noindex."
+  ],
+  "remediation_minimum": "Identify the legal operator and provide verified identity, establishment, contact, registry and sector data; have counsel approve the original legal notice before enabling publication.",
+  "additional_hardening": "Version the identity evidence and add a release test that every approved legal route is present before indexing.",
+  "suggested_owner": "Client and legal counsel",
+  "effort": "External information required",
+  "retest": "Verify the final legal notice against source documents and the public footer on the release build.",
+  "residual_risk": "NO-GO until operator and scope are confirmed; do not fill with placeholders."
+}

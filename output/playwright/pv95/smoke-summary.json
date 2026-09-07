@@ -1,0 +1,84 @@
+{
+  "schema": "pecadosvip.local-browser-smoke",
+  "version": 1,
+  "capturedAtUtc": "2026-08-27T19:44:27Z",
+  "browser": "Chromium through Playwright CLI",
+  "productionHolding": {
+    "origin": "http://127.0.0.1:4320",
+    "status200": [
+      "/",
+      "/madrid",
+      "/barcelona",
+      "/perfiles",
+      "/contacto"
+    ],
+    "status404": [
+      "/legal/privacidad",
+      "/preview-local-sintetico"
+    ],
+    "robotsDisallowAll": true,
+    "sitemapUrlCount": 0,
+    "responseHeadersObservedAtRoot": [
+      "content-security-policy",
+      "cross-origin-opener-policy",
+      "permissions-policy",
+      "referrer-policy",
+      "x-content-type-options",
+      "x-frame-options",
+      "x-robots-tag"
+    ],
+    "xPoweredByObserved": false,
+    "consoleErrors": 0,
+    "consoleWarnings": 0,
+    "requestCount": 7,
+    "nonLocalRequestCount": 0,
+    "failedRequestCount": 0,
+    "domContentLoadedApproxMs": 176,
+    "loadApproxMs": 294,
+    "horizontalOverflowAtWidths": [],
+    "widthsChecked": [320, 1280],
+    "skipLinkTabEnterFocusedMain": true
+  },
+  "syntheticPreview": {
+    "origin": "http://localhost:4330",
+    "profileCards": 4,
+    "emptyStateObserved": true,
+    "safeErrorStateObserved": true,
+    "consoleErrors": 0,
+    "consoleWarnings": 0,
+    "requestCount": 120,
+    "nonLocalRequestCount": 0,
+    "forms": 0,
+    "buttons": 0,
+    "inputs": 0,
+    "widthsChecked": [320, 1920],
+    "horizontalOverflowAtWidths": [],
+    "mobileDocumentHeightPx": 3962,
+    "skipLinkTabEnterFocusedMain": true
+  },
+  "screenshots": [
+    {
+      "path": "production-holding-320.png",
+      "sha256": "B9CED8C898B1C11B56AD38BAA00FC718DDE8319F047391D41FCC18E5C79384B3"
+    },
+    {
+      "path": "production-holding-1920.png",
+      "sha256": "A849F8F15BA9630EF59D81C7BD3FEAFCF99E85F0269C04CEF6E988EE462C71DD"
+    },
+    {
+      "path": "synthetic-preview-1920.png",
+      "sha256": "7E8336C5019AFF124B6CFE91C8011362C396848DE6B7064BB381DB37902889DF"
+    },
+    {
+      "path": "synthetic-preview-320-full.png",
+      "sha256": "7D0449A4E320C77C951AEF7D38E2BB4D8D79E17FCA4E650B4B0516D80D890818"
+    }
+  ],
+  "limits": [
+    "Local loopback observations only; no deployment was tested.",
+    "The timing values are not Core Web Vitals or a production benchmark.",
+    "No HAR was retained.",
+    "No screen reader, full keyboard journey, forced colors, device lab or UAT was completed.",
+    "The synthetic preview is not real content and does not prove visual fidelity to an approved mockup."
+  ]
+}

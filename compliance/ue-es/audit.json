@@ -1,0 +1,1030 @@
+{
+  "audit_id": "A-PECADOSVIP-20260827",
+  "asset": {
+    "name": "pecadosvip-web-delivery",
+    "owner": "Luis Araujo (product acceptance); legal operator unconfirmed",
+    "kind": "REPOSITORY",
+    "url": null,
+    "path": "pecadosvip-web-delivery"
+  },
+  "snapshot": {
+    "version": "local technical candidate 98 in working tree; last durable checkpoint 95 at 15d56f0e5812a06e03dea781487f7553ce010a5c",
+    "commit": null,
+    "base_commit": "21fe4f0c9136ece2ebd8b4e11e8e0c5e8a08f5a5",
+    "checkpoint_sha": null,
+    "tree_sha": null,
+    "freeze_status": "WORKING_CANDIDATE_NOT_COMMIT_BOUND",
+    "build": "The current scorecard declares 98/100, `pnpm run i18n:validate` exits 0 with PASS_WITH_LIMITS for exact es/en/fr/it catalogs and 10 route templates, and the focused i18n contract suite passes 10/10. A full release:verify capture bound to a clean candidate commit has not yet been produced. The last durable full local validation remains checkpoint 95 at commit 15d56f0e5812a06e03dea781487f7553ce010a5c; no deployed runtime is inferred.",
+    "historical": false,
+    "effective_at": null,
+    "effective_at_status": "PENDING_CLEAN_COMMIT_CAPTURE"
+  },
+  "environment": "local working-tree candidate for technical target 98; not commit-bound and not deployed. Last durable full local evidence is checkpoint 95 at commit 15d56f0e5812a06e03dea781487f7553ce010a5c",
+  "audit_date": "2026-08-27",
+  "objective": "Measure and improve technical alignment with candidate EU/Spain web controls while preserving fail-closed publication.",
+  "authorization": {
+    "mode": "AUTHORIZED_ACTIVE",
+    "owner_statement": "The user requested continued use of auditar-web-ue-espana, exact es/en/fr/it availability through auditar-web-multilingue and progress to a 98/100 local technical target. The current scorecard declares 98/100, while strict acceptance remains 2/20 and public/legal/multilingual release remains NO-GO.",
+    "artifact": "Current Codex task, LOCAL_TECHNICAL_SCORECARD.json, compliance/multilingual/audit.json and the last durable evidence/95-local-technical-checkpoint/evidence-manifest.json",
+    "stop_conditions": [
+      "No deployment, indexing, external form submission, payment, profile publication or third-party active testing.",
+      "Stop legal conclusions where operator, service, rights or contracting facts are missing.",
+      "Do not attribute human linguistic, accessibility or legal approval to automated catalog validation."
+    ]
+  },
+  "applicability_register_scope": "Selected material legal instruments that drive findings or release decisions. The deterministic 15-module output is in resolver-output.json, voluntary standards and broader candidate instruments are in applicability-matrix.md, and every catalog control is classified in coverage-ledger.json.",
+  "applicability": [
+    {
+      "instrument_id": "EU-GDPR-2016-679+ES-LOPDGDD-3-2018",
+      "status": "APPLICABLE",
+      "reason": "The planned profile and contact system processes personal data; the exact controller and bases remain unresolved.",
+      "facts": [
+        "The domain model includes profile identity, age, biography, measurements, media, availability and consent evidence.",
+        "The public contact flow is designed to receive location, date, venue and preferred channel.",
+        "The local development increment persists versioned profile state, request replay protection and content-free audit events, and provides integrity-checked backup/restore; it is not a production data-processing architecture."
+      ],
+      "assumptions": [
+        "Applicability is evaluated for the planned release, although no production endpoint or real profile data exists in this snapshot."
+      ],
+      "evidence": [
+        "lib/content/types.ts",
+        "LEGAL_INPUTS_REQUIRED.md"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "EU-GDPR-2016-679",
+          "identifier": "CELEX:02016R0679-20160504",
+          "provision": "arts. 2-9, 12-25, 32 and 35",
+          "version": "consolidated text referenced by legal register 2026-08-26",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:02016R0679-20160504",
+          "applicability_reason": "Personal-data processing is part of the planned profiles and contact flows."
+        },
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LOPDGDD-3-2018",
+          "identifier": "BOE-A-2018-16673",
+          "provision": "arts. 6-11",
+          "version": "BOE consolidated text",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://www.boe.es/eli/es/lo/2018/12/05/3/con",
+          "applicability_reason": "Spanish complement to GDPR for the targeted Spanish service."
+        }
+      ],
+      "open_questions": [
+        "Who is controller, processor and legal operator?",
+        "What are purposes, bases, retention, recipients, transfers and rights procedures?",
+        "Could the exact adult-context profiles, biographies, media, search or contact processing reveal or permit inference of Article 9 special-category data? No such conclusion is made from this snapshot.",
+        "Do the final purposes, scale, systematic features, data categories and risks trigger a GDPR Article 35 DPIA? This cannot be decided until the processing design is frozen."
+      ]
+    },
+    {
+      "instrument_id": "ES-LOPDGDD-3-2018-ART7",
+      "status": "UNCERTAIN",
+      "reason": "The code excludes under-18 profile subjects, but the final visitor age policy and any age-assurance processing are not defined. Article 7 is not treated as a standalone rule requiring an 18-plus website gate.",
+      "facts": [
+        "Profile validation rejects subjects younger than 18.",
+        "The production snapshot exposes only a neutral holding page and no adult-service content."
+      ],
+      "assumptions": [
+        "The final classified service may require an adult-access policy, but the legal and proportional technical mechanism has not been decided."
+      ],
+      "evidence": [
+        "lib/content/validation.ts",
+        "compliance/ue-es/findings/F-0470ade21d915c0c.json"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LOPDGDD-3-2018",
+          "identifier": "BOE-A-2018-16673",
+          "provision": "art. 7",
+          "version": "BOE consolidated text",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://www.boe.es/eli/es/lo/2018/12/05/3/con",
+          "applicability_reason": "Any final age or identity flow that processes a minor's personal data must be assessed under the applicable Spanish rule; this citation does not itself establish a universal adult-site gate."
+        }
+      ],
+      "open_questions": [
+        "What visitor age policy follows from the legally classified final service?",
+        "Can the necessary outcome be achieved without identity collection, and what data, retention and safeguards would any age-assurance method require?"
+      ]
+    },
+    {
+      "instrument_id": "ES-LO-1-1982-IMAGE+EU-GDPR-2016-679",
+      "status": "APPLICABLE",
+      "reason": "The planned release would publish identifiable people and media. Image-rights and personal-data rules are therefore material, while the validity and scope of each future rights package remain unverified.",
+      "facts": [
+        "The domain model anticipates identifiable profile biographies and media.",
+        "The development-only media store requires a rights-evidence reference, hashes content, audits mutations and attaches assets with rightsConfirmed false.",
+        "No real profile, identity or media asset is committed in the audited working tree."
+      ],
+      "assumptions": [
+        "Applicability is evaluated for the planned public release, not as a claim that unauthorised publication is occurring now."
+      ],
+      "evidence": [
+        "lib/content/types.ts",
+        "compliance/ue-es/findings/F-ab00508cfb2f4f30.json"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LO-1-1982-IMAGE",
+          "identifier": "BOE-A-1982-11196",
+          "provision": "arts. 2, 7 and 8",
+          "version": "BOE consolidated text; last update shown 2010-06-23",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://www.boe.es/eli/es/lo/1982/05/05/1/con",
+          "applicability_reason": "The planned pages use identifiable images for public promotional communication."
+        },
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "EU-GDPR-2016-679",
+          "identifier": "CELEX:02016R0679-20160504",
+          "provision": "arts. 5-9, 12-17, 24-25 and 35",
+          "version": "consolidated text referenced by legal register 2026-08-26",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:02016R0679-20160504",
+          "applicability_reason": "Profile identity, media and biographies are planned personal-data processing; special-category and DPIA questions remain open until the processing design is known."
+        }
+      ],
+      "open_questions": [
+        "What identity, consent, licence, purpose, duration, withdrawal and takedown evidence exists for each person and asset?",
+        "Does any exact profile content or inference require Article 9 analysis, and does the final risk/scale require an Article 35 DPIA?"
+      ]
+    },
+    {
+      "instrument_id": "ES-LSSI-34-2002",
+      "status": "UNCERTAIN",
+      "reason": "Provider disclosure and distance-service rules are material, but the legal operator, establishment and contracting model are unknown.",
+      "facts": [
+        "The repository has no approved legal notice or provider identity.",
+        "Static code review found no production analytics SDK or enabled public form endpoint; the new CMS workbench is loopback-only, development/test-only and refuses production mode."
+      ],
+      "assumptions": [
+        "The future site is likely a service of the information society targeting Spain; legal confirmation is required.",
+        "Cookie-consent scope remains pending until the deployed technology inventory exists."
+      ],
+      "evidence": [
+        "LEGAL_INPUTS_REQUIRED.md",
+        "package.json",
+        "app/"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LSSI-34-2002",
+          "identifier": "BOE-A-2002-13758",
+          "provision": "arts. 1-5, 10, 20-22 and 27-28",
+          "version": "BOE consolidated text; last update observed 2025-01-23",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://www.boe.es/eli/es/l/2002/07/11/34/con",
+          "applicability_reason": "The project targets Spain and plans public commercial contact; operator and terminal technology facts are incomplete."
+        }
+      ],
+      "open_questions": [
+        "What are the operator name, tax ID, address, email, registry data and sector-specific authorisations?",
+        "What technologies will hosting, CDN, forms, media and analytics inject?"
+      ]
+    },
+    {
+      "instrument_id": "ES-TRLGDCU-1-2007",
+      "status": "UNCERTAIN",
+      "reason": "The site appears directed to individuals, but B2C status and whether a distance contract is concluded through messaging or phone are not established.",
+      "facts": [
+        "The current phase excludes online checkout and payment.",
+        "The planned flow continues through contact channels."
+      ],
+      "assumptions": [
+        "No web button currently creates a payment obligation."
+      ],
+      "evidence": [
+        "Puntos_a_confirmar_PecadosVip.docx",
+        "ARCHITECTURE.md"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-TRLGDCU-1-2007",
+          "identifier": "BOE-A-2007-20555",
+          "provision": "arts. 8, 20-21, 59-62 and 92-113",
+          "version": "BOE consolidated text",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://www.boe.es/eli/es/rdlg/2007/11/16/1/con",
+          "applicability_reason": "Possible consumer-facing distance coordination requires classifying the contract formation flow."
+        }
+      ],
+      "open_questions": [
+        "When and where is a contract formed, what is offered, who charges, and what cancellation or withdrawal rules apply?"
+      ]
+    },
+    {
+      "instrument_id": "ES-LAW-11-2023-T1+ES-RD-193-2023",
+      "status": "UNCERTAIN",
+      "reason": "Private accessibility duties depend on the covered service, operator size, exceptions and transition dates.",
+      "facts": [
+        "The product adopts WCAG 2.2 AA as a voluntary engineering baseline.",
+        "The current retest adds static accessibility contracts and a synthetic six-viewport plus 320 CSS px reflow browser check.",
+        "No operator size or legal service classification was supplied."
+      ],
+      "assumptions": [
+        "A private website linked to goods or services available to the public is planned."
+      ],
+      "evidence": [
+        "PROJECT_CONTROL.md",
+        "RELEASE_CHECKLIST.md"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LAW-11-2023-T1",
+          "identifier": "BOE-A-2023-11022",
+          "provision": "arts. 2-3, 13-17 and Annex I",
+          "version": "BOE consolidated text",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://www.boe.es/eli/es/l/2023/05/08/11/con",
+          "applicability_reason": "Potential consumer e-commerce service; service and microenterprise facts are unresolved."
+        },
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-RD-193-2023",
+          "identifier": "BOE-A-2023-7417",
+          "provision": "arts. 2-6 and 14-15",
+          "version": "BOE consolidated text with transition schedule",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://www.boe.es/eli/es/rd/2023/03/21/193/con",
+          "applicability_reason": "Private website planned for a service available to the public; exact timetable and category require confirmation."
+        }
+      ],
+      "open_questions": [
+        "Is the service covered by Law 11/2023 and is the operator a microenterprise?",
+        "Is the site new or existing for the RD 193/2023 timetable?"
+      ]
+    },
+    {
+      "instrument_id": "ES-LGP-34-1988",
+      "status": "UNCERTAIN",
+      "reason": "Source documents use escort-related search terminology but do not establish the exact contractual activity; advertising legality cannot be inferred.",
+      "facts": [
+        "Automatic meeting notes mention escort search queries, model profiles, media, physical data and services.",
+        "The brief describes private companionship with travel to homes and hotels."
+      ],
+      "assumptions": [],
+      "evidence": [
+        "PecadosVip_Brief_Diseno_SEO.docx",
+        "La reunión se inició a las 2026_08_25 16_57 GMT-05_00 - Notas de Gemini.docx"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LGP-34-1988",
+          "identifier": "BOE-A-1988-26156",
+          "provision": "arts. 2-3",
+          "version": "BOE consolidated text observed 2026-08-27",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://www.boe.es/buscar/act.php?id=BOE-A-1988-26156",
+          "applicability_reason": "The proposed public pages and SEO copy would directly or indirectly promote contracting."
+        }
+      ],
+      "open_questions": [
+        "What exact services are advertised and can Spanish legal counsel approve the activity, wording, imagery, SEO and contact channels?"
+      ]
+    },
+    {
+      "instrument_id": "EU-DSA-2022-2065",
+      "status": "UNCERTAIN",
+      "reason": "The snapshot has no marketplace, search-engine or user-content functions, but the project has not confirmed whether each future profile is operator-owned content or an independent third party.",
+      "facts": [
+        "No public upload, review, marketplace, seller or moderation workflow exists."
+      ],
+      "assumptions": [
+        "Profiles are operator-controlled content rather than independent third-party advertisements."
+      ],
+      "evidence": [
+        "ARCHITECTURE.md",
+        "lib/content/types.ts"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "EU-DSA-2022-2065",
+          "identifier": "CELEX:32022R2065",
+          "provision": "arts. 2-15",
+          "version": "official journal text referenced by legal register 2026-08-26",
+          "effective_as_of": "2026-08-27",
+          "official_url": "https://eur-lex.europa.eu/eli/reg/2022/2065/oj",
+          "applicability_reason": "The observed code has no intermediary functions, but the legal role and ownership of future profile content remain unconfirmed."
+        }
+      ],
+      "open_questions": [
+        "Will future profiles be independent advertisers or third-party traders?"
+      ]
+    }
+  ],
+  "regional_scope": {
+    "status": "UNCERTAIN",
+    "observed_targeting": [
+      "Madrid",
+      "Barcelona/Catalonia"
+    ],
+    "unknown_facts": [
+      "Legal operator and establishment",
+      "Recipient location and place of service performance",
+      "Exact classified activity and any regional or municipal authorisation nexus"
+    ],
+    "official_source_routes": [
+      {
+        "name": "BOE",
+        "url": "https://www.boe.es/",
+        "status": "National material sources cited individually; not an exhaustive sectoral inventory"
+      },
+      {
+        "name": "BOCM",
+        "url": "https://www.bocm.es/",
+        "status": "Targeted regional inventory not performed because operator and activity facts are unresolved"
+      },
+      {
+        "name": "DOGC",
+        "url": "https://dogc.gencat.cat/es/inici/index.html",
+        "status": "Targeted regional inventory not performed because operator and activity facts are unresolved"
+      }
+    ],
+    "required_next_step": "Spanish counsel must identify the controlling national, autonomous-community and, if material, municipal sources after the operator, establishment, recipient and service facts are frozen. No regional obligation or exclusion is concluded here."
+  },
+  "scope": {
+    "included": [
+      "Repository source, dependencies, fail-closed content publication, routes, SEO, contact configuration, exact es/en/fr/it locale contract and catalogs, local development persistence/media/workbench/backup controls and project documents.",
+      "Client brief, confirmation document and two automatic meeting-note documents as evidence, not instructions.",
+      "Candidate EU/Spain privacy, LSSI, consumer, accessibility, advertising, platform and passive security controls.",
+      "Complementary repository/catalog evidence from compliance/multilingual/audit.json; its technical, linguistic and publication verdicts remain separate."
+    ],
+    "excluded": [
+      "Legal opinion, deployed hosting/runtime, production providers, real profiles, real media, production CMS authentication/database/encryption and active third-party testing.",
+      "Visual conformity to a mockup until the user selects the controlling design.",
+      "Named human linguistic review, legal-copy equivalence, rendered-DOM/overflow/navigation verification for all locales, assistive-technology testing, staging, deployed-origin hreflang/canonical checks and search-engine behavior."
+    ],
+    "flows": [
+      "home to city to profiles to profile detail to contact",
+      "release gating for robots, sitemap, metadata and structured data",
+      "contact destination validation",
+      "equivalent locale-prefixed route templates and locale-preserving navigation for es, en, fr and it"
+    ],
+    "profiles": [
+      "desktop and mobile source review",
+      "anonymous user",
+      "keyboard-only smoke on the synthetic loopback preview",
+      "local CMS admin/editor integration with synthetic data only",
+      "repository/catalog comparison across es, en, fr and it; not a rendered-browser locale profile"
+    ],
+    "locales": [
+      "es",
+      "en",
+      "fr",
+      "it"
+    ]
+  },
+  "coverage": {
+    "universe": 46,
+    "sample": 20,
+    "tested_controls": 15,
+    "not_tested_controls": 5,
+    "not_applicable_controls": 16,
+    "not_selected_controls": 10,
+    "ledger": "compliance/ue-es/coverage-ledger.json",
+    "classification_rule": "The sample is EXECUTED plus NOT_TESTED (15 + 5 = 20). The remaining catalog controls are 16 reversible NOT_APPLICABLE_CURRENT_SNAPSHOT and 10 NOT_SELECTED; all 46 catalog IDs appear exactly once in the ledger.",
+    "uncertainty": "High for legal operator, activity, contract formation, enterprise size, regional scope, deployed technologies, human linguistic/legal approval and untested rendered-DOM/assistive-technology coverage across es, en, fr and it."
+  },
+  "multilingual_assessment": {
+    "source": "compliance/multilingual/audit.json",
+    "required_locales": [
+      "es",
+      "en",
+      "fr",
+      "it"
+    ],
+    "applicability": {
+      "status": "APPLICABLE",
+      "reason": "Exact es/en/fr/it availability is an explicit product requirement. This product requirement does not itself prove applicability of a regional language law."
+    },
+    "execution_scope": "REPOSITORY_AND_CATALOGS_ONLY",
+    "results": {
+      "technical_multilingual": "NO DETERMINABLE",
+      "linguistic_publication": "PENDIENTE DE REVISIÓN HUMANA",
+      "publication": "NO DETERMINABLE POR FALTA DE EVIDENCIA",
+      "rendered_dom": "NOT_TESTED",
+      "browser_navigation_and_overflow": "NOT_TESTED",
+      "assistive_technology": "NOT_TESTED",
+      "staging": "NOT_TESTED",
+      "deployed_origin": "NOT_TESTED"
+    },
+    "review": {
+      "linguistic": "REQUIRES_HUMAN_REVIEW",
+      "legal_copy": "REQUIRES_LEGAL_COUNSEL",
+      "reviewed_by_named_person": false
+    },
+    "catalog_findings": {
+      "critical": 0,
+      "major": 0,
+      "total": 0
+    },
+    "coverage_denominator_effect": "NONE; the complementary multilingual package does not add to or reclassify the 46-control EU/Spain catalog."
+  },
+  "retest_delta": [
+    {
+      "area": "accessibility",
+      "before": "Draft keyboard and responsive smoke only.",
+      "after": "Seven static contracts, six regenerated viewports, 320 CSS px reflow, skip-link focus, clean console and localhost-only resources on synthetic preview.",
+      "result": "PARTIAL",
+      "residual_risk": "No criterion-complete audit or representative screen-reader flow."
+    },
+    {
+      "area": "privacy-and-local-controls",
+      "before": "Fail-closed publication gates and public projection.",
+      "after": "Versioned persistence, optimistic revisions, request replay protection, content-free audit events, loopback role/origin controls, bounded WebP image processing, structural bounded-mp4-container-v1 validation, media integrity, manifest-based backup/restore and cooperative local filesystem locks across repository/media/backup mutation paths.",
+      "result": "PARTIAL",
+      "residual_risk": "Development/test files are plaintext; the cooperative lock is local-filesystem only, not distributed, and does not auto-remove stale locks. MP4 codec/playback and production controller, bases, retention, rights operations, auth/encryption and providers remain unresolved."
+    },
+    {
+      "area": "quality",
+      "before": "65 passing tests at the prior checkpoint.",
+      "after": "Final pnpm run release:verify exit 0 with lint, typecheck, 144/144 tests, production build, structured lockfile inventory, artifact validation and exact holding-state smoke passing.",
+      "result": "PARTIAL",
+      "residual_risk": "No deployed runtime, complete dependency reachability, field performance or production operations evidence."
+    },
+    {
+      "area": "dependency-and-security-hardening",
+      "before": "The initial pre-remediation production graph reported 14 advisories (7 HIGH and 7 MODERATE), and the integrated Codex Security scan failed on a nested sourcemap.",
+      "after": "Next 16.2.11 reduced the audit to 5 transitives; workspace overrides pin sharp 0.35.0 and postcss 8.5.26; the final production audit exited 0 with no known vulnerabilities. A structured CycloneDX lockfile inventory and validated local build-artifact report were captured. Passive manual review found 0 CRITICAL/HIGH/MEDIUM and tracked 6 conditional LOW observations; current static evidence mitigates 2 in the local scope and partially mitigates 4.",
+      "result": "PARTIAL",
+      "residual_risk": "The package audit is time-bound advisory evidence, and the CycloneDX-shaped inventory was not validated against the official schema and is not VEX, provenance, reachability or pentest coverage. The integrated scanner still failed and dynamic/deployed testing was not performed."
+    },
+    {
+      "area": "multilingual-localization",
+      "before": "Spanish-only document language, routes and catalog surface.",
+      "after": "Exact base-language contract for es, en, fr and it, locale-prefixed route templates, locale-preserving selector, deterministic catalog parity validation and international SEO logic behind the aggregate publication gate. The complementary catalog report contains no critical/major catalog finding but returns technical multilingual NO DETERMINABLE, linguistic publication PENDIENTE DE REVISIÓN HUMANA and publication NO DETERMINABLE POR FALTA DE EVIDENCIA.",
+      "result": "PARTIAL",
+      "residual_risk": "Catalog and source-code evidence does not prove semantic accuracy, cultural adequacy, legal equivalence, rendered DOM, overflow, navigation, assistive technology, staging, deployed destinations, crawlability, indexation or human approval."
+    },
+    {
+      "area": "legal-and-publication",
+      "before": "NO-GO.",
+      "after": "No new operator, service, contract, rights package, privacy governance or regional legal facts.",
+      "result": "INCONCLUSIVE",
+      "residual_risk": "NO-GO remains for publication, indexing, profiles, contact, claims, real data and every language variant."
+    }
+  ],
+  "passive_security_review": {
+    "status": "PARTIAL",
+    "performed_at": "2026-08-27",
+    "method": "Passive manual source review only; no exploit, fuzzing, active scanner, race reproduction or deployed-runtime testing.",
+    "severity_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "conditional_low": 6
+    },
+    "retest_status_counts": {
+      "mitigated_in_local_scope": 2,
+      "partially_mitigated": 4,
+      "unmitigated": 0
+    },
+    "retest_summary": "The six LOW IDs remain as stable tracking records: MSR-L01 and MSR-L05 are mitigated within the bounded development/test scope, while MSR-L02, L03, L04 and L06 are partially mitigated. This is static evidence only, not a pentest, reachability result or production acceptance.",
+    "confirmed_controls": [
+      "Local administration binds to loopback, requires bearer authentication, exact allowed origin and POST for mutations.",
+      "Idempotency/replay controls and request/payload limits are present in the local workbench boundary.",
+      "Public rendering uses React/text escaping and controlled JSON-LD rather than arbitrary HTML injection.",
+      "Backup/restore validates paths and manifest integrity and publication remains fail-closed."
+    ],
+    "conditional_low_observations": [
+      {
+        "id": "MSR-L01",
+        "title": "Cross-process concurrency can lose local state or audit updates",
+        "retest_status": "MITIGATED_IN_LOCAL_SCOPE",
+        "locations": [
+          "lib/content/persistent-repository.ts",
+          "lib/media/local-media-store.ts",
+          "lib/operations/local-backup.ts",
+          "lib/operations/local-file-lock.ts"
+        ],
+        "current_evidence": "Repository, media and backup mutation paths now use a cooperative exclusive lock file in addition to in-process coordination, with bounded retries and fail-closed acquisition.",
+        "condition": "The original one-process gap is mitigated for cooperating local processes. Residual risk remains because this is a local-filesystem protocol, not a distributed lock, and stale locks are not auto-removed.",
+        "remediation": "Keep all local writers on the same cooperative protocol; use a transactional datastore or distributed lease with explicit recovery before multi-host or production use."
+      },
+      {
+        "id": "MSR-L02",
+        "title": "Path validation has residual symlink/reparse-point and TOCTOU exposure",
+        "retest_status": "PARTIALLY_MITIGATED",
+        "locations": [
+          "lib/operations/local-backup.ts:161-215,280-303",
+          "lib/publication/local-publication-candidate.ts:239-251,277-352",
+          "lib/content/persistent-repository.ts:83-136,170-227",
+          "lib/media/local-media-store.ts:314-315,418-483"
+        ],
+        "current_evidence": "Existing-path symlinks are rejected, stable reads compare pre/post state, and publication-candidate reads compare the opened handle identity and file state.",
+        "condition": "Residual risk remains under a hostile local filesystem because backup, persistence and media operations are not uniformly handle-relative/no-follow and reparse/TOCTOU behaviour was not dynamically reproduced.",
+        "remediation": "Reject reparse points and use handle-relative or no-follow operations with post-open identity checks."
+      },
+      {
+        "id": "MSR-L03",
+        "title": "Local editor responses can expose internal evidence references",
+        "retest_status": "PARTIALLY_MITIGATED",
+        "locations": [
+          "lib/workbench/local-cms-workbench.ts:554-578,829-857,875-1212"
+        ],
+        "current_evidence": "Workbench editor DTOs remove verification and rights references plus media hash, storage key and audit events; administrators retain the full internal record by design.",
+        "condition": "Residual risk remains if another adapter exposes the repository's full internal records without applying the same role projection.",
+        "remediation": "Keep role-specific projection at every adapter boundary and test that future editor/read responses suppress internal evidence fields."
+      },
+      {
+        "id": "MSR-L04",
+        "title": "Release media URL validation is weaker than publication-candidate validation",
+        "retest_status": "PARTIALLY_MITIGATED",
+        "locations": [
+          "lib/content/validation.ts:42-72",
+          "lib/publication/local-publication-candidate.ts:29,434-458"
+        ],
+        "current_evidence": "The general release validator and publication candidate share isSafePublicMediaUrl; the candidate additionally rejects known local-only path prefixes.",
+        "condition": "Residual risk remains if a release path bypasses the candidate boundary because the general validator still accepts root-relative paths that only the candidate classifies as local-only.",
+        "remediation": "Make the candidate exporter mandatory or move the local-only prefix rejection into the shared final-release policy."
+      },
+      {
+        "id": "MSR-L05",
+        "title": "Some metadata reads and aggregate backup sizes lack explicit caps",
+        "retest_status": "MITIGATED_IN_LOCAL_SCOPE",
+        "locations": [
+          "lib/media/local-media-store.ts:85-88,418-435,489-505",
+          "lib/operations/local-backup.ts:26-29,391-468,613-685"
+        ],
+        "current_evidence": "Metadata is capped at 256 KiB; backups cap individual files at 128 MiB, aggregate bytes at 768 MiB and entries at 10,000, with local tests covering oversized metadata and aggregate restore budgets.",
+        "condition": "The original unbounded local conditions are mitigated; the static budgets and whole-file reads are development/test controls, not a production capacity or streaming design.",
+        "remediation": "Preserve and tune these limits for the frozen local snapshot; design streaming and operational quotas separately if a production media/backup service is introduced."
+      },
+      {
+        "id": "MSR-L06",
+        "title": "Local bearer tokens accept printable 32-character values and requests are not throttled",
+        "retest_status": "PARTIALLY_MITIGATED",
+        "locations": [
+          "lib/workbench/local-cms-workbench.ts:33-37,97-102,124-161,197-231,744-763"
+        ],
+        "current_evidence": "Tokens now require a 43-128 character base64url-like form with character diversity, are stored as SHA-256 digests and compared with timingSafeEqual; loopback-only binding remains enforced.",
+        "condition": "Residual risk remains because token generation and rotation are not enforced and authentication attempts are not throttled; exposure rises if the local service is proxied or shared.",
+        "remediation": "Generate and rotate high-entropy tokens and add attempt throttling before any use beyond a trusted loopback workstation."
+      }
+    ],
+    "not_tested": [
+      "Dynamic exploit, fuzzing and race-condition reproduction",
+      "Deployed TLS, headers, CDN, WAF and origin behaviour",
+      "Real identities, ACLs, personal data and provider boundaries",
+      "Deep image/polyglot/malware handling",
+      "Git-history secret exposure",
+      "Official CycloneDX schema validation, dependency reachability, provenance and VEX"
+    ]
+  },
+  "tools": [
+    {
+      "name": "auditar-web-ue-espana catalog validator",
+      "version": "catalog 2026.08.26",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "GOV-APPLICABILITY-001",
+        "GOV-SOURCE-FRESHNESS-001"
+      ],
+      "configuration": "46 controls and 56 instruments; schema check successful"
+    },
+    {
+      "name": "source freshness checker",
+      "version": "local registry check rerun 2026-08-27 with max-age 45 days",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "GOV-SOURCE-FRESHNESS-001"
+      ],
+      "configuration": "52 FRESH entries and 4 PENDING_VERIFICATION entries. The --fail-on-stale run exited 0; the strict --fail-on-stale --fail-on-pending gate exited 1 exactly because four records remain pending. The checker is offline and detects registry age/status only; it does not reopen official sources, interpret reforms, prove applicability or constitute legal review."
+    },
+    {
+      "name": "DOCX OOXML extraction",
+      "version": "python-docx from bundled workspace runtime",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "GOV-APPLICABILITY-001",
+        "PRIV-RGPD-BASES-001",
+        "CONS-PRECONTRACT-001"
+      ],
+      "configuration": "Paragraphs and tables extracted; visual layout not tested"
+    },
+    {
+      "name": "integrated repository validation",
+      "version": "last durable full capture: checkpoint 95 at commit 15d56f0e5812a06e03dea781487f7553ce010a5c on 2026-08-27",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "SEC-RGPD-DESIGN-001",
+        "SEO-GOOD-PRACTICE-001",
+        "A11Y-WCAG22-BASELINE-001",
+        "QUALITY-ISO25010-001"
+      ],
+      "configuration": "At checkpoint 95, pnpm run release:verify exited 0: lint PASS, typecheck PASS, 144/144 tests PASS, vinext production build PASS, local scorecard validation, lockfile inventory generation, build-artifact validation and exact holding-state smoke PASS. Raw local log retained at evidence/95-local-technical-checkpoint/release-verify.log (SHA-256 38AE74BCC711FCC641B05984B6CAB432C6D0C32CEEBDE5EB638FEEF3ED544E69) and bound to commit 15d56f0e5812a06e03dea781487f7553ce010a5c by evidence/95-local-technical-checkpoint/evidence-manifest.json (SHA-256 D7F26A8E27EA4789F39CEC2855FE376DF3DAA0B86E138F2E4156A10D35D9BD95). This is historical evidence for the current working candidate and does not validate its new files."
+    },
+    {
+      "name": "current local locale validator",
+      "version": "scripts/validate-locales.ts; working-tree execution 2026-08-27",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "QUALITY-ISO25010-001",
+        "SEO-GOOD-PRACTICE-001"
+      ],
+      "configuration": "pnpm run i18n:validate exited 0 with PASS_WITH_LIMITS: exact locales es/en/fr/it, 0 catalog issues and 10 route templates. The focused tests/i18n-contract.test.ts suite passed 10/10, including fail-closed untranslated dynamic content and locale-preserving holding navigation. These checks explicitly retain linguistic review PENDIENTE DE REVISIÓN HUMANA and publication NO DETERMINABLE POR FALTA DE EVIDENCIA; they do not validate rendered DOM, staging or deployment."
+    },
+    {
+      "name": "auditar-web-multilingue catalog comparison",
+      "version": "compare_locales.py 1.0.0; repository-catalog-regression report generated 2026-08-28 local time",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "QUALITY-ISO25010-001",
+        "SEO-GOOD-PRACTICE-001"
+      ],
+      "configuration": "compliance/multilingual/audit.json reports 0 findings and exact catalog/placeholder/markup comparison, but its verdicts are technical multilingual NO DETERMINABLE, linguistic publication PENDIENTE DE REVISIÓN HUMANA and publication NO DETERMINABLE POR FALTA DE EVIDENCIA. Execution scope is the translation package only; no DOM, browser, overflow, assistive technology, staging, deployed origin or legal-copy equivalence was tested."
+    },
+    {
+      "name": "Playwright CLI local browser smoke",
+      "version": "Playwright CLI with local Chromium, 2026-08-27",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "A11Y-WCAG22-BASELINE-001",
+        "SEO-GOOD-PRACTICE-001"
+      ],
+      "configuration": "Current synthetic loopback preview: keyboard skip link, no horizontal overflow at 360, 390, 768, 1024, 1440 and 1920 CSS px, plus 320 CSS px reflow; zero console errors/warnings, no forms, no external links or resource origins; no screen-reader or complete contrast audit"
+    },
+    {
+      "name": "local CMS, persistence, media and backup integration tests",
+      "version": "Node test runner; working increment 2026-08-27",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "SEC-RGPD-DESIGN-001",
+        "PRIV-RGPD-BASES-001",
+        "QUALITY-ISO25010-001"
+      ],
+      "configuration": "Synthetic local tests cover versioned atomic persistence, optimistic revisions, replay protection, audit events, loopback role/origin controls, bounded WebP image processing, structural bounded-mp4-container-v1 checks, media signature/hash/quota/tamper controls, recoverable archive, integrity-checked backup/restore and cooperative local-filesystem locking for repository/media/backup mutation paths. The adapters refuse production; the lock is not distributed and does not auto-remove stale locks, and the tests do not prove MP4 codec/playback, production authentication or encryption."
+    },
+    {
+      "name": "production holding-state HTTP smoke",
+      "version": "fresh vinext production build 2026-08-27",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "SECTOR-ADVERTISING-001",
+        "SEO-GOOD-PRACTICE-001",
+        "CONS-PRECONTRACT-001"
+      ],
+      "configuration": "Six public paths tested with development preview and contact flags set adversarially: only neutral holding content, no service claims or destination, noindex, robots disallow-all, empty sitemap and unpublished legal route 404"
+    },
+    {
+      "name": "coverage ledger reconciliation",
+      "version": "catalog 2026.08.26; ledger v1",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "GOV-APPLICABILITY-001"
+      ],
+      "configuration": "46 unique catalog IDs with exact set equality: 15 EXECUTED, 5 NOT_TESTED, 16 NOT_APPLICABLE_CURRENT_SNAPSHOT and 10 NOT_SELECTED; sample equals 15 + 5"
+    },
+    {
+      "name": "pnpm production dependency audit",
+      "version": "pnpm 11.19.0; current runtime Next 16.2.11 after the remediation sequence on 2026-08-27",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "SEC-SCA-REACHABILITY-001"
+      ],
+      "configuration": "Initial `pnpm audit --prod --audit-level=moderate`: 14 advisories (7 HIGH, 7 MODERATE). Next 16.2.11 reduced the graph to 5 transitives. pnpm workspace overrides pinned sharp 0.35.0 and postcss 8.5.26. At candidate commit 15d56f0e5812a06e03dea781487f7553ce010a5c, the final command exited 0 with `No known vulnerabilities found`. Raw local log retained at evidence/95-local-technical-checkpoint/pnpm-audit-production.log (SHA-256 F3A611CDD8459321215B29A353108B8A9857FB2F99809601E2D51B2982EEA402) and bound by the final evidence manifest; this is advisory SCA, not reachability, VEX, provenance or pentest evidence."
+    },
+    {
+      "name": "structured CycloneDX lockfile inventory",
+      "version": "local generator at candidate commit 15d56f0e5812a06e03dea781487f7553ce010a5c",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "SEC-SCA-REACHABILITY-001",
+        "QUALITY-ISO25010-001"
+      ],
+      "configuration": "Reproducible CycloneDX 1.6-shaped inventory generated from pnpm-lock.yaml and retained at evidence/95-local-technical-checkpoint/sbom.cdx.json (SHA-256 CFF0DF3643A8C2674BC6650C8D660DFF94AA6066DBFE8C65659B09409560CD7A). It is a structured lockfile inventory only: official CycloneDX schema validation, VEX, provenance, signing and dependency reachability remain NOT_TESTED."
+    },
+    {
+      "name": "local build-artifact validator",
+      "version": "local validator at candidate commit 15d56f0e5812a06e03dea781487f7553ce010a5c",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "SEC-RGPD-DESIGN-001",
+        "QUALITY-ISO25010-001"
+      ],
+      "configuration": "Local dist validation passed for required files, per-file SHA-256, symlink/secret/source-map/non-runtime/case-collision rejection and configured file/byte budgets. Durable report: evidence/95-local-technical-checkpoint/build-artifact-report.json (SHA-256 BFD9119E134FBF89B87AC0BF150D7F44867D3795B53226819C60E46BE37B53A9). This is not signing, attestation, deployment or runtime security evidence."
+    },
+    {
+      "name": "passive manual security review",
+      "version": "static source review 2026-08-27",
+      "status": "SUCCEEDED",
+      "affected_controls": [
+        "SEC-RGPD-DESIGN-001",
+        "QUALITY-ISO25010-001"
+      ],
+      "configuration": "Scoped review of traversal/symlinks, payloads, internal-data projection, origin/CSRF, limits, secrets, XSS/HTML and fail-closed publication. Review-only counts: 0 CRITICAL, 0 HIGH, 0 MEDIUM; six stable LOW IDs retested as 2 mitigated in the bounded local scope and 4 partially mitigated. No exploit, fuzzing, active scan or deployed test."
+    },
+    {
+      "name": "deployed cookie and storage inventory",
+      "version": "no deployed runtime",
+      "status": "NOT_RUN",
+      "affected_controls": [
+        "COOKIE-LSSI-CONSENT-001",
+        "COOKIE-AEPD-UX-001"
+      ],
+      "configuration": "Pending hosting, CDN, media, form and analytics provider selection; source review cannot establish deployed terminal technologies"
+    },
+    {
+      "name": "integrated Codex Security dependency reachability scan",
+      "version": "single attempted run before final compliance refresh",
+      "status": "FAILED",
+      "affected_controls": [
+        "SEC-SCA-REACHABILITY-001"
+      ],
+      "reason": "The integrated scanner failed before producing a durable result; this specific reachability technique remains NOT_TESTED even though the aggregate control now has a PARTIAL result from the completed package audit and manual review.",
+      "configuration": "Scanner failed while reading a nested dependency sourcemap; no durable scan ID or reachability result. It was not rerun and is not represented as executed."
+    }
+  ],
+  "finding_ids": [
+    "F-d0ddd59b09a70c2e",
+    "F-3f2f2e51be65edb1",
+    "F-1b1707ba34e2e4e1",
+    "F-2f8825c8118094bd",
+    "F-7e8fcbac30938098",
+    "F-0470ade21d915c0c",
+    "F-ab00508cfb2f4f30",
+    "F-6890fb5a6df63213",
+    "F-30b719d32a855cfb"
+  ],
+  "evidence_manifest": [
+    {
+      "evidence_id": "E-BRIEF-DOCX",
+      "path": "Requerimientos_Cliente/PecadosVip_Brief_Diseno_SEO.docx",
+      "sha256": "52c40b3215e30975a16fc7bfdddc8a82a15e97712937786341c361a32ba90f75",
+      "access": "RESTRICTED",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-CONFIRM-DOCX",
+      "path": "Requerimientos_Cliente/Puntos_a_confirmar_PecadosVip.docx",
+      "sha256": "3f7b924f76a32f7f2a8841d40050d8808bc190c9eb1beb006110119832c60cfa",
+      "access": "RESTRICTED",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-MEETING-1657-DOCX",
+      "path": "Reuniones/La reunion 2026-08-25 16-57 - Notas de Gemini.docx",
+      "sha256": "06bebd08980adf15d99db662e06100a3b166a05328ea8e93025ffdf722758aa6",
+      "access": "RESTRICTED",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-QA-PRODUCTION-HOLDING",
+      "path": "output/playwright/production-holding-smoke.json",
+      "sha256": "3be2f432204b3a59432d38dcdfbe05609e30655d93e2c228eabd9b06730a5ff0",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-QA-DRAFT-UI-PRE-BOUNDARY",
+      "path": "output/playwright/qa-results.json",
+      "sha256": "0b80738672124dc50ce2d524a74b5635f3a48a5585b5ee4e6573362b8db188d2",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-QA-CONTACT-RETEST",
+      "path": "output/playwright/contact-gate-retest.json",
+      "sha256": "f4cfb53e266a9beee5e954a12da839430017105ca868d3c4191293787c5ed641",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-A11Y-STATIC-CONTRACT",
+      "path": "tests/accessibility-contract.test.ts",
+      "sha256": "23d17972447e7fe2e7507d086ce6e9233b9c81a783d0dce438a2f93ff7d2d92e",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-A11Y-REFLOW-320",
+      "path": "output/playwright/final-preview/reflow-320-equivalent-400.png",
+      "sha256": "17e3a10ba3b0ade95a90cd5a3f7842dc2d002514986f115384f469f0b9fbf4cf",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-LOCAL-CMS-WORKBENCH",
+      "path": "tests/local-cms-workbench.test.ts",
+      "sha256": "14be397d2c5e7f40f51cb8be246739083f87ea794160c4f5adc193c4d53a3583",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-LOCAL-MEDIA-STORE",
+      "path": "tests/local-media-store.test.ts",
+      "sha256": "db8cedc6838cce57db213b7ee13349e5609af15a227c40ae07214d1a2013813f",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-LOCAL-BACKUP",
+      "path": "tests/local-backup.test.ts",
+      "sha256": "cb1b4706ffb498c209ff985ecf1df469de42f5218a455a84bdeaa3d77d6e402f",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-SCA-LOCKFILE",
+      "path": "pnpm-lock.yaml",
+      "sha256": "2d61a1a4292c25cb9ffe466283ac4038c452955a36d67c29f2a749dec7595430",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-SCA-PACKAGE",
+      "path": "package.json",
+      "sha256": "59bfaf43ecc5f955d6f0d3fe47d2df737fda244dcc30e3c068f7730d216cb042",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-SCA-WORKSPACE-POLICY",
+      "path": "pnpm-workspace.yaml",
+      "sha256": "ed4575e56cbb176182c00c25218690aa1c39d6e53cc4e0b7ee2b2314bb36ad90",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-LOCAL-CHECKPOINT-MANIFEST",
+      "path": "evidence/87-local-checkpoint/evidence-manifest.json",
+      "sha256": "673fa0fb0cbdb5516c29f446b6a0e9dd0f8af3079bc2a2e3736583210edc1e93",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-VALIDATE-LOG",
+      "path": "evidence/87-local-checkpoint/validate.log",
+      "sha256": "b7fb69d762a222801671c6b99314fffb70505fde34543f5dc97522040e486ebe",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-SCA-AUDIT-LOG",
+      "path": "evidence/87-local-checkpoint/pnpm-audit-production.log",
+      "sha256": "75d58b4a9a72221e27f789e8500338a1c3d89f3006e654d7a3cd9f97fbc5acf4",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-LOCAL-95-CHECKPOINT-MANIFEST",
+      "path": "evidence/95-local-technical-checkpoint/evidence-manifest.json",
+      "sha256": "d7f26a8e27ea4789f39cec2855fe376df3daa0b86e138f2e4156a10d35d9bd95",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-LOCAL-95-RELEASE-VERIFY",
+      "path": "evidence/95-local-technical-checkpoint/release-verify.log",
+      "sha256": "38ae74bcc711fcc641b05984b6cab432c6d0c32ceebde5eb638feef3ed544e69",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-LOCAL-95-SCA-AUDIT",
+      "path": "evidence/95-local-technical-checkpoint/pnpm-audit-production.log",
+      "sha256": "f3a611cdd8459321215b29a353108b8a9857fb2f99809601e2d51b2982eea402",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-LOCAL-CURRENT-SCORECARD",
+      "path": "LOCAL_TECHNICAL_SCORECARD.json",
+      "sha256": "7bbfcd48e5d1a18783dfabab98d97e6a987612481ed4859f7eed1dc262c478fd",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-LOCAL-95-SBOM",
+      "path": "evidence/95-local-technical-checkpoint/sbom.cdx.json",
+      "sha256": "cff0df3643a8c2674bc6650c8d660dff94aa6066dbfe8c65659b09409560cd7a",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-LOCAL-95-BUILD-REPORT",
+      "path": "evidence/95-local-technical-checkpoint/build-artifact-report.json",
+      "sha256": "bfd9119e134fbf89b87ac0bf150d7f44867d3795b53226819c60e46be37b53a9",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-COVERAGE-LEDGER",
+      "path": "compliance/ue-es/coverage-ledger.json",
+      "sha256": "7c8e1a2a9fc61a368564208932181b88a246f57ab1190167646a123b60a31a01",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-MULTILINGUAL-AUDIT",
+      "path": "compliance/multilingual/audit.json",
+      "sha256": "19b4b3768c42070b2943e1dcc7911110aae0ee5e6d5d0dcde82b54a2286b5273",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-MULTILINGUAL-REPORT",
+      "path": "compliance/multilingual/audit-report.md",
+      "sha256": "1dfae62cc5042d62037c0946dced5cd8b86ae8ccaa28b5d269ca3d8abcd58617",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-MULTILINGUAL-ROUTE-INVENTORY",
+      "path": "compliance/multilingual/route-inventory.json",
+      "sha256": "972fd4b3cd0d0bae3dffd3e2ff2c9b3355177f48158144cd7172ee035b17a68c",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-I18N-VALIDATOR",
+      "path": "scripts/validate-locales.ts",
+      "sha256": "4a5a97c9e4332d1844d63210d542432591ea9a8adccb116138e52c6624e73b23",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-I18N-LOCALE-CONTRACT",
+      "path": "lib/i18n/locales.ts",
+      "sha256": "8f7f78bf701d62897196f05deae1123fcb893fac11db4bf7eea4fcaa948bc05d",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-I18N-CONTRACT-TESTS",
+      "path": "tests/i18n-contract.test.ts",
+      "sha256": "21af0f993266c29ee3c408749ae33cd2b035abe28a5c648914b7d22cb6a00f95",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    }
+  ],
+  "limitations": [
+    "No deployed URL exists, so headers, cookies, storage, third parties, field performance and production network behaviour were not tested.",
+    "Automatic meeting notes can contain transcription errors and do not prove the legal nature of the service.",
+    "No legal operator, establishment, enterprise size, contract formation, terms, rights package or approved legal texts were supplied.",
+    "Madrid and Barcelona/Catalonia are observed target locations, but establishment, recipient, place-of-performance and classified-activity facts are missing; no exhaustive BOCM/DOGC or municipal inventory was performed.",
+    "The exact profile and contact design is not frozen, so this audit does not conclude whether GDPR Article 9 data are processed or inferred, or whether an Article 35 DPIA is required.",
+    "No visual target was selected among three incompatible mockups.",
+    "The local CMS, JSON persistence, media store and backup controls are development/test-only: plaintext files, cooperative local-filesystem locks and loopback tokens are not production authentication, encryption, distributed concurrency, monitoring or rights-operation evidence. Lock acquisition is fail-closed, but stale locks are not auto-removed.",
+    "The final production dependency audit found no known vulnerabilities at execution time and its raw local log plus evidence manifest are retained. A reproducible CycloneDX 1.6-shaped lockfile inventory is also retained, but it was not validated against the official schema and is not VEX, provenance, signing or full reachability evidence; the integrated Codex Security scan failed on a nested sourcemap.",
+    "The passive manual security review found no CRITICAL/HIGH/MEDIUM items in its scope and six conditional LOW hardening observations (2 mitigated in the bounded local scope, 4 partially mitigated), but no exploit, fuzzing, race reproduction, secret-history review or deployed-runtime security test was performed.",
+    "The es/en/fr/it catalog comparison is a repository-only translation-package audit. It does not establish semantic accuracy, cultural adequacy, legal equivalence, rendered-DOM behavior, browser navigation/overflow, assistive-technology behavior, staging, deployed hreflang/canonical destinations, crawlability, indexation or rankings.",
+    "No named human reviewer approved the English, French or Italian assisted translations. The exact complementary verdicts remain technical multilingual NO DETERMINABLE, linguistic publication PENDIENTE DE REVISIÓN HUMANA and publication NO DETERMINABLE POR FALTA DE EVIDENCIA.",
+    "The current 98/100 scorecard is a working-tree local technical candidate and has no clean-commit evidence manifest yet. The last durable full capture remains checkpoint 95 at commit 15d56f0e5812a06e03dea781487f7553ce010a5c; neither checkpoint supplies an independent tree SHA, signed release/tag, deployed artifact identity or final acceptance.",
+    "This is a technical control assessment, not legal advice or certification."
+  ],
+  "score": {
+    "numerator": 98,
+    "denominator": 100,
+    "coverage": 0.98,
+    "status": "ESTIMATED_NON_ACCEPTANCE_PROXY",
+    "uncertainty": "The 98/100 score is a weighted working-tree local technical-execution proxy declared by LOCAL_TECHNICAL_SCORECARD.json, not a statistical interval, legal-control pass rate, human linguistic approval or acceptance percentage. It is not yet bound to a clean candidate commit by a 98 evidence manifest. External, legal, production, rendered-browser, visual-approval and strict requirement-acceptance evidence remains outside the numerator.",
+    "calculation_rule": "Atomic weighted local technical scorecard: inventory and evidence 15/15, architecture 9/10, implementation and integration 45/45, QA and corrections 24/25, package and handoff 5/5, totaling 98/100. The three points added after checkpoint 95 cover only the exact es/en/fr/it route/language contract, deterministic catalog parity with conservative verdicts and fail-closed international SEO metadata logic. Reproducible EU/Spain catalog-control coverage remains 15 EXECUTED plus 5 NOT_TESTED in coverage-ledger.json; the multilingual catalog audit does not add to or reclassify that legal-control denominator. Strict requirement verification remains 2/20, and public/legal/multilingual release remains NO-GO. This score is not requirement acceptance, linguistic approval, legal compliance, certification, deployment or production readiness.",
+    "strict_requirement_verification": {
+      "verified": 2,
+      "total": 20,
+      "coverage": 0.1,
+      "states": "2 VERIFIED, 12 PARTIAL, 5 BLOCKED and 1 AT_RISK"
+    }
+  }
+}

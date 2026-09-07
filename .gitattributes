@@ -1,0 +1,3 @@
+# Security patch digests are part of the frozen lockfile contract.
+# Keep patch bytes stable across Windows and Linux checkouts.
+patches/*.patch text eol=lf

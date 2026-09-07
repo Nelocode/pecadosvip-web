@@ -1,0 +1,527 @@
+{
+  "meta": {
+    "titleTemplate": "{title} | PecadosVip",
+    "siteName": "PecadosVip",
+    "default": {
+      "readyTitle": "PecadosVip | Compagnia privata a Madrid e Barcelona",
+      "holdingTitle": "PecadosVip | Sito in preparazione",
+      "readyDescription": "Servizio di compagnia privata con spostamento presso abitazioni e hotel a Madrid e Barcelona. Assistenza discreta e personalizzata.",
+      "holdingDescription": "Versione non pubblicata. I contenuti e i canali restano chiusi fino al completamento delle approvazioni per la pubblicazione.",
+      "keywords": [
+        "compagnia privata Madrid",
+        "compagnia privata Barcelona",
+        "servizio in hotel",
+        "assistenza a domicilio",
+        "PecadosVip"
+      ],
+      "socialImageAlt": "PecadosVip Madrid e Barcelona"
+    },
+    "home": {
+      "title": "PecadosVip | Madrid e Barcelona",
+      "description": "Progetto di compagnia privata con spostamento presso hotel e abitazioni a Madrid e Barcelona."
+    },
+    "profiles": {
+      "title": "Profili",
+      "description": "Catalogo dei profili PecadosVip pubblicati e approvati."
+    },
+    "services": {
+      "title": "Servizi",
+      "description": "Catalogo dei servizi PecadosVip pubblicati e approvati."
+    },
+    "service": {
+      "unavailableTitle": "Servizio non disponibile",
+      "unavailableDescription": "Il servizio richiesto non è pubblicato."
+    },
+    "profile": {
+      "unavailableTitle": "Profilo non disponibile",
+      "unavailableDescription": "Il profilo richiesto non è pubblicato."
+    },
+    "contact": {
+      "title": "Contatto privato",
+      "description": "Stato dei canali di contatto privati di PecadosVip."
+    },
+    "legal": {
+      "unpublishedTitle": "Informazioni legali non pubblicate",
+      "publishedDescription": "Informazioni legali approvate e aggiornate: {title}.",
+      "unpublishedDescription": "Le informazioni legali non sono ancora pubblicate."
+    },
+    "cities": {
+      "madrid": {
+        "title": "Compagnia privata a Madrid",
+        "description": "Servizio di compagnia privata a Madrid, con spostamento presso abitazioni e hotel. Assistenza discreta e copertura soggetta a conferma preventiva.",
+        "openGraphDescription": "Assistenza privata presso abitazioni e hotel a Madrid, sempre con discrezione e conferma preventiva.",
+        "twitterDescription": "Assistenza privata e discreta a Madrid.",
+        "imageAlt": "PecadosVip Madrid"
+      },
+      "barcelona": {
+        "title": "Compagnia privata a Barcelona",
+        "description": "Servizio di compagnia privata a Barcelona, con spostamento presso abitazioni e hotel. Assistenza curata e disponibilità soggetta a conferma.",
+        "openGraphDescription": "Assistenza privata presso abitazioni e hotel a Barcelona, con presenza discreta in città e in comuni selezionati.",
+        "twitterDescription": "Assistenza privata e discreta a Barcelona.",
+        "imageAlt": "PecadosVip Barcelona"
+      }
+    }
+  },
+  "layout": {
+    "skipLink": "Vai al contenuto principale"
+  },
+  "navigation": {
+    "brandHomeAria": "PecadosVip, pagina iniziale",
+    "primaryAria": "Navigazione principale",
+    "mobileAria": "Navigazione mobile",
+    "home": "Inizio",
+    "madrid": "Madrid",
+    "barcelona": "Barcelona",
+    "profiles": "Profili",
+    "services": "Servizi",
+    "privateContact": "Contatto privato",
+    "contact": "Contatto"
+  },
+  "languageSelector": {
+    "label": "Lingua",
+    "ariaLabel": "Seleziona la lingua",
+    "currentLanguage": "Lingua attuale: {language}",
+    "options": {
+      "es": "Español",
+      "en": "English",
+      "fr": "Français",
+      "it": "Italiano"
+    }
+  },
+  "holding": {
+    "eyebrow": "Versione non pubblicata",
+    "title": "Contenuto in preparazione",
+    "body": "Questa versione non offre servizi, non pubblica profili e non riceve richieste. Il contenuto resterà chiuso fino al completamento delle approvazioni per la pubblicazione."
+  },
+  "notFound": {
+    "eyebrow": "Errore 404",
+    "title": "Pagina non trovata",
+    "body": "La pagina richiesta non esiste o non è disponibile.",
+    "homeLink": "Torna alla home"
+  },
+  "notice": {
+    "title": "Anteprima locale",
+    "body": "Contenuto, copertura e canali sono in attesa di approvazione. Questa versione non rappresenta un servizio pubblicato."
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Discrezione · Esclusività · Assistenza privata",
+      "title": "Il lusso di scegliere",
+      "titleAccent": "a casa tua o in hotel",
+      "body": "Un'esperienza responsive per Madrid e Barcelona. Copertura e disponibilità saranno mostrate come reali solo dopo l'approvazione.",
+      "profilesCta": "Vedi i profili",
+      "contactCta": "Contatto privato",
+      "artLabel": "Madrid · Barcelona"
+    },
+    "trust": {
+      "ariaLabel": "Principi del progetto",
+      "items": [
+        { "code": "01", "text": "Privacy curata" },
+        { "code": "02", "text": "Solo per persone di almeno 18 anni" },
+        { "code": "03", "text": "Nessun locale aperto al pubblico" },
+        { "code": "04", "text": "Canali soggetti ad approvazione" }
+      ]
+    },
+    "cities": {
+      "eyebrow": "Copertura in fase di convalida",
+      "title": "Due città, un'unica esperienza",
+      "body": "Le pagine attuali sono bozze di prodotto. In questa versione nessuna zona è presentata come copertura confermata.",
+      "madridCode": "M·01",
+      "barcelonaCode": "B·01",
+      "cardCta": "Vedi la bozza della città"
+    },
+    "profiles": {
+      "eyebrow": "Profili",
+      "title": "Catalogo protetto da approvazione",
+      "openCatalog": "Apri il catalogo",
+      "emptyTitle": "Non ci sono profili pubblicati.",
+      "emptyBody": "I profili appariranno solo dopo la convalida della maggiore età, del consenso, dei diritti d'uso e dell'approvazione dei contenuti."
+    },
+    "finalContact": {
+      "eyebrow": "Contatto senza esposizione",
+      "title": "I canali restano chiusi fino all'approvazione.",
+      "cta": "Controlla lo stato del contatto"
+    }
+  },
+  "cityUi": {
+    "structuredData": {
+      "serviceName": "Compagnia privata a {city}",
+      "serviceType": "Servizio di compagnia privata con spostamento"
+    },
+    "hero": {
+      "availabilityCta": "Verifica la disponibilità",
+      "howItWorksCta": "Come funziona",
+      "trustAria": "Caratteristiche del servizio",
+      "trustItems": [
+        { "code": "01", "text": "Assistenza personale" },
+        { "code": "02", "text": "Hotel e abitazioni" },
+        { "code": "03", "text": "Privacy curata" }
+      ]
+    },
+    "ageRibbon": {
+      "ariaLabel": "Condizioni di accesso",
+      "adultOnly": "Solo per persone di almeno 18 anni",
+      "deliveryOnly": "Servizio con spostamento · Nessun locale aperto al pubblico"
+    },
+    "principles": [
+      {
+        "code": "01",
+        "title": "Spostamento",
+        "body": "L'assistenza viene fornita esclusivamente presso l'hotel o l'abitazione confermati."
+      },
+      {
+        "code": "02",
+        "title": "Conferma reale",
+        "body": "Zona, orario e disponibilità vengono convalidati prima di accettare la richiesta."
+      },
+      {
+        "code": "03",
+        "title": "Prenotazione privata",
+        "body": "Chiediamo solo le informazioni indispensabili per coordinare l'arrivo."
+      }
+    ],
+    "priorityAvailability": "Zona di richiesta prioritaria",
+    "otherAreas": {
+      "label": "Altre zone di richiesta",
+      "body": "L'inclusione in questo elenco non sostituisce la conferma della copertura per una data specifica."
+    },
+    "processLabel": "Come funziona",
+    "discretionLabel": "Il lusso della discrezione",
+    "manifesto": {
+      "imageAlt": "PecadosVip: Madrid e Barcelona, privacy, presenza e distinzione",
+      "label": "Manifesto del marchio",
+      "body": "Un'identità sobria, una presenza indimenticabile."
+    },
+    "faq": {
+      "label": "Informazioni pratiche",
+      "title": "Domande frequenti a {city}",
+      "body": "Risposte chiare prima di condividere qualsiasi informazione sensibile."
+    },
+    "contactLabel": "Prenotazione privata · {city}"
+  },
+  "cities": {
+    "madrid": {
+      "slug": "madrid",
+      "city": "Madrid",
+      "regionLabel": "Madrid · Assistenza privata",
+      "kicker": "La capitale, a modo tuo",
+      "headline": "La città cambia.",
+      "headlineAccent": "La tua intimità no.",
+      "lead": "Compagnia privata con spostamento presso abitazioni e hotel. Un'assistenza curata, puntuale e discretamente straordinaria.",
+      "coordinates": ["40.4168° N", "3.7038° W"],
+      "introEyebrow": "Madrid, senza rumore",
+      "introTitle": "Presenza quando la desideri. Privacy in ogni dettaglio.",
+      "introBody": [
+        "Madrid richiede ritmo, buon senso e una logistica impeccabile. Coordiniamo ogni richiesta individualmente per offrire un'esperienza serena fin dal primo contatto.",
+        "Il servizio viene svolto esclusivamente con spostamento. Non abbiamo un locale aperto al pubblico: raggiungiamo l'abitazione o l'hotel indicati, sempre dopo aver confermato la zona e la disponibilità."
+      ],
+      "areaEyebrow": "Copertura soggetta a conferma",
+      "areaTitle": "Madrid, quartiere per quartiere",
+      "areaIntro": "L'assistenza viene organizzata in base alla domanda, al profilo alberghiero e alla facilità di spostamento. Queste sono zone di richiesta prioritaria; la disponibilità esatta viene confermata privatamente.",
+      "highlights": [
+        {
+          "code": "M·01",
+          "name": "Centro",
+          "note": "Hotel, Gran Vía, Justicia e il cuore notturno della capitale."
+        },
+        {
+          "code": "M·02",
+          "name": "Barajas",
+          "note": "Assistenza coordinata per hotel e soggiorni vicini all'aeroporto."
+        },
+        {
+          "code": "M·03",
+          "name": "Salamanca · Retiro",
+          "note": "Contesto residenziale e alberghiero con particolare attenzione agli orari."
+        },
+        {
+          "code": "M·04",
+          "name": "Chamberí · Chamartín",
+          "note": "Spostamenti pianificati per incontri tranquilli e riservati."
+        }
+      ],
+      "locations": [
+        "Pozuelo de Alarcón",
+        "Majadahonda",
+        "Las Rozas",
+        "Alcobendas",
+        "San Sebastián de los Reyes",
+        "Alcalá de Henares",
+        "Getafe",
+        "Leganés",
+        "Móstoles",
+        "Torrejón de Ardoz",
+        "Rivas-Vaciamadrid",
+        "Tres Cantos"
+      ],
+      "processTitle": "Una prenotazione chiara, senza conversazioni superflue",
+      "processIntro": "Chiediamo solo quanto necessario per confermare il servizio. Le informazioni sensibili non vengono pubblicate né utilizzate al di fuori del coordinamento.",
+      "steps": [
+        {
+          "title": "Indica la zona e il momento",
+          "text": "Comunica il quartiere o il comune, la data approssimativa e se si tratta di un hotel o di un'abitazione."
+        },
+        {
+          "title": "Ricevi una conferma privata",
+          "text": "Convalidiamo copertura e disponibilità prima di proporti l'opzione adatta."
+        },
+        {
+          "title": "Goditi un arrivo puntuale",
+          "text": "Coordiniamo lo spostamento con discrezione e senza esporre informazioni non necessarie."
+        }
+      ],
+      "discretionTitle": "A Madrid, la vera esclusività è non lasciare traccia.",
+      "discretionText": "Progettiamo ogni interazione per proteggere il tuo tempo, il tuo spazio e la tua privacy. Nessun locale pubblico, nessuna esposizione e nessuna promessa che non possiamo confermare.",
+      "faqs": [
+        {
+          "question": "Il servizio è disponibile in tutti i quartieri di Madrid?",
+          "answer": "La copertura dipende dalla zona, dall'orario e dalla disponibilità del momento. Centro, Barajas, Salamanca, Retiro, Chamberí e Chamartín sono zone di richiesta prioritaria, ma confermiamo sempre prima di finalizzare la prenotazione."
+        },
+        {
+          "question": "Potete raggiungere un hotel vicino all'aeroporto?",
+          "answer": "Sì, gli spostamenti verso gli hotel di Barajas e dintorni possono essere coordinati quando c'è disponibilità. Consigliamo di indicare in anticipo l'hotel e la fascia oraria."
+        },
+        {
+          "question": "Servite anche i comuni della regione?",
+          "answer": "Gestiamo richieste in comuni selezionati come Pozuelo, Majadahonda, Las Rozas, Alcobendas o Alcalá de Henares. L'assistenza non viene mai presentata come disponibile finché non è stata convalidata per quella data."
+        },
+        {
+          "question": "Esiste un locale PecadosVip a Madrid?",
+          "answer": "No. Il servizio viene svolto esclusivamente con spostamento presso abitazioni e hotel. Non presentiamo alcun indirizzo come punto di assistenza aperto al pubblico."
+        }
+      ],
+      "closingTitle": "Madrid non aspetta. Neanche la tua prenotazione dovrebbe farlo.",
+      "closingText": "Dicci solo dove e quando. Confermeremo il resto privatamente."
+    },
+    "barcelona": {
+      "slug": "barcelona",
+      "city": "Barcelona",
+      "regionLabel": "Barcelona · Assistenza privata",
+      "kicker": "Dall'Eixample al Mediterraneo",
+      "headline": "La notte scorre.",
+      "headlineAccent": "La tua privacy rimane.",
+      "lead": "Compagnia privata con spostamento presso abitazioni e hotel a Barcelona. Vicinanza, eleganza e un coordinamento su misura per te.",
+      "coordinates": ["41.3874° N", "2.1686° E"],
+      "introEyebrow": "Barcelona, in privato",
+      "introTitle": "Naturale nei modi. Impeccabile nell'assistenza.",
+      "introBody": [
+        "Barcelona unisce soggiorni brevi, vita locale e fughe sul mare. Per questo ogni richiesta viene coordinata secondo il ritmo reale della città e la distanza dello spostamento.",
+        "Offriamo assistenza esclusivamente presso abitazioni e hotel, senza un locale aperto al pubblico. La copertura viene convalidata prima della conferma affinché l'esperienza inizi con chiarezza."
+      ],
+      "areaEyebrow": "Città, costa e comuni",
+      "areaTitle": "Da Barcelona al mare, senza perdere la discrezione",
+      "areaIntro": "Diamo priorità alle zone con attività alberghiera, turismo e domanda residenziale. Le zone seguenti orientano la richiesta; ogni spostamento resta soggetto alla disponibilità reale.",
+      "highlights": [
+        {
+          "code": "B·01",
+          "name": "Città di Barcelona",
+          "note": "Coordinamento agile per hotel, appartamenti e abitazioni in città."
+        },
+        {
+          "code": "B·02",
+          "name": "Castelldefels · Sitges",
+          "note": "Assistenza pianificata per soggiorni sulla costa, svago e fughe private."
+        },
+        {
+          "code": "B·03",
+          "name": "Sant Cugat · Vallès",
+          "note": "Spostamenti riservati verso zone residenziali e aziendali."
+        },
+        {
+          "code": "B·04",
+          "name": "Baix Llobregat",
+          "note": "Richieste per Gavà, Viladecans, El Prat, Esplugues e Sant Just."
+        }
+      ],
+      "locations": [
+        "Castelldefels",
+        "Sitges",
+        "Sant Cugat del Vallès",
+        "Esplugues de Llobregat",
+        "Sant Just Desvern",
+        "Gavà",
+        "Badalona",
+        "L'Hospitalet de Llobregat",
+        "Sabadell",
+        "Terrassa",
+        "Mataró",
+        "Vilanova i la Geltrú"
+      ],
+      "processTitle": "Il coordinamento giusto fa sembrare tutto semplice",
+      "processIntro": "Il mare, il traffico e le distanze contano. Confermiamo ogni dettaglio prima dello spostamento per tutelare puntualità e privacy.",
+      "steps": [
+        {
+          "title": "Comunicaci la tua posizione",
+          "text": "Indica la città o il comune, l'hotel o l'abitazione e una fascia oraria approssimativa."
+        },
+        {
+          "title": "Convalidiamo lo spostamento",
+          "text": "Verifichiamo la copertura reale, i tempi di arrivo e la disponibilità per la tua zona."
+        },
+        {
+          "title": "Confermiamo in modo riservato",
+          "text": "Ricevi solo le informazioni necessarie per un'esperienza tranquilla e puntuale."
+        }
+      ],
+      "discretionTitle": "Barcelona si vive verso l'esterno. Ciò che conta resta dentro.",
+      "discretionText": "L'assistenza premium non ha bisogno di eccessi: ha bisogno di criterio. Curiamo la conversazione, lo spostamento e l'arrivo per mantenere ogni dettaglio nell'ambito privato.",
+      "faqs": [
+        {
+          "question": "Offrite assistenza sia nella città di Barcelona sia nei comuni vicini?",
+          "answer": "Sì, le richieste vengono gestite a Barcelona e in comuni selezionati della provincia. La disponibilità dipende dalla data, dall'orario e dalla distanza, quindi viene sempre confermata in anticipo."
+        },
+        {
+          "question": "Si può richiedere assistenza in un hotel a Sitges o Castelldefels?",
+          "answer": "Possiamo coordinare spostamenti verso hotel sulla costa quando esiste copertura per quella fascia oraria. Prima indichi luogo e orario, meglio potremo convalidare il tragitto."
+        },
+        {
+          "question": "Come viene calcolato il tempo di arrivo fuori città?",
+          "answer": "Prima di confermare esaminiamo il comune, la mobilità del momento e la disponibilità. Non promettiamo un tempo finché non abbiamo verificato che lo spostamento sia fattibile."
+        },
+        {
+          "question": "Posso recarmi in un locale PecadosVip a Barcelona?",
+          "answer": "No. PecadosVip opera esclusivamente con spostamento presso abitazioni e hotel; non esiste un punto di assistenza aperto al pubblico."
+        }
+      ],
+      "closingTitle": "La tua Barcelona. Il tuo momento. Le tue regole.",
+      "closingText": "Comunica zona e orario. Confermeremo lo spostamento con la discrezione che ti aspetti."
+    }
+  },
+  "profiles": {
+    "eyebrow": "Catalogo protetto",
+    "title": "Profili",
+    "intro": "I filtri operano sui contenuti pubblicabili. Le bozze e i record senza evidenze non appaiono mai in questa rotta.",
+    "filters": {
+      "legend": "Filtri del catalogo",
+      "ageHelp": "L'età deve essere compresa tra {minAge} e {maxAge} anni. L'età minima non può superare quella massima.",
+      "city": "Città",
+      "allCities": "Tutte",
+      "availability": "Disponibilità",
+      "allAvailability": "Tutte",
+      "minimumAge": "Età minima",
+      "maximumAge": "Età massima",
+      "apply": "Applica i filtri"
+    },
+    "availability": {
+      "available": "Disponibile",
+      "limited": "Disponibilità limitata",
+      "unavailable": "Non disponibile",
+      "onRequest": "Su richiesta"
+    },
+    "results": {
+      "title": "Risultati",
+      "count": "{count, plural, one {# profilo} other {# profili}}",
+      "invalidTitle": "I filtri non sono validi.",
+      "invalidBody": "Nessun contenuto è stato consultato o esposto. Reimposta i filtri per continuare.",
+      "reset": "Reimposta i filtri",
+      "filteredEmptyTitle": "Non ci sono profili per questi filtri.",
+      "filteredEmptyBody": "Modifica i criteri o reimposta i filtri per vedere il catalogo completo.",
+      "unpublishedTitle": "Il catalogo non è ancora pubblicato.",
+      "unpublishedBody": "Nessun profilo ha superato congiuntamente i controlli sui contenuti, sull'età, sul consenso, sui diritti e sulla pubblicazione."
+    },
+    "card": {
+      "ageYears": "{age} anni",
+      "statusPrefix": "Stato:",
+      "viewProfile": "Vedi profilo",
+      "viewProfileAria": "Vedi il profilo di {name}",
+      "syntheticView": "Vista sintetica",
+      "syntheticViewAria": "Vista sintetica di {name}"
+    }
+  },
+  "profile": {
+    "galleryAria": "Galleria di {name}",
+    "publishedEyebrow": "Profilo pubblicato",
+    "ageYears": "{age} anni",
+    "measurements": {
+      "heightCm": "Altezza",
+      "weightKg": "Peso",
+      "bustCm": "Seno",
+      "waistCm": "Vita",
+      "hipsCm": "Fianchi"
+    },
+    "units": {
+      "centimeters": "cm",
+      "kilograms": "kg"
+    },
+    "servicesTitle": "Servizi"
+  },
+  "servicesHub": {
+    "eyebrow": "Servizi approvati",
+    "title": "Esperienze private con condizioni chiare.",
+    "body": "Questa rotta mostra solo servizi pubblicati, approvati e collegati a profili pubblicabili.",
+    "catalogTitle": "Catalogo dei servizi",
+    "cardAction": "Vedi servizio",
+    "profileCount": "{count} profili collegati",
+    "faqTitle": "Prima di scegliere",
+    "faqs": [
+      { "question": "La disponibilità è garantita?", "answer": "No. Deve essere confermata in privato per ogni profilo, città e momento." },
+      { "question": "I limiti possono cambiare?", "answer": "Solo tramite un accordo esplicito, informato e revocabile tra adulti." }
+    ]
+  },
+  "serviceDetail": {
+    "breadcrumbAria": "Percorso di navigazione del servizio",
+    "services": "Servizi",
+    "eyebrow": "Servizio pubblicato",
+    "profilesTitle": "Profili correlati",
+    "profilesBody": "Profili approvati che includono questo servizio.",
+    "contactTitle": "Conferma privata",
+    "contactBody": "Verifica copertura, disponibilità e condizioni solo tramite un canale approvato.",
+    "back": "Torna ai servizi"
+  },
+  "contact": {
+    "eyebrow": "Contatto privato",
+    "title": "Condividi dati solo quando esiste un canale approvato.",
+    "body": "Questa versione non invia moduli né memorizza richieste. I canali vengono attivati solo dopo averne convalidato la destinazione e completato le approvazioni relative a contatto e privacy.",
+    "safety": {
+      "title": "Stato tecnico",
+      "items": [
+        "Non è attivo alcun modulo POST.",
+        "Da questa pagina non vengono caricati SDK di analisi o messaggistica.",
+        "Non inserire informazioni sensibili mentre i canali sono disabilitati."
+      ]
+    }
+  },
+  "contactOptions": {
+    "title": "Canali di contatto",
+    "channels": {
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "phone": "Telefono",
+      "email": "E-mail"
+    },
+    "unavailableSuffix": "non disponibile",
+    "enabledMessage": "Usa esclusivamente uno dei canali approvati indicati come attivi.",
+    "disabledMessage": "I canali sono disabilitati fino al completamento delle approvazioni relative a pubblicazione, contatto e privacy.",
+    "form": {
+      "title": "Modulo di contatto privato",
+      "intro": "Condividi solo le informazioni necessarie per consentirci di rispondere.",
+      "name": "Nome o alias",
+      "reply": "E-mail o telefono per la risposta",
+      "city": "Città",
+      "selectCity": "Seleziona una città",
+      "message": "Messaggio",
+      "privacyPrefix": "Inviando il modulo accetti il trattamento descritto nella",
+      "privacyLink": "Informativa sulla privacy",
+      "submit": "Invia richiesta"
+    }
+  },
+  "footer": {
+    "brandHomeAria": "PecadosVip, pagina iniziale",
+    "tagline": "Progetto web per Madrid e Barcelona in fase di convalida.",
+    "linksAria": "Link a piè di pagina",
+    "publicationStatusAria": "Stato di pubblicazione",
+    "adultOnly": "Solo per persone di almeno 18 anni",
+    "legalApproved": "Informazioni legali approvate e accessibili",
+    "legalPending": "Informazioni legali in attesa di approvazione"
+  },
+  "legal": {
+    "approvedEyebrow": "Informazioni legali approvate",
+    "updatedLabel": "Ultimo aggiornamento: {date}",
+    "documents": {
+      "legalNotice": "Note legali",
+      "privacy": "Privacy",
+      "cookies": "Cookie",
+      "serviceTerms": "Termini del servizio"
+    }
+  }
+}

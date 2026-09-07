@@ -1,0 +1,59 @@
+{
+  "name": "sites-project",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "candidate:export": "node --experimental-strip-types scripts/local-publication-candidate.ts",
+    "cms:backup": "node --experimental-strip-types scripts/local-cms-backup.ts create",
+    "cms:local": "node --experimental-strip-types scripts/local-cms-workbench.ts",
+    "cms:restore": "node --experimental-strip-types scripts/local-cms-backup.ts restore",
+    "dev": "vinext dev",
+    "dev:preview": "node --experimental-strip-types scripts/local-synthetic-preview.ts",
+    "build": "vinext build && npm run standalone:prepare",
+    "brand:filigree": "node --experimental-strip-types scripts/prepare-brand-filigree.ts",
+    "start": "vinext start",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern output --ignore-pattern .playwright-cli",
+    "i18n:validate": "node --experimental-strip-types scripts/validate-locales.ts",
+    "release:artifact": "pnpm run release:artifact:worker && pnpm run release:artifact:standalone",
+    "release:artifact:standalone": "node --experimental-strip-types scripts/validate-build-artifact.ts --profile standalone",
+    "release:artifact:worker": "node --experimental-strip-types scripts/validate-build-artifact.ts --profile worker",
+    "release:sbom": "node --experimental-strip-types scripts/generate-sbom.ts",
+    "release:verify": "pnpm run validate && pnpm run i18n:validate && pnpm run score:validate && pnpm run release:sbom && pnpm run release:artifact && pnpm run smoke:production",
+    "score:validate": "node --experimental-strip-types scripts/validate-local-scorecard.ts",
+    "smoke:production": "node --experimental-strip-types scripts/production-holding-smoke.ts",
+    "standalone:prepare": "node --experimental-strip-types scripts/prepare-standalone.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/accessibility-contract.test.ts tests/analytics.test.ts tests/beta-media.test.ts tests/contact-config.test.ts tests/container-release.test.ts tests/content-contract.test.ts tests/favicon-route.test.ts tests/i18n-contract.test.ts tests/image-size-security-patch.test.ts tests/lifecycle.test.ts tests/local-backup.test.ts tests/local-cms-workbench.test.ts tests/local-file-lock.test.ts tests/local-media-store.test.ts tests/local-scorecard.test.ts tests/persistent-repository.test.ts tests/public-legal.test.ts tests/public-profiles.test.ts tests/public-services.test.ts tests/public-synthetic-beta.test.ts tests/publication-candidate.test.ts tests/release-artifacts.test.ts tests/release-gates.test.ts tests/repository.test.ts tests/runtime-city-presentation.test.ts tests/runtime-content-activation.test.ts tests/runtime-publication.test.ts tests/security-headers.test.ts tests/seo-safety.test.ts tests/synthetic-preview.test.ts",
+    "validate": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
+  },
+  "dependencies": {
+    "next": "16.2.11",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "sharp": "0.35.2",
+    "vinext": "1.0.0-beta.3"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.51.1",
+    "@cloudflare/workers-types": "5.20260801.1",
+    "@openai/sites-vite-plugin": "^0.1.0 || ^0.2.0",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.26",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.11",
+    "react-server-dom-webpack": "19.2.8",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vite": "8.0.16",
+    "wrangler": "4.120.0"
+  },
+  "type": "module",
+  "packageManager": "pnpm@11.19.0"
+}

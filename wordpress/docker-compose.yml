@@ -1,0 +1,82 @@
+name: pecadosvip-wordpress-qa
+
+x-wordpress-environment: &wordpress-environment
+  WORDPRESS_DB_HOST: db:3306
+  WORDPRESS_DB_USER: pecadosvip_qa
+  WORDPRESS_DB_NAME: pecadosvip_qa
+  WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
+  WORDPRESS_CONFIG_EXTRA: |
+    define('WP_ENVIRONMENT_TYPE', 'local');
+    define('WP_AUTO_UPDATE_CORE', false);
+    define('WP_HTTP_BLOCK_EXTERNAL', true);
+
+services:
+  db:
+    image: mariadb:11.4.13@sha256:611a2fcc5fa7c6ceb8644c6f74b25ede004ff6c3a6b38c8f8c23d3bbf6c26430
+    environment:
+      MARIADB_DATABASE: pecadosvip_qa
+      MARIADB_USER: pecadosvip_qa
+      MARIADB_PASSWORD_FILE: /run/secrets/db_password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    secrets:
+      - db_password
+      - db_root_password
+    volumes:
+      - qa_database:/var/lib/mysql
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  wordpress:
+    image: wordpress:7.1.0-php8.3-apache@sha256:5a93c470ae8220fddf71f6ebe3bc94e615ddc2ae4d9810f795b830fb11c41a17
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: *wordpress-environment
+    ports:
+      - "127.0.0.1:${WP_QA_PORT:-8088}:80"
+    secrets:
+      - db_password
+    volumes:
+      - qa_wordpress:/var/www/html
+      - ./dist/pecadosvip:/var/www/html/wp-content/themes/pecadosvip:ro
+      - ./dist/pecadosvip-content:/var/www/html/wp-content/plugins/pecadosvip-content:ro
+    healthcheck:
+      test: [CMD, php, -r, "exit(is_file('/var/www/html/wp-config.php') ? 0 : 1);"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  cli:
+    image: wordpress:cli-2.12.0-php8.3@sha256:2b5e9d4d3e51909dca1aaa4732e9f5e5bf0377c2114dbd8ff39f060bff202586
+    profiles: [tools]
+    user: "33:33"
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    environment:
+      <<: *wordpress-environment
+      WP_QA_URL: "http://127.0.0.1:${WP_QA_PORT:-8088}${WP_QA_PATH:-}"
+    secrets:
+      - db_password
+      - admin_password
+    volumes:
+      - qa_wordpress:/var/www/html
+      - ./dist/pecadosvip:/var/www/html/wp-content/themes/pecadosvip:ro
+      - ./dist/pecadosvip-content:/var/www/html/wp-content/plugins/pecadosvip-content:ro
+      - ./qa:/qa:ro
+      - ./tests:/theme-tests:ro
+
+volumes:
+  qa_database:
+  qa_wordpress:
+
+secrets:
+  db_password:
+    file: ./output/docker-secrets/db-password.txt
+  db_root_password:
+    file: ./output/docker-secrets/db-root-password.txt
+  admin_password:
+    file: ./output/docker-secrets/admin-password.txt

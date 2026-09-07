@@ -1,0 +1,11 @@
+command: pnpm run validate
+candidateCommit: 9788e73ad7b46b495e19efbd9aec1a9131241b76
+startedAtUtc: 2026-08-27T20:45:11.9152702Z
+finishedAtUtc: 2026-08-27T20:45:13.4241098Z
+exitCode: 1
+--- stdout ---
+[ERR_PNPM_VERIFY_DEPS_BEFORE_RUN] The value of the enableGlobalVirtualStore setting has changed
+
+Run "pnpm install"
+
+--- stderr ---

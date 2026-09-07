@@ -1,0 +1,25 @@
+/*
+Theme Name: PecadosVip Frontend
+Description: Frontend nativo de WordPress con perfiles, servicios, ciudades y páginas editables mediante PecadosVip Contenido. No modifica el backend del proyecto original.
+Version: 2.0.0-beta.1
+Requires at least: 6.6
+Requires PHP: 8.0
+Author: PecadosVip
+Text Domain: pecadosvip
+*/
+
+.pvwp-native {
+  margin: 0;
+  background: #080808;
+  color: #f2eee5;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+}
+.pvwp-native a { color: #eac577; }
+.pvwp-native-shell { max-width: 72rem; margin: auto; padding: 2rem 1.5rem; }
+.pvwp-native-shell img { max-width: 100%; height: auto; }
+.pvwp-native header, .pvwp-native footer { border-color: #695430; border-style: solid; border-width: 0 0 1px; }
+.pvwp-native footer { border-width: 1px 0 0; }
+.pvwp-native .custom-logo { max-height: 6rem; width: auto; }
+.pvwp-native .screen-reader-text:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.pvwp-native a:focus-visible { outline: 2px solid #eac577; outline-offset: 4px; }

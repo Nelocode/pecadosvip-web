@@ -1,0 +1,93 @@
+# Marca, canales y términos técnicos que no deben traducirse.
+PecadosVip
+WhatsApp
+Telegram
+POST
+SDK
+responsive
+premium
+cm
+kg
+Error 404
+
+# Endónimos del selector de idioma.
+Español
+English
+Français
+Italiano
+
+# Ciudades, distritos, municipios y topónimos.
+Madrid
+Barcelona
+Girona
+Tarragona
+Toledo
+Guadalajara
+Segovia
+Centro
+Gran Vía
+Justicia
+Barajas
+Salamanca
+Retiro
+Chamberí
+Chamartín
+Pozuelo de Alarcón
+Majadahonda
+Las Rozas
+Alcobendas
+San Sebastián de los Reyes
+Alcalá de Henares
+Getafe
+Leganés
+Móstoles
+Torrejón de Ardoz
+Rivas-Vaciamadrid
+Tres Cantos
+Eixample
+Castelldefels
+Sitges
+Sant Cugat
+Vallès
+Baix Llobregat
+Gavà
+Viladecans
+El Prat
+Esplugues
+Sant Just
+Sant Cugat del Vallès
+Esplugues de Llobregat
+Sant Just Desvern
+Badalona
+L'Hospitalet de Llobregat
+Sabadell
+Terrassa
+Mataró
+Vilanova i la Geltrú
+
+# Códigos editoriales estables, no texto traducible.
+M·01
+M·02
+M·03
+M·04
+B·01
+B·02
+B·03
+B·04
+
+# Compuestos íntegros que el comparador evalúa como una sola cadena.
+40.4168° N
+3.7038° W
+41.3874° N
+2.1686° E
+Castelldefels · Sitges
+Sant Cugat · Vallès
+Salamanca · Retiro
+Chamberí · Chamartín
+Madrid · Barcelona
+PecadosVip Madrid
+PecadosVip Barcelona
+{title} | PecadosVip
+Cookies
+Disponible
+Peso

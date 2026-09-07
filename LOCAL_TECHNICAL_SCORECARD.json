@@ -1,0 +1,790 @@
+{
+  "schema": "pecadosvip.local-technical-scorecard",
+  "version": 2,
+  "asset": "pecadosvip-web-delivery",
+  "scope": "LOCAL_TECHNICAL_EXECUTION_ONLY",
+  "status": "LOCAL_TARGET_EARNED",
+  "denominator": 100,
+  "baseline_score": 87,
+  "declared_score": 98,
+  "target_score": 98,
+  "calculation_rule": "Scores are sums of indivisible criterion points. EARNED receives all max_points; PENDING receives zero. The immutable 87-point baseline plus target_95_increment criteria preserves the 95-point checkpoint, and target_98_increment criteria add only the three evidenced multilingual points required for the 98 target.",
+  "prior_checkpoint": {
+    "score": 95,
+    "scorecard_sha256": "6B217074A89FC1C55BBAEAD819336D6D746B1C02E7F6039D450DC7D0DD9BA012",
+    "evidence": "evidence/95-local-technical-checkpoint/evidence-manifest.json"
+  },
+  "separation": {
+    "strict_requirements": {
+      "verified": 2,
+      "total": 20,
+      "source": "REQUIREMENTS_TRACEABILITY.csv"
+    },
+    "public_legal_release": "NO-GO",
+    "release_source": "RELEASE_CHECKLIST.md",
+    "multilingual_verdicts": {
+      "source_locale": "es",
+      "required_locales": [
+        "es",
+        "en",
+        "fr",
+        "it"
+      ],
+      "technical_multilingual": "NO DETERMINABLE",
+      "linguistic_publication": "PENDIENTE DE REVISIÓN HUMANA",
+      "publication": "NO DETERMINABLE POR FALTA DE EVIDENCIA",
+      "source": "compliance/multilingual/audit.json"
+    },
+    "unscored_release_gates": [
+      {
+        "id": "IMP-011",
+        "title": "Production identity, database, object storage and contact adapters",
+        "status": "PENDING",
+        "evidence": [
+          {
+            "id": "EV-IMP-011-EXTERNAL-GATES",
+            "path": "RELEASE_CHECKLIST.md",
+            "locator": "production identity, infrastructure, contact and deployment gates"
+          }
+        ],
+        "acceptance": "Authorized staging integrates named providers and passes migration, authorization, storage, contact and rollback tests.",
+        "limit": "This external production-readiness gate remains mandatory and unearned; moving it outside the local technical denominator does not close or waive it."
+      }
+    ],
+    "does_not_measure": [
+      "CLIENT_OR_UAT_ACCEPTANCE",
+      "DEPLOYMENT_OR_INDEXING_AUTHORIZATION",
+      "LEGAL_COMPLIANCE_OR_CERTIFICATION",
+      "PRODUCTION_READINESS"
+    ]
+  },
+  "dimensions": [
+    {
+      "id": "inventory_evidence",
+      "title": "Inventario y evidencia",
+      "max_points": 15,
+      "baseline_earned_points": 14,
+      "declared_earned_points": 15,
+      "target_95_earned_points": 15,
+      "target_98_earned_points": 15
+    },
+    {
+      "id": "architecture",
+      "title": "Arquitectura",
+      "max_points": 10,
+      "baseline_earned_points": 9,
+      "declared_earned_points": 9,
+      "target_95_earned_points": 9,
+      "target_98_earned_points": 9
+    },
+    {
+      "id": "implementation_integration",
+      "title": "Implementación e integración",
+      "max_points": 45,
+      "baseline_earned_points": 38,
+      "declared_earned_points": 45,
+      "target_95_earned_points": 42,
+      "target_98_earned_points": 45
+    },
+    {
+      "id": "qa_corrections",
+      "title": "QA y correcciones",
+      "max_points": 25,
+      "baseline_earned_points": 22,
+      "declared_earned_points": 24,
+      "target_95_earned_points": 24,
+      "target_98_earned_points": 24
+    },
+    {
+      "id": "packaging_handoff",
+      "title": "Empaquetado y handoff",
+      "max_points": 5,
+      "baseline_earned_points": 4,
+      "declared_earned_points": 5,
+      "target_95_earned_points": 5,
+      "target_98_earned_points": 5
+    }
+  ],
+  "criteria": [
+    {
+      "id": "INV-001",
+      "dimension": "inventory_evidence",
+      "title": "Requisitos normalizados y trazados a implementación, prueba y evidencia",
+      "max_points": 5,
+      "baseline_earned_points": 5,
+      "status": "EARNED",
+      "earned_points": 5,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-INV-001-TRACEABILITY",
+          "path": "REQUIREMENTS_TRACEABILITY.csv",
+          "locator": "20 normalized requirements with state, implementation, test and evidence columns"
+        }
+      ],
+      "acceptance": "Every normalized requirement has a stable ID, priority, owner, implementation, test, evidence and state.",
+      "limit": "Traceability does not convert PARTIAL, BLOCKED or AT_RISK requirements into acceptance."
+    },
+    {
+      "id": "INV-002",
+      "dimension": "inventory_evidence",
+      "title": "Commit-bound local validation and dependency-audit evidence",
+      "max_points": 4,
+      "baseline_earned_points": 4,
+      "status": "EARNED",
+      "earned_points": 4,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-INV-002-CHECKPOINT-MANIFEST",
+          "path": "evidence/87-local-checkpoint/evidence-manifest.json",
+          "locator": "candidateCommit, commands, exitCode, timestamps and logSha256"
+        }
+      ],
+      "acceptance": "A durable manifest binds raw validate and production-audit logs to one candidate commit and environment.",
+      "limit": "The capture is local and is not UAT, deployment, pentest or production evidence."
+    },
+    {
+      "id": "INV-003",
+      "dimension": "inventory_evidence",
+      "title": "Reconciled EU and Spain control coverage ledger",
+      "max_points": 5,
+      "baseline_earned_points": 5,
+      "status": "EARNED",
+      "earned_points": 5,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-INV-003-COMPLIANCE-LEDGER",
+          "path": "compliance/ue-es/coverage-ledger.json",
+          "locator": "46 unique catalog controls with mutually exclusive classifications"
+        }
+      ],
+      "acceptance": "Every catalog control appears once with result, method, evidence and reopen trigger where applicable.",
+      "limit": "Coverage classification is not a legal-compliance score."
+    },
+    {
+      "id": "INV-004",
+      "dimension": "inventory_evidence",
+      "title": "Atomic and machine-validated local score ledger",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": true,
+      "evidence": [
+        {
+          "id": "EV-INV-004-SCORECARD-VALIDATOR",
+          "path": "scripts/validate-local-scorecard.ts",
+          "locator": "closed-schema, unique-evidence, score and separation invariants"
+        },
+        {
+          "id": "EV-INV-004-SCORECARD-TESTS",
+          "path": "tests/local-scorecard.test.ts",
+          "locator": "negative schema, arithmetic, evidence path and 2/20 plus NO-GO invariants"
+        }
+      ],
+      "acceptance": "The validator and focused tests pass after the owner closes the criterion and a final checkpoint manifest references the ledger.",
+      "limit": "Creating the ledger does not self-award this point; it remains PENDING until explicit closure."
+    },
+    {
+      "id": "ARC-001",
+      "dimension": "architecture",
+      "title": "Single-site route and domain architecture",
+      "max_points": 3,
+      "baseline_earned_points": 3,
+      "status": "EARNED",
+      "earned_points": 3,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-ARC-001-ARCHITECTURE",
+          "path": "ARCHITECTURE.md",
+          "locator": "system boundaries, URL map, ports, trust boundaries and integration criteria"
+        }
+      ],
+      "acceptance": "One responsive application defines scalable city, profile, contact, legal and technical route families.",
+      "limit": "Unapproved cities and content remain gated."
+    },
+    {
+      "id": "ARC-002",
+      "dimension": "architecture",
+      "title": "Aggregate fail-closed publication boundary",
+      "max_points": 3,
+      "baseline_earned_points": 3,
+      "status": "EARNED",
+      "earned_points": 3,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-ARC-002-RELEASE-GATE",
+          "path": "lib/content/release-gates.ts",
+          "locator": "evaluateRelease and assertReleaseReady"
+        }
+      ],
+      "acceptance": "Publication is denied unless the complete content snapshot passes the aggregate release validator.",
+      "limit": "A local gate does not authorize publication."
+    },
+    {
+      "id": "ARC-003",
+      "dimension": "architecture",
+      "title": "Explicit local repository and operator contracts",
+      "max_points": 3,
+      "baseline_earned_points": 3,
+      "status": "EARNED",
+      "earned_points": 3,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-ARC-003-REPOSITORY-PORT",
+          "path": "lib/content/repository.ts",
+          "locator": "ProfileRepository, Actor, mutation contexts and repository state"
+        }
+      ],
+      "acceptance": "Profile lifecycle, roles, revisions, replay and audit are expressed through explicit typed contracts.",
+      "limit": "The local contracts are not a selected production IdP, database or storage topology."
+    },
+    {
+      "id": "ARC-004",
+      "dimension": "architecture",
+      "title": "Selected production topology and accountable owners",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "PENDING",
+      "earned_points": 0,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-ARC-004-DECISIONS",
+          "path": "DECISIONS_REQUIRED.md",
+          "locator": "pending hosting, identity, database, storage, domain and channel decisions"
+        }
+      ],
+      "acceptance": "Named owners approve production topology, providers, environments, data flows and operational responsibilities.",
+      "limit": "This point requires external decisions and is intentionally outside the local 95 target."
+    },
+    {
+      "id": "IMP-001",
+      "dimension": "implementation_integration",
+      "title": "Public route families and neutral holding boundary",
+      "max_points": 8,
+      "baseline_earned_points": 8,
+      "status": "EARNED",
+      "earned_points": 8,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-IMP-001-HOME-ROUTE",
+          "path": "app/(legacy)/page.tsx",
+          "locator": "preserved legacy runtime visibility boundary and public home composition"
+        }
+      ],
+      "acceptance": "Home, cities, profiles, detail and contact are implemented behind a neutral fail-closed holding boundary.",
+      "limit": "The public experience remains disabled."
+    },
+    {
+      "id": "IMP-002",
+      "dimension": "implementation_integration",
+      "title": "Profile query, filtering, pagination and minimized detail projection",
+      "max_points": 7,
+      "baseline_earned_points": 7,
+      "status": "EARNED",
+      "earned_points": 7,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-IMP-002-PUBLIC-PROFILES",
+          "path": "lib/content/public-profiles.ts",
+          "locator": "queryPublicProfiles and getPublicProfileDetail"
+        }
+      ],
+      "acceptance": "Queries fail closed, support more than eight profiles and omit internal approval and evidence fields.",
+      "limit": "Only synthetic test fixtures have exercised publishable profiles."
+    },
+    {
+      "id": "IMP-003",
+      "dimension": "implementation_integration",
+      "title": "Content, media, SEO, contact and analytics release validation",
+      "max_points": 6,
+      "baseline_earned_points": 6,
+      "status": "EARNED",
+      "earned_points": 6,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-IMP-003-CONTENT-VALIDATION",
+          "path": "lib/content/validation.ts",
+          "locator": "draft and release validation including publication evidence and safe media URLs"
+        }
+      ],
+      "acceptance": "Release validation checks content completeness, evidence, routes, canonical origin, contact, legal and consent prerequisites.",
+      "limit": "The prerequisites are not supplied with real approved values."
+    },
+    {
+      "id": "IMP-004",
+      "dimension": "implementation_integration",
+      "title": "Local CMS lifecycle, persistence, revision and audit implementation",
+      "max_points": 8,
+      "baseline_earned_points": 8,
+      "status": "EARNED",
+      "earned_points": 8,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-IMP-004-PERSISTENCE",
+          "path": "lib/content/persistent-repository.ts",
+          "locator": "versioned envelope, atomic save, reload, revisions, replay and audit"
+        }
+      ],
+      "acceptance": "The development adapter persists and validates lifecycle state without exposing a physical-delete API.",
+      "limit": "It is plaintext, single-process development storage."
+    },
+    {
+      "id": "IMP-005",
+      "dimension": "implementation_integration",
+      "title": "Bounded local media integrity and recoverable lifecycle baseline",
+      "max_points": 5,
+      "baseline_earned_points": 5,
+      "status": "EARNED",
+      "earned_points": 5,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-IMP-005-MEDIA-BASELINE",
+          "path": "lib/media/local-media-store.ts",
+          "locator": "signature, quota, hash, metadata, audit, archive and restore baseline"
+        }
+      ],
+      "acceptance": "Local media storage validates bounded inputs, preserves integrity metadata and archives without physical deletion.",
+      "limit": "The baseline point excludes the in-progress optimization, video UI and replacement increment."
+    },
+    {
+      "id": "IMP-006",
+      "dimension": "implementation_integration",
+      "title": "Integrity-checked local backup and atomic restore",
+      "max_points": 4,
+      "baseline_earned_points": 4,
+      "status": "EARNED",
+      "earned_points": 4,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-IMP-006-BACKUP",
+          "path": "lib/operations/local-backup.ts",
+          "locator": "bounded manifest, SHA-256 validation, staging, rollback and restore"
+        }
+      ],
+      "acceptance": "Backup and restore reject unsafe paths and tampering before committing a local destination.",
+      "limit": "No encrypted, remote or production recovery is claimed."
+    },
+    {
+      "id": "IMP-007",
+      "dimension": "implementation_integration",
+      "title": "Synthetic image normalization and bounded WebP derivatives",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": true,
+      "evidence": [
+        {
+          "id": "EV-IMP-007-MEDIA-TESTS",
+          "path": "tests/local-media-store.test.ts",
+          "locator": "synthetic JPEG and PNG normalization, bounded desktop/mobile WebP derivatives, hashes and metadata stripping"
+        },
+        {
+          "id": "EV-IMP-007-MEDIA-PIPELINE",
+          "path": "lib/media/local-media-store.ts",
+          "locator": "sharp-webp-v1 pipeline, pixel and byte limits, variant metadata and atomic staging"
+        }
+      ],
+      "acceptance": "Synthetic JPEG and PNG inputs prove bounded desktop/mobile WebP processing, hashes, metadata stripping and atomic cleanup in the complete gate.",
+      "limit": "This point does not claim every image codec, malware scanning, visual quality acceptance, CDN storage or real image rights."
+    },
+    {
+      "id": "IMP-012",
+      "dimension": "implementation_integration",
+      "title": "Bounded structural MP4 ingestion and authenticated local adapter",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": true,
+      "evidence": [
+        {
+          "id": "EV-IMP-012-MP4-ADAPTER",
+          "path": "lib/media/local-media-store.ts",
+          "locator": "bounded non-fragmented MP4 container checks and original variant persistence"
+        },
+        {
+          "id": "EV-IMP-012-MP4-TESTS",
+          "path": "tests/local-cms-workbench.test.ts",
+          "locator": "authenticated synthetic MP4 API store, read and attach flow"
+        }
+      ],
+      "acceptance": "Bounded synthetic ftyp/moov/mdat inputs are stored only after structural checks, fragmented input is rejected and authenticated API read/attach passes in the complete gate.",
+      "limit": "This is not codec probing, decoded video validation, playback, HTTP Range, transcoding, captions, malware scanning or visual acceptance."
+    },
+    {
+      "id": "IMP-013",
+      "dimension": "implementation_integration",
+      "title": "Minimized workbench projections and authenticated media flow",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": true,
+      "evidence": [
+        {
+          "id": "EV-IMP-013-WORKBENCH-PROJECTIONS",
+          "path": "lib/workbench/local-cms-workbench.ts",
+          "locator": "role-specific media projections, exact-origin checks and authenticated media route"
+        },
+        {
+          "id": "EV-IMP-013-WORKBENCH-TESTS",
+          "path": "tests/local-cms-workbench.test.ts",
+          "locator": "editor redaction, admin evidence visibility, authenticated media and lifecycle API tests"
+        }
+      ],
+      "acceptance": "Editor responses omit rights evidence, hashes and storage keys; admin retains required audit fields; authenticated store/read/attach/archive flows pass in the complete gate.",
+      "limit": "This loopback workbench is not a production identity provider, browser media preview or multi-user authorization service."
+    },
+    {
+      "id": "IMP-014",
+      "dimension": "implementation_integration",
+      "title": "Fail-closed local-media boundary through publication export",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": true,
+      "evidence": [
+        {
+          "id": "EV-IMP-014-WORKBENCH-BOUNDARY",
+          "path": "lib/workbench/local-cms-workbench.ts",
+          "locator": "loopback-only authenticated __local-media route"
+        },
+        {
+          "id": "EV-IMP-014-EXPORT-REJECTION",
+          "path": "tests/publication-candidate.test.ts",
+          "locator": "local workbench media references are rejected from publication candidates"
+        }
+      ],
+      "acceptance": "Local media bytes require an authenticated loopback request and any __local-media reference causes public-candidate export to fail closed.",
+      "limit": "This point does not claim token rotation, revocation, throttling, object storage or production authentication."
+    },
+    {
+      "id": "IMP-015",
+      "dimension": "implementation_integration",
+      "title": "Explicit ES, EN, FR and IT locale contract and stable local routing",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": false,
+      "target_98_increment": true,
+      "evidence": [
+        {
+          "id": "EV-IMP-015-LOCALE-CONTRACT",
+          "path": "lib/i18n/locales.ts",
+          "locator": "source locale es, exact es/en/fr/it allowlist, stable locale paths and fail-closed locale helpers"
+        },
+        {
+          "id": "EV-IMP-015-LOCALE-TESTS",
+          "path": "tests/i18n-contract.test.ts",
+          "locator": "exact locale set, endonyms, path preservation, document language and unsupported-locale rejection"
+        }
+      ],
+      "acceptance": "The repository defines source locale es and exact base locales es, en, fr and it with stable local URLs, matching document language, endonym selector labels and fail-closed unsupported-locale behavior covered by deterministic tests.",
+      "limit": "This point proves only the local route and language contract; it does not prove a deployed site, rendered-browser accessibility, human linguistic approval or publication readiness."
+    },
+    {
+      "id": "IMP-016",
+      "dimension": "implementation_integration",
+      "title": "Deterministic multilingual catalog parity with conservative verdicts",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": false,
+      "target_98_increment": true,
+      "evidence": [
+        {
+          "id": "EV-IMP-016-MULTILINGUAL-AUDIT",
+          "path": "compliance/multilingual/audit.json",
+          "locator": "validated ES/EN/FR/IT repository audit with coverage, control results, limitations and independent verdicts"
+        },
+        {
+          "id": "EV-IMP-016-MULTILINGUAL-REPORT",
+          "path": "compliance/multilingual/audit-report.md",
+          "locator": "human-readable audit, pending human and specialist review, limitations and reproducible retest"
+        }
+      ],
+      "acceptance": "The versioned multilingual audit records exact catalog coverage, UTF-8, placeholder and markup parity, explicit fallback limits and no open critical or major technical catalog finding for es, en, fr and it.",
+      "limit": "Automated and AI-assisted evidence cannot approve meaning, tone, legal copy, localized keyword research or any language for publication; the linguistic verdict remains pending human review."
+    },
+    {
+      "id": "IMP-017",
+      "dimension": "implementation_integration",
+      "title": "Fail-closed international SEO metadata graph for ES, EN, FR and IT",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": false,
+      "target_98_increment": true,
+      "evidence": [
+        {
+          "id": "EV-IMP-017-SEO-GRAPH",
+          "path": "lib/seo.ts",
+          "locator": "same-locale canonical and self-referential reciprocal es/en/fr/it alternates behind the aggregate publication gate"
+        },
+        {
+          "id": "EV-IMP-017-SEO-TESTS",
+          "path": "tests/i18n-contract.test.ts",
+          "locator": "localized metadata, canonical, hreflang reciprocity and blocked holding noindex assertions"
+        }
+      ],
+      "acceptance": "Deterministic tests prove localized metadata and a same-locale canonical plus self-referential reciprocal hreflang graph for all four locales only when the aggregate release boundary permits publication, while the blocked holding stays noindex.",
+      "limit": "This point does not prove deployed HTTP destinations, indexability, semantic equivalence, local-market SEO research, rankings or authorization to publish."
+    },
+    {
+      "id": "QA-001",
+      "dimension": "qa_corrections",
+      "title": "Integrated lint, typecheck, tests and production build gate",
+      "max_points": 8,
+      "baseline_earned_points": 8,
+      "status": "EARNED",
+      "earned_points": 8,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-QA-001-VALIDATE-LOG",
+          "path": "evidence/87-local-checkpoint/validate.log",
+          "locator": "exitCode 0 with lint, typecheck, 115 tests and build"
+        }
+      ],
+      "acceptance": "The complete declared local validation command exits zero on the candidate commit.",
+      "limit": "Existing node_modules were validated; clean-room installation is a separate handoff criterion."
+    },
+    {
+      "id": "QA-002",
+      "dimension": "qa_corrections",
+      "title": "Deterministic negative release and privacy tests",
+      "max_points": 6,
+      "baseline_earned_points": 6,
+      "status": "EARNED",
+      "earned_points": 6,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-QA-002-RELEASE-TESTS",
+          "path": "tests/release-gates.test.ts",
+          "locator": "blocked publication, missing approvals, unsafe contacts, origins and media"
+        }
+      ],
+      "acceptance": "Automated tests demonstrate that material missing or unsafe release inputs fail closed.",
+      "limit": "Synthetic fixtures do not prove real approvals."
+    },
+    {
+      "id": "QA-003",
+      "dimension": "qa_corrections",
+      "title": "Loopback production-holding and preview browser smoke",
+      "max_points": 4,
+      "baseline_earned_points": 4,
+      "status": "EARNED",
+      "earned_points": 4,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-QA-003-BROWSER-SUMMARY",
+          "path": "output/playwright/pv95/smoke-summary.json",
+          "locator": "holding and synthetic preview loopback observations"
+        }
+      ],
+      "acceptance": "Observed routes, headers, console, local network, skip link and responsive widths satisfy the recorded smoke checks.",
+      "limit": "The smoke is loopback-only and is not a complete product journey."
+    },
+    {
+      "id": "QA-004",
+      "dimension": "qa_corrections",
+      "title": "Accessibility engineering baseline",
+      "max_points": 3,
+      "baseline_earned_points": 3,
+      "status": "EARNED",
+      "earned_points": 3,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-QA-004-A11Y-CONTRACTS",
+          "path": "tests/accessibility-contract.test.ts",
+          "locator": "language, landmarks, labels, focus, target size, motion and core contrast contracts"
+        }
+      ],
+      "acceptance": "Static contracts and recorded browser checks cover the declared baseline accessibility properties.",
+      "limit": "No complete WCAG or assistive-technology conformance is claimed."
+    },
+    {
+      "id": "QA-005",
+      "dimension": "qa_corrections",
+      "title": "Time-bound production dependency advisory audit",
+      "max_points": 1,
+      "baseline_earned_points": 1,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-QA-005-PNPM-AUDIT",
+          "path": "evidence/87-local-checkpoint/pnpm-audit-production.log",
+          "locator": "exitCode 0 and No known vulnerabilities found"
+        }
+      ],
+      "acceptance": "The candidate production graph has a retained successful advisory-audit result at capture time.",
+      "limit": "It is not reachability, provenance, VEX, SAST or pentest evidence."
+    },
+    {
+      "id": "QA-009",
+      "dimension": "qa_corrections",
+      "title": "Deterministic lockfile graph inventory in CycloneDX format",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": true,
+      "evidence": [
+        {
+          "id": "EV-QA-009-SBOM-GENERATOR",
+          "path": "scripts/generate-sbom.ts",
+          "locator": "deterministic pnpm lockfile graph conversion with component hashes and dependency scopes"
+        },
+        {
+          "id": "EV-QA-009-SBOM-TESTS",
+          "path": "tests/release-artifacts.test.ts",
+          "locator": "reproducible bytes, graph targets, scopes, hashes and protected-output tests"
+        }
+      ],
+      "acceptance": "The versioned generator emits byte-reproducible structured CycloneDX 1.6 JSON from the frozen package and pnpm lockfile, and its negative tests pass in the complete gate.",
+      "limit": "The output is a lockfile inventory; it is not official schema validation, SAST, VEX, provenance, reachability or pentest evidence."
+    },
+    {
+      "id": "QA-010",
+      "dimension": "qa_corrections",
+      "title": "Deterministic build-artifact integrity and hygiene validation",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": true,
+      "evidence": [
+        {
+          "id": "EV-QA-010-ARTIFACT-VALIDATOR",
+          "path": "scripts/validate-build-artifact.ts",
+          "locator": "required runtime files, hashes, symlinks, forbidden names, collisions and byte budgets"
+        },
+        {
+          "id": "EV-QA-010-ARTIFACT-TESTS",
+          "path": "tests/release-artifacts.test.ts",
+          "locator": "deterministic pass/fail reports, every budget, unsafe paths and protected-output tests"
+        }
+      ],
+      "acceptance": "The versioned validator inventories and hashes the built artifact, enforces required files and bounded hygiene policy, and emits a deterministic report in the complete gate.",
+      "limit": "This is not content secret scanning, SAST, attestation, dependency reachability or a pentest; the integrated scanner remains FAILED."
+    },
+    {
+      "id": "QA-008",
+      "dimension": "qa_corrections",
+      "title": "Deployed runtime, assistive technology, performance, pentest and UAT",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "PENDING",
+      "earned_points": 0,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-QA-008-EXTERNAL-QA-GATES",
+          "path": "RELEASE_CHECKLIST.md",
+          "locator": "deployed security, performance, assistive technology and UAT gates"
+        }
+      ],
+      "acceptance": "Authorized deployed testing and named human acceptance close the remaining production-quality gate.",
+      "limit": "This point is intentionally outside the local 95 target."
+    },
+    {
+      "id": "HAN-001",
+      "dimension": "packaging_handoff",
+      "title": "Private code checkpoint and reproducible project entrypoint",
+      "max_points": 2,
+      "baseline_earned_points": 2,
+      "status": "EARNED",
+      "earned_points": 2,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-HAN-001-README",
+          "path": "README.md",
+          "locator": "local setup, validation, safety state and project entrypoint"
+        }
+      ],
+      "acceptance": "The private repository has a documented local entrypoint and validation workflow.",
+      "limit": "Repository availability is not production admin access or acceptance."
+    },
+    {
+      "id": "HAN-002",
+      "dimension": "packaging_handoff",
+      "title": "Local operations and recovery runbook",
+      "max_points": 1,
+      "baseline_earned_points": 1,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-HAN-002-RUNBOOK",
+          "path": "OPERATIONS_RUNBOOK.md",
+          "locator": "validation, workbench, backup, restore, candidate and diagnostics"
+        }
+      ],
+      "acceptance": "The operator can follow documented local validation, CMS, backup, restore and diagnostic procedures.",
+      "limit": "The runbook does not document an actual production platform."
+    },
+    {
+      "id": "HAN-003",
+      "dimension": "packaging_handoff",
+      "title": "Fail-closed stage archive procedure",
+      "max_points": 1,
+      "baseline_earned_points": 1,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": false,
+      "evidence": [
+        {
+          "id": "EV-HAN-003-ARCHIVE-GUIDE",
+          "path": "STAGE_ARCHIVE_GUIDE.md",
+          "locator": "archive contents, exclusions, validation, custody and NO-GO"
+        }
+      ],
+      "acceptance": "A fail-closed documented procedure defines inventory, hashing, exclusions and confidential custody for stage packaging.",
+      "limit": "A documented procedure is not the final extracted and validated technical package."
+    },
+    {
+      "id": "HAN-005",
+      "dimension": "packaging_handoff",
+      "title": "Durable local checkpoint evidence package",
+      "max_points": 1,
+      "baseline_earned_points": 0,
+      "status": "EARNED",
+      "earned_points": 1,
+      "target_95_increment": true,
+      "evidence": [
+        {
+          "id": "EV-HAN-005-EVIDENCE-CAPTURE",
+          "path": "scripts/capture-stage-evidence.ps1",
+          "locator": "commit-bound raw release gate and audit logs plus scorecard, SBOM and build-report hashes"
+        }
+      ],
+      "acceptance": "A clean candidate commit produces durable raw release-gate and dependency-audit logs, a manifest, and hashed copies of the scorecard, SBOM and build report.",
+      "limit": "This point does not itself claim ZIP clean-room reproduction, deployment, acceptance or production readiness."
+    }
+  ]
+}

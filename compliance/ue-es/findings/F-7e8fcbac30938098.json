@@ -1,0 +1,108 @@
+{
+  "finding_id": "F-7e8fcbac30938098",
+  "audit_id": "A-PECADOSVIP-20260827",
+  "asset": "pecadosvip-web-delivery",
+  "environment": "local repository snapshot; no deployed URL",
+  "release": null,
+  "logical_location": "public routes and responsive layout",
+  "url_or_path": "app/",
+  "line": null,
+  "role": "anonymous visitor using keyboard or pointer",
+  "locale": "es",
+  "browser": "Chromium through Playwright CLI",
+  "viewport": "360, 390, 768, 1024, 1440 and 1920 CSS px",
+  "observed_at": "2026-08-27T17:11:00Z",
+  "domain": "accessibility",
+  "control_id": "A11Y-WCAG22-BASELINE-001",
+  "control_version": "1.0.0",
+  "applicability_status": "APPLICABLE",
+  "applicability_reason": "WCAG 2.2 AA is an explicit voluntary engineering baseline for the project; statutory private-service accessibility remains separately uncertain.",
+  "expected": "Critical public flows meet an evidenced WCAG 2.2 level A/AA baseline across keyboard access, semantics, focus, reflow, contrast, names and roles, and representative assistive technologies.",
+  "observed": "The current local increment adds explicit document language, a focusable skip target, corrected header/main/footer landmarks, named navigation and profile cards, grouped and labelled filters, accessible status text, units for measurements, visible focus, reduced-motion handling, minimum target-size contracts and verified core colour-token contrast. A development-only synthetic preview was exercised in Chromium at 360, 390, 768, 1024, 1440 and 1920 CSS px, plus a 320 CSS px reflow check equivalent to 400 percent at a 1280 CSS px baseline; client and scroll widths matched, the skip link transferred focus to main, no forms or external resource origins were present, and the console had no errors or warnings. Production still exposes only the neutral holding state. This is not a complete WCAG audit and no screen reader was used.",
+  "method": "Static accessibility-contract tests, Chromium/Playwright keyboard and responsive checks on the explicitly synthetic loopback-only preview, visual inspection of corrected mobile and desktop captures, and a production holding-state smoke.",
+  "preconditions": [
+    "The local production build was served only on 127.0.0.1 during the test and stopped afterward.",
+    "No real profiles, legal text, contact destination or third-party resource was enabled."
+  ],
+  "limitations": [
+    "No screen reader or speech-recognition technology was exercised.",
+    "The 320 CSS px reflow check and static contracts do not replace a complete zoom, text-spacing, contrast-state, motion or pointer target-size audit across final content.",
+    "Visual fidelity was excluded because the client has not selected the controlling mockup.",
+    "The browser retest covers synthetic local preview content, not approved real profiles, legal text or production integrations.",
+    "Local observations do not prove deployed behaviour."
+  ],
+  "tool_status": "SUCCEEDED",
+  "tool_error": null,
+  "result": "PARTIAL",
+  "evidence": [
+    {
+      "kind": "TEST",
+      "path_or_url": "tests/accessibility-contract.test.ts",
+      "sha256": "9afdf3cb8d69983cd7cf566d7bc06a9318f55e6c480db0edc4796dcd423bf7df",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T16:53:00Z"
+    },
+    {
+      "kind": "SCREENSHOT",
+      "path_or_url": "output/playwright/final-preview/viewport-360.png",
+      "sha256": "f438e51bb948fa6b40c4031a0c33a8d5e9d51729273e88247c22e4f94997d721",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T17:11:00Z"
+    },
+    {
+      "kind": "SCREENSHOT",
+      "path_or_url": "output/playwright/final-preview/viewport-1440.png",
+      "sha256": "ebe065b2ecda119664538b5567d9e6386342e77460eba068494e08cdcbd133c8",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T17:11:00Z"
+    },
+    {
+      "kind": "SCREENSHOT",
+      "path_or_url": "output/playwright/final-preview/reflow-320-equivalent-400.png",
+      "sha256": "17e3a10ba3b0ade95a90cd5a3f7842dc2d002514986f115384f469f0b9fbf4cf",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T17:11:00Z"
+    }
+  ],
+  "impact": "Untested accessibility criteria could still prevent some people from understanding or operating the final service even though the tested keyboard and responsive baseline improved.",
+  "prevalence": "All public routes, final content, interactive controls and future media.",
+  "reproducibility": "REPRODUCED_TWICE",
+  "technical_severity": "MEDIUM",
+  "confidence": "HIGH",
+  "priority": "P1 before release",
+  "legal_relevance": "NONE_IDENTIFIED",
+  "source_refs": [
+    {
+      "class": "VOLUNTARY_STANDARD",
+      "legal_effect": "Voluntary engineering baseline; it is not presented as binding law or as a universal presumption of conformity.",
+      "instrument_id": "W3C-WCAG-2.2",
+      "instrument": "Web Content Accessibility Guidelines (WCAG) 2.2",
+      "identifier": "W3C Recommendation 05 October 2023",
+      "provision": "levels A and AA",
+      "version": "W3C Recommendation 2023-10-05",
+      "effective_as_of": "2026-08-27",
+      "official_url": "https://www.w3.org/TR/WCAG22/",
+      "applicability_reason": "The project requirements adopt WCAG 2.2 AA as a quality baseline regardless of unresolved statutory scope.",
+      "verified_at": "2026-08-27",
+      "verification_method": "Official W3C Recommendation URL and project audit register."
+    }
+  ],
+  "review_status": "REQUIRES_HUMAN_REVIEW",
+  "false_positive_analysis": "Passing the tested keyboard and layout checks is counterevidence to a blanket accessibility failure, but it cannot establish full WCAG conformance.",
+  "counterevidence": [
+    "Skip-link activation transfers focus to the main landmark in the current synthetic preview.",
+    "The tested preview has no horizontal overflow at six standard widths or at the 320 CSS px reflow check.",
+    "Static contracts cover landmarks, labels, link purpose, status text, focus, reduced motion, target-size rules and core colour-token contrast.",
+    "The current preview produced no console errors or warnings and loaded no external resource origin."
+  ],
+  "remediation_minimum": "Run a criterion-based WCAG 2.2 A/AA audit on the frozen release, including keyboard, focus, accessible names, errors, contrast, zoom/reflow, target size and representative screen-reader flows; remediate and retest every nonconformance.",
+  "additional_hardening": "Add automated accessibility smoke checks to CI and maintain a manual assistive-technology matrix for each release.",
+  "suggested_owner": "Frontend engineering and an independent accessibility reviewer",
+  "effort": "Medium after content and visual target are frozen",
+  "retest": "Repeat the same six widths plus keyboard and representative screen-reader scenarios on the versioned release artifact.",
+  "residual_risk": "NO-GO for accessibility acceptance until the untested criteria and assistive-technology coverage are completed."
+}

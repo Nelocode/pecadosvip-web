@@ -1,0 +1,9 @@
+command: pnpm audit --prod --audit-level=moderate
+candidateCommit: 8231629f98e4cb2fff4264e9181286cd8dcda466
+startedAtUtc: 2026-08-27T20:55:59.2961639Z
+finishedAtUtc: 2026-08-27T20:56:00.9462478Z
+exitCode: 0
+--- stdout ---
+No known vulnerabilities found
+
+--- stderr ---

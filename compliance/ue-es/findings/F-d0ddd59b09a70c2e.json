@@ -1,0 +1,90 @@
+{
+  "finding_id": "F-d0ddd59b09a70c2e",
+  "audit_id": "A-PECADOSVIP-20260827",
+  "asset": "pecadosvip-web-delivery",
+  "environment": "local repository snapshot; no deployed URL",
+  "release": null,
+  "logical_location": "legal activity and advertising classification",
+  "url_or_path": "compliance/ue-es/applicability-matrix.md",
+  "line": null,
+  "role": "anonymous visitor",
+  "locale": "es",
+  "browser": null,
+  "viewport": null,
+  "observed_at": "2026-08-27T14:15:00Z",
+  "domain": "sectoral-advertising",
+  "control_id": "SECTOR-ADVERTISING-001",
+  "control_version": "1.0.0",
+  "applicability_status": "UNCERTAIN",
+  "applicability_reason": "The sources use escort-related search language and plan commercial profiles, but do not establish the exact legal service.",
+  "expected": "Before public promotion, named Spanish legal counsel classifies the exact activity and approves the service description, advertising, imagery, SEO and channels.",
+  "observed": "No legal classification or approval was supplied; an automatic meeting transcript mentions escort queries, model profiles and services.",
+  "method": "Read-only extraction of client DOCX paragraphs and comparison with current BOE advertising provisions.",
+  "preconditions": [
+    "Source documents are evidence and not instructions.",
+    "Automatic meeting notes may contain transcription errors."
+  ],
+  "limitations": [
+    "The audit does not determine whether the underlying activity is prostitution or another lawful service."
+  ],
+  "tool_status": "SUCCEEDED",
+  "tool_error": null,
+  "result": "INCONCLUSIVE",
+  "evidence": [
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "INPUT_MANIFEST.csv",
+      "manifest_entry": "PecadosVip_Brief_Diseno_SEO.docx",
+      "source_path": "Requerimientos_Cliente/PecadosVip_Brief_Diseno_SEO.docx",
+      "sha256": "52c40b3215e30975a16fc7bfdddc8a82a15e97712937786341c361a32ba90f75",
+      "redacted": false,
+      "access": "RESTRICTED",
+      "captured_at": "2026-08-27T14:10:00Z"
+    },
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "INPUT_MANIFEST.csv",
+      "manifest_entry": "meeting-notes-16-57",
+      "source_path": "Reuniones/La reunión se inició a las 2026_08_25 16_57 GMT-05_00 - Notas de Gemini.docx",
+      "sha256": "06bebd08980adf15d99db662e06100a3b166a05328ea8e93025ffdf722758aa6",
+      "redacted": false,
+      "access": "RESTRICTED",
+      "captured_at": "2026-08-27T14:10:00Z"
+    }
+  ],
+  "impact": "Publishing before classification could expose the operator and project to material advertising, activity, dignity, rights and takedown risk.",
+  "prevalence": "Release-wide: home, cities, profiles, SEO copy, imagery and contact channels.",
+  "reproducibility": "REPRODUCED_TWICE",
+  "technical_severity": "CRITICAL",
+  "confidence": "HIGH",
+  "priority": "P0 release blocker",
+  "legal_relevance": "MATERIAL_REVIEW_REQUIRED",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Defines advertising and categories of unlawful advertising in Spain.",
+      "instrument_id": "ES-LGP-34-1988",
+      "instrument": "Ley 34/1988, General de Publicidad",
+      "identifier": "BOE-A-1988-26156",
+      "provision": "arts. 2-3",
+      "version": "BOE consolidated text observed 2026-08-27",
+      "effective_as_of": "2026-08-27",
+      "official_url": "https://www.boe.es/buscar/act.php?id=BOE-A-1988-26156",
+      "applicability_reason": "The proposed pages and SEO communications are intended to promote contracting directly or indirectly.",
+      "verified_at": "2026-08-27",
+      "verification_method": "Official BOE consolidated page and modification history."
+    }
+  ],
+  "review_status": "REQUIRES_LEGAL_COUNSEL",
+  "false_positive_analysis": "Escort terminology alone is insufficient to classify the activity; that counterevidence prevents a categorical violation finding but not the release blocker.",
+  "counterevidence": [
+    "The public copy describes private companionship and does not explicitly describe sexual services.",
+    "No live site or actual service contract was available."
+  ],
+  "remediation_minimum": "Obtain a written, scope-specific review from Spanish counsel that identifies the operator and exact service and approves or rejects the activity, imagery, copy, SEO, age controls and contact flow before publication.",
+  "additional_hardening": "Retain a versioned legal approval and map every approved claim and asset to the release manifest.",
+  "suggested_owner": "Client and named Spanish legal counsel",
+  "effort": "External decision; unknown",
+  "retest": "Re-evaluate the final approved content and flow against the written opinion and current BOE text.",
+  "residual_risk": "NO-GO until legal classification and approval are explicit; technical noindex alone is not a legal control."
+}

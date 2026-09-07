@@ -1,0 +1,4 @@
+services:
+  wordpress:
+    volumes:
+      - ./qa/subdirectory.conf:/etc/apache2/conf-enabled/pecadosvip-subdirectory.conf:ro

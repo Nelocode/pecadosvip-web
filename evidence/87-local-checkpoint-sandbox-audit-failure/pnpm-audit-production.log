@@ -1,0 +1,16 @@
+command: pnpm audit --prod --audit-level=moderate
+candidateCommit: b9d67186f7bc14503398796df85a23eab1978386
+startedAtUtc: 2026-08-27T20:52:19.2941413Z
+finishedAtUtc: 2026-08-27T20:53:31.0315682Z
+exitCode: 1
+--- stdout ---
+[WARN] POST https://registry.npmjs.org/-/npm/v1/security/advisories/bulk error (EACCES). Will retry in 10 seconds. 2 retries left.
+[WARN] POST https://registry.npmjs.org/-/npm/v1/security/advisories/bulk error (EACCES). Will retry in 1 minute. 1 retries left.
+[ERROR] fetch failed
+
+TypeError: fetch failed
+    at Object.processResponse (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:81949:20)
+    at file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:82330:23
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+--- stderr ---

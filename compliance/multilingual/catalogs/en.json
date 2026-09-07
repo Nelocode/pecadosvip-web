@@ -1,0 +1,527 @@
+{
+  "meta": {
+    "titleTemplate": "{title} | PecadosVip",
+    "siteName": "PecadosVip",
+    "default": {
+      "readyTitle": "PecadosVip | Private companionship in Madrid and Barcelona",
+      "holdingTitle": "PecadosVip | Site in preparation",
+      "readyDescription": "Private companionship service with travel to homes and hotels in Madrid and Barcelona. Discreet, personalised attention.",
+      "holdingDescription": "Unpublished version. Content and channels remain closed until release approvals are complete.",
+      "keywords": [
+        "private companionship Madrid",
+        "private companionship Barcelona",
+        "hotel service",
+        "at-home attention",
+        "PecadosVip"
+      ],
+      "socialImageAlt": "PecadosVip Madrid and Barcelona"
+    },
+    "home": {
+      "title": "PecadosVip | Madrid and Barcelona",
+      "description": "Private companionship project with travel to hotels and homes in Madrid and Barcelona."
+    },
+    "profiles": {
+      "title": "Profiles",
+      "description": "Catalogue of published and approved PecadosVip profiles."
+    },
+    "services": {
+      "title": "Services",
+      "description": "Catalogue of published and approved PecadosVip services."
+    },
+    "service": {
+      "unavailableTitle": "Service unavailable",
+      "unavailableDescription": "The requested service is not published."
+    },
+    "profile": {
+      "unavailableTitle": "Profile unavailable",
+      "unavailableDescription": "The requested profile is not published."
+    },
+    "contact": {
+      "title": "Private contact",
+      "description": "Status of PecadosVip private contact channels."
+    },
+    "legal": {
+      "unpublishedTitle": "Unpublished legal information",
+      "publishedDescription": "Approved and current legal information: {title}.",
+      "unpublishedDescription": "The legal information has not yet been published."
+    },
+    "cities": {
+      "madrid": {
+        "title": "Private companionship in Madrid",
+        "description": "Private companionship service in Madrid, with travel to homes and hotels. Discreet attention and coverage subject to prior confirmation.",
+        "openGraphDescription": "Private attention in Madrid homes and hotels, always with discretion and prior confirmation.",
+        "twitterDescription": "Private and discreet attention in Madrid.",
+        "imageAlt": "PecadosVip Madrid"
+      },
+      "barcelona": {
+        "title": "Private companionship in Barcelona",
+        "description": "Private companionship service in Barcelona, with travel to homes and hotels. Thoughtful attention and availability subject to confirmation.",
+        "openGraphDescription": "Private attention in Barcelona homes and hotels, with a discreet presence in the city and selected municipalities.",
+        "twitterDescription": "Private and discreet attention in Barcelona.",
+        "imageAlt": "PecadosVip Barcelona"
+      }
+    }
+  },
+  "layout": {
+    "skipLink": "Skip to main content"
+  },
+  "navigation": {
+    "brandHomeAria": "PecadosVip, home",
+    "primaryAria": "Main navigation",
+    "mobileAria": "Mobile navigation",
+    "home": "Home",
+    "madrid": "Madrid",
+    "barcelona": "Barcelona",
+    "profiles": "Profiles",
+    "services": "Services",
+    "privateContact": "Private contact",
+    "contact": "Contact"
+  },
+  "languageSelector": {
+    "label": "Language",
+    "ariaLabel": "Select language",
+    "currentLanguage": "Current language: {language}",
+    "options": {
+      "es": "Español",
+      "en": "English",
+      "fr": "Français",
+      "it": "Italiano"
+    }
+  },
+  "holding": {
+    "eyebrow": "Unpublished version",
+    "title": "Content in preparation",
+    "body": "This version does not offer services, publish profiles or receive requests. Content will remain closed until release approvals are complete."
+  },
+  "notFound": {
+    "eyebrow": "Error 404",
+    "title": "Page not found",
+    "body": "The requested page does not exist or is not available.",
+    "homeLink": "Return to home"
+  },
+  "notice": {
+    "title": "Local prototype",
+    "body": "Content, coverage and channels are pending approval. This version does not represent a published service."
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Discretion · Exclusivity · Private attention",
+      "title": "The luxury of choosing",
+      "titleAccent": "at home or in a hotel",
+      "body": "A responsive experience for Madrid and Barcelona. Coverage and availability will only be shown as real after approval.",
+      "profilesCta": "View profiles",
+      "contactCta": "Private contact",
+      "artLabel": "Madrid · Barcelona"
+    },
+    "trust": {
+      "ariaLabel": "Project principles",
+      "items": [
+        { "code": "01", "text": "Privacy handled with care" },
+        { "code": "02", "text": "Adults aged 18 and over only" },
+        { "code": "03", "text": "No premises open to the public" },
+        { "code": "04", "text": "Channels subject to approval" }
+      ]
+    },
+    "cities": {
+      "eyebrow": "Coverage under validation",
+      "title": "Two cities, one experience",
+      "body": "The current pages are product drafts. No area is presented as confirmed coverage in this version.",
+      "madridCode": "M·01",
+      "barcelonaCode": "B·01",
+      "cardCta": "View city draft"
+    },
+    "profiles": {
+      "eyebrow": "Profiles",
+      "title": "Catalogue protected by approval",
+      "openCatalog": "Open catalogue",
+      "emptyTitle": "No profiles are published.",
+      "emptyBody": "Profiles will appear only after age of majority, consent, usage rights and content approval have been validated."
+    },
+    "finalContact": {
+      "eyebrow": "Contact without exposure",
+      "title": "Channels remain closed until they are approved.",
+      "cta": "Check contact status"
+    }
+  },
+  "cityUi": {
+    "structuredData": {
+      "serviceName": "Private companionship in {city}",
+      "serviceType": "Private companionship service with travel"
+    },
+    "hero": {
+      "availabilityCta": "Check availability",
+      "howItWorksCta": "How it works",
+      "trustAria": "Service features",
+      "trustItems": [
+        { "code": "01", "text": "Personal attention" },
+        { "code": "02", "text": "Hotels and homes" },
+        { "code": "03", "text": "Privacy handled with care" }
+      ]
+    },
+    "ageRibbon": {
+      "ariaLabel": "Access conditions",
+      "adultOnly": "Adults aged 18 and over only",
+      "deliveryOnly": "Service with travel · No premises open to the public"
+    },
+    "principles": [
+      {
+        "code": "01",
+        "title": "Travel to you",
+        "body": "Attention is provided only at the confirmed hotel or home."
+      },
+      {
+        "code": "02",
+        "title": "Real confirmation",
+        "body": "Area, time and availability are validated before accepting a request."
+      },
+      {
+        "code": "03",
+        "title": "Private booking",
+        "body": "We ask only for the information essential to coordinate arrival."
+      }
+    ],
+    "priorityAvailability": "Priority enquiry area",
+    "otherAreas": {
+      "label": "Other enquiry areas",
+      "body": "Inclusion on this list does not replace confirmation of coverage for a specific date."
+    },
+    "processLabel": "How it works",
+    "discretionLabel": "The luxury of discretion",
+    "manifesto": {
+      "imageAlt": "PecadosVip: Madrid and Barcelona, privacy, presence and distinction",
+      "label": "Brand manifesto",
+      "body": "A restrained identity, an unforgettable presence."
+    },
+    "faq": {
+      "label": "Practical information",
+      "title": "Frequently asked questions in {city}",
+      "body": "Clear answers before sharing any sensitive information."
+    },
+    "contactLabel": "Private booking · {city}"
+  },
+  "cities": {
+    "madrid": {
+      "slug": "madrid",
+      "city": "Madrid",
+      "regionLabel": "Madrid · Private attention",
+      "kicker": "The capital, your way",
+      "headline": "The city changes.",
+      "headlineAccent": "Your privacy does not.",
+      "lead": "Private companionship with travel to homes and hotels. Thoughtful, punctual and discreetly exceptional attention.",
+      "coordinates": ["40.4168° N", "3.7038° W"],
+      "introEyebrow": "Madrid, without the noise",
+      "introTitle": "Presence when you want it. Privacy in every detail.",
+      "introBody": [
+        "Madrid demands pace, sound judgement and flawless logistics. We coordinate each request individually to offer a calm experience from the first contact.",
+        "The service is provided exclusively by travelling to you. We do not have premises open to the public: we come to the specified home or hotel, always after confirming the area and availability."
+      ],
+      "areaEyebrow": "Coverage subject to confirmation",
+      "areaTitle": "Madrid, district by district",
+      "areaIntro": "Attention is organised according to demand, the hotel profile and ease of travel. These are priority enquiry areas; exact availability is confirmed privately.",
+      "highlights": [
+        {
+          "code": "M·01",
+          "name": "Centro",
+          "note": "Hotels, Gran Vía, Justicia and the capital's nightlife centre."
+        },
+        {
+          "code": "M·02",
+          "name": "Barajas",
+          "note": "Coordinated attention for hotels and stays near the airport."
+        },
+        {
+          "code": "M·03",
+          "name": "Salamanca · Retiro",
+          "note": "Residential and hotel surroundings with particular care for timing."
+        },
+        {
+          "code": "M·04",
+          "name": "Chamberí · Chamartín",
+          "note": "Planned travel for calm, private meetings."
+        }
+      ],
+      "locations": [
+        "Pozuelo de Alarcón",
+        "Majadahonda",
+        "Las Rozas",
+        "Alcobendas",
+        "San Sebastián de los Reyes",
+        "Alcalá de Henares",
+        "Getafe",
+        "Leganés",
+        "Móstoles",
+        "Torrejón de Ardoz",
+        "Rivas-Vaciamadrid",
+        "Tres Cantos"
+      ],
+      "processTitle": "A clear booking, without unnecessary conversation",
+      "processIntro": "We ask only for what is needed to confirm the service. Sensitive information is neither published nor used outside coordination.",
+      "steps": [
+        {
+          "title": "Tell us the area and time",
+          "text": "Share the district or municipality, the approximate date and whether it is a hotel or home."
+        },
+        {
+          "title": "Receive a private confirmation",
+          "text": "We validate coverage and availability before suggesting the appropriate option."
+        },
+        {
+          "title": "Enjoy a punctual arrival",
+          "text": "We coordinate travel discreetly and without exposing unnecessary information."
+        }
+      ],
+      "discretionTitle": "In Madrid, true exclusivity means leaving no trace.",
+      "discretionText": "We design every interaction to protect your time, your space and your privacy. No public premises, no exposure and no promises we cannot confirm.",
+      "faqs": [
+        {
+          "question": "Is the service available in every district of Madrid?",
+          "answer": "Coverage depends on the area, time and current availability. Centro, Barajas, Salamanca, Retiro, Chamberí and Chamartín are priority enquiry areas, but we always confirm before finalising a booking."
+        },
+        {
+          "question": "Can you come to a hotel near the airport?",
+          "answer": "Yes, travel to hotels in Barajas and the surrounding area can be coordinated when availability exists. We recommend providing the hotel and time window in advance."
+        },
+        {
+          "question": "Do you also serve municipalities in the region?",
+          "answer": "We handle requests in selected municipalities such as Pozuelo, Majadahonda, Las Rozas, Alcobendas or Alcalá de Henares. Attention is never published as available until it has been validated for that date."
+        },
+        {
+          "question": "Does PecadosVip have premises in Madrid?",
+          "answer": "No. The service is provided exclusively by travelling to homes and hotels. We do not present any address as a public service point."
+        }
+      ],
+      "closingTitle": "Madrid does not wait. Your booking should not have to either.",
+      "closingText": "Tell us only where and when. We will confirm the rest privately."
+    },
+    "barcelona": {
+      "slug": "barcelona",
+      "city": "Barcelona",
+      "regionLabel": "Barcelona · Private attention",
+      "kicker": "From Eixample to the Mediterranean",
+      "headline": "The night flows.",
+      "headlineAccent": "Your privacy remains.",
+      "lead": "Private companionship with travel to homes and hotels in Barcelona. Closeness, elegance and coordination tailored to you.",
+      "coordinates": ["41.3874° N", "2.1686° E"],
+      "introEyebrow": "Barcelona, in private",
+      "introTitle": "Natural in manner. Impeccable in attention.",
+      "introBody": [
+        "Barcelona combines short stays, local life and escapes by the sea. That is why each request is coordinated according to the city's real pace and the travel distance.",
+        "We attend exclusively in homes and hotels, with no premises open to the public. Coverage is validated before confirmation so the experience begins with clarity."
+      ],
+      "areaEyebrow": "City, coast and municipalities",
+      "areaTitle": "From Barcelona to the sea, without losing discretion",
+      "areaIntro": "We prioritise areas with hotel activity, tourism and residential demand. The following areas guide the enquiry; every journey remains subject to real availability.",
+      "highlights": [
+        {
+          "code": "B·01",
+          "name": "Barcelona city",
+          "note": "Agile coordination for hotels, apartments and homes in the city."
+        },
+        {
+          "code": "B·02",
+          "name": "Castelldefels · Sitges",
+          "note": "Planned attention for coastal stays, leisure and private escapes."
+        },
+        {
+          "code": "B·03",
+          "name": "Sant Cugat · Vallès",
+          "note": "Private travel to residential and business areas."
+        },
+        {
+          "code": "B·04",
+          "name": "Baix Llobregat",
+          "note": "Enquiries for Gavà, Viladecans, El Prat, Esplugues and Sant Just."
+        }
+      ],
+      "locations": [
+        "Castelldefels",
+        "Sitges",
+        "Sant Cugat del Vallès",
+        "Esplugues de Llobregat",
+        "Sant Just Desvern",
+        "Gavà",
+        "Badalona",
+        "L'Hospitalet de Llobregat",
+        "Sabadell",
+        "Terrassa",
+        "Mataró",
+        "Vilanova i la Geltrú"
+      ],
+      "processTitle": "The right coordination makes everything seem simple",
+      "processIntro": "The sea, traffic and distances matter. We confirm every detail before travel to protect punctuality and privacy.",
+      "steps": [
+        {
+          "title": "Tell us your location",
+          "text": "Specify the city or municipality, hotel or home, and an approximate time window."
+        },
+        {
+          "title": "We validate the journey",
+          "text": "We check real coverage, arrival times and availability for your area."
+        },
+        {
+          "title": "We confirm privately",
+          "text": "You receive only the information needed for a calm, punctual experience."
+        }
+      ],
+      "discretionTitle": "Barcelona is lived outwards. What matters stays within.",
+      "discretionText": "Premium attention does not need excess: it needs judgement. We take care with the conversation, journey and arrival to keep every detail in the private sphere.",
+      "faqs": [
+        {
+          "question": "Do you attend both Barcelona city and nearby municipalities?",
+          "answer": "Yes, requests are handled in Barcelona and selected municipalities in the province. Availability depends on the date, time and distance, so it is always confirmed in advance."
+        },
+        {
+          "question": "Can attention be requested at a hotel in Sitges or Castelldefels?",
+          "answer": "We can coordinate travel to coastal hotels when coverage exists for that time window. The sooner you provide the location and time, the better we can validate the journey."
+        },
+        {
+          "question": "How is the arrival time outside the city calculated?",
+          "answer": "Before confirming, we review the municipality, current mobility and availability. We do not promise a time until we have checked that the journey is feasible."
+        },
+        {
+          "question": "Can I visit PecadosVip premises in Barcelona?",
+          "answer": "No. PecadosVip operates solely by travelling to homes and hotels; there is no service point open to the public."
+        }
+      ],
+      "closingTitle": "Your Barcelona. Your moment. Your rules.",
+      "closingText": "Share the area and time. We will confirm the journey with the discretion you expect."
+    }
+  },
+  "profiles": {
+    "eyebrow": "Protected catalogue",
+    "title": "Profiles",
+    "intro": "Filters operate on publishable content. Drafts and records without evidence never appear on this route.",
+    "filters": {
+      "legend": "Catalogue filters",
+      "ageHelp": "Age must be between {minAge} and {maxAge}. The minimum age cannot exceed the maximum.",
+      "city": "City",
+      "allCities": "All",
+      "availability": "Availability",
+      "allAvailability": "All",
+      "minimumAge": "Minimum age",
+      "maximumAge": "Maximum age",
+      "apply": "Apply filters"
+    },
+    "availability": {
+      "available": "Available",
+      "limited": "Limited availability",
+      "unavailable": "Unavailable",
+      "onRequest": "On request"
+    },
+    "results": {
+      "title": "Results",
+      "count": "{count, plural, one {# profile} other {# profiles}}",
+      "invalidTitle": "The filters are invalid.",
+      "invalidBody": "No content was queried or exposed. Reset the filters to continue.",
+      "reset": "Reset filters",
+      "filteredEmptyTitle": "There are no profiles for these filters.",
+      "filteredEmptyBody": "Change the criteria or reset the filters to see the full catalogue.",
+      "unpublishedTitle": "The catalogue has not yet been published.",
+      "unpublishedBody": "No profiles have jointly passed the content, age, consent, rights and release controls."
+    },
+    "card": {
+      "ageYears": "{age} years old",
+      "statusPrefix": "Status:",
+      "viewProfile": "View profile",
+      "viewProfileAria": "View {name}'s profile",
+      "syntheticView": "Synthetic view",
+      "syntheticViewAria": "Synthetic view of {name}"
+    }
+  },
+  "profile": {
+    "galleryAria": "Gallery of {name}",
+    "publishedEyebrow": "Published profile",
+    "ageYears": "{age} years old",
+    "measurements": {
+      "heightCm": "Height",
+      "weightKg": "Weight",
+      "bustCm": "Bust",
+      "waistCm": "Waist",
+      "hipsCm": "Hips"
+    },
+    "units": {
+      "centimeters": "cm",
+      "kilograms": "kg"
+    },
+    "servicesTitle": "Services"
+  },
+  "servicesHub": {
+    "eyebrow": "Approved services",
+    "title": "Private experiences with clear conditions.",
+    "body": "This route only shows published, approved services linked to publishable profiles.",
+    "catalogTitle": "Services catalogue",
+    "cardAction": "View service",
+    "profileCount": "{count} linked profiles",
+    "faqTitle": "Before choosing",
+    "faqs": [
+      { "question": "Is availability guaranteed?", "answer": "No. It must be confirmed privately for each profile, city and time." },
+      { "question": "Can boundaries be changed?", "answer": "Only through explicit, informed and reversible agreement between adults." }
+    ]
+  },
+  "serviceDetail": {
+    "breadcrumbAria": "Service breadcrumb",
+    "services": "Services",
+    "eyebrow": "Published service",
+    "profilesTitle": "Related profiles",
+    "profilesBody": "Approved profiles that include this service.",
+    "contactTitle": "Private confirmation",
+    "contactBody": "Check coverage, availability and conditions only through an approved channel.",
+    "back": "Back to services"
+  },
+  "contact": {
+    "eyebrow": "Private contact",
+    "title": "Share data only when an approved channel exists.",
+    "body": "This version does not send forms or store requests. Channels are activated only after validating their destination and completing contact and privacy approvals.",
+    "safety": {
+      "title": "Technical status",
+      "items": [
+        "There is no active POST form.",
+        "No analytics or messaging SDKs are loaded from this page.",
+        "Do not include sensitive information while the channels are disabled."
+      ]
+    }
+  },
+  "contactOptions": {
+    "title": "Contact channels",
+    "channels": {
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "phone": "Telephone",
+      "email": "Email"
+    },
+    "unavailableSuffix": "unavailable",
+    "enabledMessage": "Use only one of the approved channels shown as active.",
+    "disabledMessage": "Channels are disabled until release, contact and privacy approvals are complete.",
+    "form": {
+      "title": "Private contact form",
+      "intro": "Share only the information we need to reply.",
+      "name": "Name or alias",
+      "reply": "Email or telephone for our reply",
+      "city": "City",
+      "selectCity": "Select a city",
+      "message": "Message",
+      "privacyPrefix": "By submitting, you accept the processing described in the",
+      "privacyLink": "Privacy policy",
+      "submit": "Send request"
+    }
+  },
+  "footer": {
+    "brandHomeAria": "PecadosVip, home",
+    "tagline": "Web project for Madrid and Barcelona in the validation phase.",
+    "linksAria": "Footer links",
+    "publicationStatusAria": "Publication status",
+    "adultOnly": "Adults aged 18 and over only",
+    "legalApproved": "Legal information approved and accessible",
+    "legalPending": "Legal information pending approval"
+  },
+  "legal": {
+    "approvedEyebrow": "Approved legal information",
+    "updatedLabel": "Last updated: {date}",
+    "documents": {
+      "legalNotice": "Legal notice",
+      "privacy": "Privacy",
+      "cookies": "Cookies",
+      "serviceTerms": "Terms of service"
+    }
+  }
+}

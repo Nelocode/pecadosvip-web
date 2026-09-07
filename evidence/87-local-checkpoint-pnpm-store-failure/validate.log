@@ -1,0 +1,22 @@
+command: pnpm run validate
+candidateCommit: 84ebcb3086d4a99bffe1a42b339d12300c066f03
+startedAtUtc: 2026-08-27T20:18:28.8142552Z
+finishedAtUtc: 2026-08-27T20:38:55.6376378Z
+exitCode: 1
+--- stdout ---
+Recreating C:\Users\artot\OneDrive\Desktop\01_Proyectos_y_Desarrollo\Personales\Proyecto_Chicas_Lindas\pecadosvip-web-delivery\node_modules
+[ERROR] Command failed with exit code 4294967295: "C:\Users\artot\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" "C:\Users\artot\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules\pnpm\bin\pnpm.mjs" install
+
+pnpm: Command failed with exit code 4294967295: "C:\Users\artot\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" "C:\Users\artot\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules\pnpm\bin\pnpm.mjs" install
+    at getFinalError (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:88973:14)
+    at makeError (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:91280:21)
+    at getSyncResult (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:93124:10)
+    at spawnSubprocessSync (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:93084:14)
+    at execaCoreSync (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:93014:23)
+    at callBoundExeca (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:95542:23)
+    at boundExeca (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:95519:49)
+    at sync2 (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:95678:10)
+    at runPnpmCli (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:252207:5)
+    at runDepsStatusCheck (file:///C:/Users/artot/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:253973:7)
+
+--- stderr ---

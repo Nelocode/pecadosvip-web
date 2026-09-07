@@ -1,0 +1,64 @@
+{
+  "schema": "pecadosvip.stage-evidence",
+  "version": 2,
+  "stage": "98-local-technical-checkpoint",
+  "capturedAtUtc": "2026-08-28T01:32:02.4812151Z",
+  "candidateCommit": "73249861acb9874a310e9f112450d00a65a4b1e3",
+  "workingTreeCleanBeforeCapture": true,
+  "environment": {
+    "operatingSystem": "Microsoft Windows 10.0.26200",
+    "architecture": "X64",
+    "node": "v24.16.0",
+    "pnpm": "11.19.0",
+    "pnpmStoreConfiguredFromModulesMetadata": true
+  },
+  "commands": [
+    {
+      "name": "release-verify",
+      "command": "pnpm run release:verify",
+      "exitCode": 0,
+      "startedAtUtc": "2026-08-28T01:32:02.4988450Z",
+      "finishedAtUtc": "2026-08-28T01:33:01.3696955Z",
+      "logPath": "release-verify.log",
+      "logBytes": 18967,
+      "logSha256": "D484CFBC41B35A07FE2642B6665B936639E41CC9793F9B8FEC7EA11B5FA2E9AC"
+    },
+    {
+      "name": "pnpm-audit-production",
+      "command": "pnpm audit --prod --audit-level=moderate",
+      "exitCode": 0,
+      "startedAtUtc": "2026-08-28T01:33:01.4656571Z",
+      "finishedAtUtc": "2026-08-28T01:33:03.7040668Z",
+      "logPath": "pnpm-audit-production.log",
+      "logBytes": 269,
+      "logSha256": "AB49A74F6919CAFC65A62432459355A0791A7DE0D785F02313169AF4CE60EE07"
+    }
+  ],
+  "scorecard": {
+    "path": "LOCAL_TECHNICAL_SCORECARD.json",
+    "sha256": "7BBFCD48E5D1A18783DFABAB98D97E6A987612481ED4859F7EED1DC262C478FD",
+    "declaredScore": 98,
+    "denominator": 100,
+    "strictRequirementsVerified": 2,
+    "strictRequirementsTotal": 20,
+    "publicLegalRelease": "NO-GO"
+  },
+  "releaseArtifacts": [
+    {
+      "name": "sbom.cdx.json",
+      "bytes": 596470,
+      "sha256": "CFF0DF3643A8C2674BC6650C8D660DFF94AA6066DBFE8C65659B09409560CD7A"
+    },
+    {
+      "name": "build-artifact-report.json",
+      "bytes": 20414,
+      "sha256": "BC2007B312A7A211E06523067CCB68533AAB6CF304C4492EED7BB82F2796A058"
+    }
+  ],
+  "limits": [
+    "Local execution only; no deployed runtime was tested.",
+    "The local CycloneDX SBOM records the lockfile graph; it is not provenance, VEX, reachability or a pentest result.",
+    "Package audit is time-bound and does not prove reachability, provenance, VEX or pentest results.",
+    "A green validate result is not UAT, legal approval, visual acceptance or production readiness."
+  ]
+}

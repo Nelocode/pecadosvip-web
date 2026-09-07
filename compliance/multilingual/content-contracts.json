@@ -1,0 +1,32 @@
+{
+  "contracts": {
+    "home.trust.items[1].text": {
+      "type": "number",
+      "value": "18"
+    },
+    "cityUi.ageRibbon.adultOnly": {
+      "type": "number",
+      "value": "18"
+    },
+    "footer.adultOnly": {
+      "type": "number",
+      "value": "18"
+    },
+    "cities.madrid.coordinates[0]": {
+      "type": "number",
+      "value": "40.4168"
+    },
+    "cities.madrid.coordinates[1]": {
+      "type": "number",
+      "value": "3.7038"
+    },
+    "cities.barcelona.coordinates[0]": {
+      "type": "number",
+      "value": "41.3874"
+    },
+    "cities.barcelona.coordinates[1]": {
+      "type": "number",
+      "value": "2.1686"
+    }
+  }
+}

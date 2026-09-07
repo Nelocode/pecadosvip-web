@@ -1,0 +1,161 @@
+{
+  "inventory_version": "1.0.0",
+  "source_locale": "es",
+  "required_locales": ["es", "en", "fr", "it"],
+  "route_strategy": "locale-prefix",
+  "routes": [
+    {
+      "path": "/",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/madrid",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/barcelona",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/girona",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/tarragona",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/toledo",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/guadalajara",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/segovia",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/perfiles",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/perfiles/{slug}",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/servicios",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/servicios/{slug}",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/contacto",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/legal/aviso-legal",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/legal/privacidad",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/legal/cookies",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/legal/terminos-del-servicio",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    }
+  ]
+}

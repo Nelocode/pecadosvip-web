@@ -1,0 +1,2 @@
+key,role,master_path,selected_path,master_sha256,selected_sha256,width,height,format,origin,technical_review,human_review,legal_review,publication_scope
+home-editorial,home_hero,assets/synthetic-hero/master/home-hero-editorial-v01.png,assets/synthetic-hero/selected/home-hero-editorial-v01.webp,7AF179131740C9C149AD39CD130557CECEA14C6A082CDF6AFA46140299F8196F,22859FB751202D9B5645BE116C09CD64BEE9D0963170D52E18C68FFCB9D64C35,1536,1024,image/webp,openai_image_generation,PASS,PENDING,PENDING,local_preview_only_no_publication

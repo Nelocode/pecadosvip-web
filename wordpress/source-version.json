@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/Nelocode/pecadosvip.git",
+  "sourceCommit": "f12dafcd7b800e16fb36efcc8b85f5e6c9a71dd0",
+  "sourceBranch": "main",
+  "description": "Provenance of the downloaded source; allows rebuilding an extracted ZIP without Git."
+}

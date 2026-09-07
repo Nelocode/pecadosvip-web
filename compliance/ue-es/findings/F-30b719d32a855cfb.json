@@ -1,0 +1,147 @@
+{
+  "finding_id": "F-30b719d32a855cfb",
+  "audit_id": "A-PECADOSVIP-20260827",
+  "asset": "pecadosvip-web-delivery",
+  "environment": "local candidate commit 15d56f0e5812a06e03dea781487f7553ce010a5c; no deployed URL",
+  "release": null,
+  "logical_location": "dependency reachability and security scan",
+  "url_or_path": "pnpm-lock.yaml",
+  "line": null,
+  "role": "release engineer",
+  "locale": "es",
+  "browser": null,
+  "viewport": null,
+  "observed_at": "2026-08-27T22:20:38.6365967Z",
+  "domain": "software supply chain security",
+  "control_id": "SEC-SCA-REACHABILITY-001",
+  "control_version": "1.0.0",
+  "applicability_status": "APPLICABLE",
+  "applicability_reason": "The application has a versioned JavaScript dependency graph that must be evaluated before a release claim.",
+  "expected": "A compatible dependency and reachability scan completes on the frozen lockfile and build, triages material findings and records reproducible evidence.",
+  "observed": "The pre-remediation production graph first reported 14 advisories (7 HIGH and 7 MODERATE). Moving the runtime to Next 16.2.11 reduced the result to 5 transitive advisories; workspace overrides then pinned sharp 0.35.0 and postcss 8.5.26. On candidate commit 15d56f0e5812a06e03dea781487f7553ce010a5c, the durable `pnpm audit --prod --audit-level=moderate` log records exit 0 and `No known vulnerabilities found`; the durable release-verification log records lint/typecheck success, 144/144 tests, a completed build, a valid 95/100 local scorecard, a deterministic CycloneDX-structured lockfile inventory, a passing build artifact validator and the exact holding smoke. The CycloneDX inventory was not validated against the official schema and is not VEX, provenance or reachability. Passive source review reports 0 CRITICAL, 0 HIGH and 0 MEDIUM findings and tracks 6 conditional LOW observations: 2 mitigated in the local scope and 4 partially mitigated. The separate integrated Codex Security scan still FAILED while reading a nested sourcemap and produced no durable scan identifier or reachability conclusion.",
+  "method": "Retest of the production dependency graph with pnpm audit, deterministic lockfile inventory generation, build artifact validation and passive manual source review of local publication, persistence, cooperative local-filesystem locking, media, backup and workbench boundaries. Final outputs are retained under evidence/95-local-technical-checkpoint and bound by a SHA-256 manifest to candidate commit 15d56f0e5812a06e03dea781487f7553ce010a5c. The historical evidence/87-local-checkpoint capture is preserved separately. The failed integrated reachability scan is recorded as FAILED/NOT_TESTED and was not treated as executed.",
+  "preconditions": [
+    "The package manifest, workspace override policy and lockfile identify the audited production graph.",
+    "Final local release verification passes with 144/144 tests and a production build."
+  ],
+  "limitations": [
+    "The final package audit is an advisory-database result at execution time; it is not a pentest, exploitability or full reachability conclusion.",
+    "A durable CycloneDX-structured lockfile inventory is retained, but official-schema validation, VEX, provenance attestation and durable integrated reachability remain absent.",
+    "The integrated Codex Security scan failed on a nested sourcemap and remains NOT_TESTED as a technique.",
+    "The source review was passive: no exploit, fuzz, active scan or deployed-runtime test was performed. Cooperative local lock contention was exercised, but hostile or distributed locking was not."
+  ],
+  "tool_status": "SUCCEEDED",
+  "tool_error": null,
+  "result": "PARTIAL",
+  "evidence": [
+    {
+      "kind": "OTHER",
+      "path_or_url": "pnpm-lock.yaml",
+      "sha256": "2d61a1a4292c25cb9ffe466283ac4038c452955a36d67c29f2a749dec7595430",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T22:19:33.7189605Z"
+    },
+    {
+      "kind": "OTHER",
+      "path_or_url": "package.json",
+      "sha256": "d2ddd6940db24dedd1dbf4b8935ef301e6a57166a39babdac437634aba4109c8",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T22:19:33.7189605Z"
+    },
+    {
+      "kind": "OTHER",
+      "path_or_url": "pnpm-workspace.yaml",
+      "sha256": "ed4575e56cbb176182c00c25218690aa1c39d6e53cc4e0b7ee2b2314bb36ad90",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T19:35:37Z"
+    },
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "evidence/87-local-checkpoint/evidence-manifest.json",
+      "sha256": "673fa0fb0cbdb5516c29f446b6a0e9dd0f8af3079bc2a2e3736583210edc1e93",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T20:55:25.4489098Z"
+    },
+    {
+      "kind": "LOG",
+      "path_or_url": "evidence/87-local-checkpoint/validate.log",
+      "sha256": "b7fb69d762a222801671c6b99314fffb70505fde34543f5dc97522040e486ebe",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T20:55:59.2199168Z"
+    },
+    {
+      "kind": "LOG",
+      "path_or_url": "evidence/87-local-checkpoint/pnpm-audit-production.log",
+      "sha256": "75d58b4a9a72221e27f789e8500338a1c3d89f3006e654d7a3cd9f97fbc5acf4",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T20:56:00.9462478Z"
+    },
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "evidence/95-local-technical-checkpoint/evidence-manifest.json",
+      "sha256": "d7f26a8e27ea4789f39cec2855fe376df3daa0b86e138f2e4156a10d35d9bd95",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T22:19:33.7189605Z"
+    },
+    {
+      "kind": "LOG",
+      "path_or_url": "evidence/95-local-technical-checkpoint/release-verify.log",
+      "sha256": "38ae74bcc711fcc641b05984b6cab432c6d0c32ceebde5eb638feef3ed544e69",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T22:20:36.3994739Z"
+    },
+    {
+      "kind": "LOG",
+      "path_or_url": "evidence/95-local-technical-checkpoint/pnpm-audit-production.log",
+      "sha256": "f3a611cdd8459321215b29a353108b8a9857fb2f99809601e2d51b2982eea402",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T22:20:38.6365967Z"
+    },
+    {
+      "kind": "SBOM",
+      "path_or_url": "evidence/95-local-technical-checkpoint/sbom.cdx.json",
+      "sha256": "cff0df3643a8c2674bc6650c8d660dff94aa6066dbfe8c65659b09409560cd7a",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T22:20:36.3994739Z"
+    },
+    {
+      "kind": "OTHER",
+      "path_or_url": "evidence/95-local-technical-checkpoint/build-artifact-report.json",
+      "sha256": "bfd9119e134fbf89b87ac0bf150d7f44867d3795b53226819c60e46be37b53a9",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T22:20:36.3994739Z"
+    }
+  ],
+  "impact": "Known production advisories were removed from the final audited graph, but a vulnerable reachable component or code-level weakness outside the advisory database could still remain undetected.",
+  "prevalence": "The complete production dependency graph and generated bundles.",
+  "reproducibility": "REPRODUCED_ONCE",
+  "technical_severity": "LOW",
+  "confidence": "HIGH",
+  "priority": "P1 before release",
+  "legal_relevance": "NONE_IDENTIFIED",
+  "source_refs": [],
+  "review_status": "REQUIRES_HUMAN_REVIEW",
+  "false_positive_analysis": "The zero-advisory result is scoped to the production dependency audit at execution time. It does not justify a zero-risk or zero-vulnerability claim and does not suppress the failed reachability technique.",
+  "counterevidence": [
+    "The retained production-audit log for candidate commit 15d56f0e5812a06e03dea781487f7553ce010a5c exited 0 with no known vulnerabilities after the recorded upgrade and overrides.",
+    "The retained release-verification log for the same candidate records lint/typecheck success, 144/144 passing tests, a completed production build and the local release gates.",
+    "Passive review and focused tests confirmed loopback-only administration, bearer and exact-origin checks, payload limits, fail-closed publication, escaped rendering, cooperative local lock contention and backup integrity checks."
+  ],
+  "remediation_minimum": "Keep the production audit at zero known advisories on the frozen candidate and retain its raw output; validate the CycloneDX inventory against the official schema if it will be represented as an interoperable SBOM, and complete compatible reachability or VEX/provenance evidence before public release. Keep the integrated scanner marked FAILED/NOT_TESTED until a real compatible run completes.",
+  "additional_hardening": "Automate recurring dependency review and expiry-bound exceptions; preserve cooperative local lock tests and fail-closed stale-lock handling, strengthen handle-relative reparse-point/TOCTOU controls, projection at every adapter boundary, uniform rejection of local-only media URLs and local-token throttling/rotation before any architecture broadens beyond trusted loopback use. Use a transactional or distributed datastore/lock design for production rather than extending the local filesystem protocol.",
+  "suggested_owner": "Release engineering and security reviewer",
+  "effort": "Low to medium for retained audit evidence and hardening; scanner compatibility may vary",
+  "retest": "Repeat the production audit and artifact inventory on every changed frozen commit/build; validate the CycloneDX document against the official schema if used interoperably, then complete a compatible reachability or VEX/provenance review. Reverify the four partially mitigated LOW observations and the two locally mitigated controls without promoting passive evidence to a pentest.",
+  "residual_risk": "The production graph had no known advisories at the recorded audit and a structured lockfile inventory plus artifact report are retained, but official SBOM-schema conformance, reachability, provenance, dynamic exploitation and deployed-runtime security remain untested. The integrated scanner remains FAILED/NOT_TESTED. Public/legal release remains NO-GO."
+}

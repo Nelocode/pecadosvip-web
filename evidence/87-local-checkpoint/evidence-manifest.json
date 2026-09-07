@@ -1,0 +1,42 @@
+{
+  "schema": "pecadosvip.stage-evidence",
+  "version": 1,
+  "stage": "87-local-checkpoint",
+  "capturedAtUtc": "2026-08-27T20:55:25.4489098Z",
+  "candidateCommit": "8231629f98e4cb2fff4264e9181286cd8dcda466",
+  "workingTreeCleanBeforeCapture": true,
+  "environment": {
+    "operatingSystem": "Microsoft Windows 10.0.26200",
+    "architecture": "X64",
+    "node": "v24.16.0",
+    "pnpm": "11.19.0",
+    "pnpmStoreConfiguredFromModulesMetadata": true
+  },
+  "commands": [
+    {
+      "name": "validate",
+      "command": "pnpm run validate",
+      "exitCode": 0,
+      "startedAtUtc": "2026-08-27T20:55:25.4680039Z",
+      "finishedAtUtc": "2026-08-27T20:55:59.2199168Z",
+      "logPath": "validate.log",
+      "logBytes": 12200,
+      "logSha256": "B7FB69D762A222801671C6B99314FFFB70505FDE34543F5DC97522040E486EBE"
+    },
+    {
+      "name": "pnpm-audit-production",
+      "command": "pnpm audit --prod --audit-level=moderate",
+      "exitCode": 0,
+      "startedAtUtc": "2026-08-27T20:55:59.2961639Z",
+      "finishedAtUtc": "2026-08-27T20:56:00.9462478Z",
+      "logPath": "pnpm-audit-production.log",
+      "logBytes": 269,
+      "logSha256": "75D58B4A9A72221E27F789E8500338A1C3D89F3006E654D7A3CD9F97FBC5ACF4"
+    }
+  ],
+  "limits": [
+    "Local execution only; no deployed runtime was tested.",
+    "Package audit is time-bound and does not prove reachability, provenance, VEX, SBOM or pentest results.",
+    "A green validate result is not UAT, legal approval, visual acceptance or production readiness."
+  ]
+}

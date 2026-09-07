@@ -1,0 +1,127 @@
+{
+  "finding_id": "F-1b1707ba34e2e4e1",
+  "audit_id": "A-PECADOSVIP-20260827",
+  "asset": "pecadosvip-web-delivery",
+  "environment": "local repository snapshot; no deployed URL",
+  "release": null,
+  "logical_location": "profiles and contact privacy design",
+  "url_or_path": "lib/content/types.ts",
+  "line": 32,
+  "role": "visitor and profile subject",
+  "locale": "es",
+  "browser": null,
+  "viewport": null,
+  "observed_at": "2026-08-27T17:10:00Z",
+  "domain": "privacy",
+  "control_id": "PRIV-RGPD-BASES-001",
+  "control_version": "1.0.0",
+  "applicability_status": "APPLICABLE",
+  "applicability_reason": "The planned product models personal profile/media data and a visitor contact flow.",
+  "expected": "Before processing, purposes, roles, bases, transparency, minimisation, retention, recipients, transfers, rights, security and evidence procedures are approved and implemented.",
+  "observed": "The local increment now has durable versioned profile state, optimistic revisions, replay-resistant request IDs, append-only audit events without profile content, recoverable archive, integrity-checked backup/restore and a loopback-only development workbench with server-side role mapping, same-origin mutation checks and production refusal. These are technical safeguards for synthetic/local work, not an approved production backend. Privacy content, controller/processor roles, purposes and bases, retention, rights workflow, provider inventory, production authentication, encryption and cross-process concurrency remain unresolved.",
+  "method": "Static review plus local integration tests of content types, persistent repository, workbench authorization/idempotency/audit, backup/restore, validation, release gates and the legal-input register.",
+  "preconditions": [
+    "No real profiles or enabled contact endpoint exist in the snapshot."
+  ],
+  "limitations": [
+    "Provider logs and backend data flows cannot be tested without a deployed architecture.",
+    "The exact adult-context biographies, media, search and contact processing are not frozen, so this audit cannot conclude whether Article 9 special-category data are processed or inferred, or whether Article 35 requires a DPIA.",
+    "The JSON persistence and media storage are explicitly local development/test mechanisms: plaintext at rest, one-process locking and token-based loopback access are not accepted as production controls."
+  ],
+  "tool_status": "SUCCEEDED",
+  "tool_error": null,
+  "result": "PARTIAL",
+  "evidence": [
+    {
+      "kind": "OTHER",
+      "path_or_url": "lib/content/types.ts",
+      "sha256": "d81a4491ab16b2c6f770d1c96cc1d3bf4735a021c100ff31d8d9ec950b67dfcf",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T14:15:00Z"
+    },
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "LEGAL_INPUTS_REQUIRED.md",
+      "sha256": "61874a4a251077882f9e6a5ea6fd2d2ccac22c7c5105e035243ea666ec7aea5b",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T14:15:00Z"
+    },
+    {
+      "kind": "OTHER",
+      "path_or_url": "lib/content/persistent-repository.ts",
+      "sha256": "f4f7a6e7306b3227aa58eb05101350f1062e69ced886b616394b4bc676851051",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T19:35:37Z"
+    },
+    {
+      "kind": "OTHER",
+      "path_or_url": "lib/workbench/local-cms-workbench.ts",
+      "sha256": "05a794fc6b8a2f47c77a1ea8078d881f03fe94f3182739673e4a280886e91ae2",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T19:35:37Z"
+    },
+    {
+      "kind": "TEST",
+      "path_or_url": "tests/local-cms-workbench.test.ts",
+      "sha256": "bbb537c2b9e3a59ae4c1affe3f1f02e68c7f755fc2f0a8af73c16782501264e4",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-27T17:10:00Z"
+    }
+  ],
+  "impact": "Enabling profiles or contact without the missing governance could expose visitors and profile subjects to unlawful, excessive or insecure processing.",
+  "prevalence": "All real profile/media records and every enabled contact channel.",
+  "reproducibility": "REPRODUCED_TWICE",
+  "technical_severity": "HIGH",
+  "confidence": "HIGH",
+  "priority": "P0 release blocker",
+  "legal_relevance": "MATERIAL_REVIEW_REQUIRED",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Directly applicable data-protection duties within material and territorial scope.",
+      "instrument_id": "EU-GDPR-2016-679",
+      "instrument": "Regulation (EU) 2016/679 (GDPR)",
+      "identifier": "CELEX:02016R0679-20160504",
+      "provision": "arts. 5-9, 12-25, 32 and 35",
+      "version": "consolidated text referenced by the skill register 2026-08-26",
+      "effective_as_of": "2026-08-27",
+      "official_url": "https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:02016R0679-20160504",
+      "applicability_reason": "The planned profile and contact system processes personal data in a Spanish-targeted service. Article 9 and Article 35 are cited as unresolved classification questions, not as conclusions that special-category processing or a mandatory DPIA exists.",
+      "verified_at": "2026-08-26",
+      "verification_method": "Official EUR-Lex reference and skill legal-register freshness check."
+    },
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Complements GDPR in Spain.",
+      "instrument_id": "ES-LOPDGDD-3-2018",
+      "instrument": "Ley Organica 3/2018 (LOPDGDD)",
+      "identifier": "BOE-A-2018-16673",
+      "provision": "arts. 6-11",
+      "version": "BOE consolidated text",
+      "effective_as_of": "2026-08-27",
+      "official_url": "https://www.boe.es/eli/es/lo/2018/12/05/3/con",
+      "applicability_reason": "Spanish complement for the targeted processing context.",
+      "verified_at": "2026-08-27",
+      "verification_method": "Official BOE consolidated text."
+    }
+  ],
+  "review_status": "REQUIRES_HUMAN_REVIEW",
+  "false_positive_analysis": "The current disabled flow prevents observed form submission and real profiles are absent, so this is a pre-release design gap rather than proof of production processing.",
+  "counterevidence": [
+    "Publication gates require adult-age, consent and rights evidence.",
+    "No real profile data is committed.",
+    "Local state changes persist revisions, request replay protection and audit events without copying profile content into the event log.",
+    "The local workbench refuses production mode and non-loopback binding; its backup path validates a versioned integrity manifest before restore."
+  ],
+  "remediation_minimum": "Approve and implement the controller/processor map, treatment inventory, legal bases, layered privacy information, minimised fields, retention, rights process, provider contracts and security controls before enabling data collection or real profiles. Classify whether any exact profile content or inference falls within Article 9 and record the Article 35 screening decision.",
+  "additional_hardening": "Replace the local JSON/workbench mechanism with a production architecture that has appropriate authentication, encryption, multi-process concurrency, monitoring, tested deletion and access controls. Complete a DPIA/necessity and proportionality assessment if the final context, scale, systematic features, data categories or risks meet the applicable threshold; counsel/privacy leadership must determine and document whether it is required.",
+  "suggested_owner": "Client privacy owner, legal counsel and engineering",
+  "effort": "Medium to high; external facts required",
+  "retest": "Trace every real data field and provider from collection to deletion and exercise one non-destructive rights-request workflow in staging.",
+  "residual_risk": "High until governance and runtime evidence exist; keep endpoints and profiles disabled."
+}

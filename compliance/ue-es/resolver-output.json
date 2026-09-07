@@ -1,0 +1,158 @@
+{
+  "audit_date": "2026-08-27",
+  "decisions": [
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "EU-GDPR-2016-679",
+        "ES-LOPDGDD-3-2018"
+      ],
+      "module": "privacy",
+      "reason": "Se declara tratamiento de datos personales.",
+      "requires_human_confirmation": false,
+      "status": "APPLICABLE"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "ES-LSSI-34-2002"
+      ],
+      "module": "cookie-consent",
+      "reason": "Falta inventario por estados de consentimiento.",
+      "requires_human_confirmation": true,
+      "status": "UNCERTAIN"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "ES-RD-1112-2018"
+      ],
+      "module": "public-accessibility",
+      "reason": "Falta resolver naturaleza pública, vínculo contractual o alcance expreso.",
+      "requires_human_confirmation": true,
+      "status": "UNCERTAIN"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "ES-LAW-11-2023-T1"
+      ],
+      "module": "eaa-service-accessibility",
+      "reason": "Falta identificar servicio, consumidor, tamaño o si se prestan servicios.",
+      "requires_human_confirmation": true,
+      "status": "UNCERTAIN"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "ES-TRLGDCU-1-2007"
+      ],
+      "module": "consumer-ecommerce",
+      "reason": "Falta resolver B2C y contratación a distancia.",
+      "requires_human_confirmation": true,
+      "status": "UNCERTAIN"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "ES-LAW-11-2023-T1"
+      ],
+      "module": "cefr-b2-banking",
+      "reason": "El sector declarado no es banca de consumo.",
+      "requires_human_confirmation": false,
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "EU-DSA-2022-2065"
+      ],
+      "module": "dsa",
+      "reason": "No se resolvió el rol de intermediación.",
+      "requires_human_confirmation": true,
+      "status": "UNCERTAIN"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "ES-ENS-311-2022"
+      ],
+      "module": "ens",
+      "reason": "No consta alcance expreso ni se descartó un nexo contractual público.",
+      "requires_human_confirmation": true,
+      "status": "UNCERTAIN"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "ES-ENI-4-2010"
+      ],
+      "module": "eni",
+      "reason": "No consta alcance expreso ni se descartó un nexo contractual público.",
+      "requires_human_confirmation": true,
+      "status": "UNCERTAIN"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "EU-NIS2-2022-2555"
+      ],
+      "module": "nis2-readiness",
+      "reason": "El perfil descarta entidad NIS con evidencia.",
+      "requires_human_confirmation": false,
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "EU-DORA-2022-2554"
+      ],
+      "module": "dora",
+      "reason": "El perfil excluye expresamente el activo del alcance DORA.",
+      "requires_human_confirmation": false,
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "EU-CRA-2024-2847"
+      ],
+      "module": "cra",
+      "reason": "No hay producto con elementos digitales cubierto.",
+      "requires_human_confirmation": false,
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "EU-AI-ACT-2024-1689"
+      ],
+      "module": "ai-act",
+      "reason": "No se declara sistema de IA.",
+      "requires_human_confirmation": false,
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "EU-ODR-REPEAL-2024-3228"
+      ],
+      "module": "legacy-odr-link",
+      "reason": "La plataforma ODR fue derogada; no exigir el antiguo enlace.",
+      "requires_human_confirmation": false,
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "assumptions": [],
+      "instrument_ids": [
+        "OWASP-ASVS-5.0.0"
+      ],
+      "module": "security-passive",
+      "reason": "Baseline técnico pasivo; no implica obligación legal automática.",
+      "requires_human_confirmation": false,
+      "status": "APPLICABLE"
+    }
+  ],
+  "resolver_version": "1.1.0",
+  "warning": "Matriz preliminar: verificar hechos, vigencia, transposición y razonamiento antes de concluir."
+}
