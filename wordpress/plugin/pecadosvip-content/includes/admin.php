@@ -3,6 +3,7 @@ if (!defined('ABSPATH')) { exit; }
 
 add_action('admin_menu', function() {
     add_menu_page('PecadosVip', 'PecadosVip', 'edit_posts', 'pecadosvip-content', 'pvc_dashboard', 'dashicons-palmtree', 25);
+    add_submenu_page('pecadosvip-content', 'Dashboard / Importar', 'Dashboard / Importar', 'edit_posts', 'pecadosvip-content', 'pvc_dashboard');
     add_submenu_page('pecadosvip-content', 'Textos, cabecera y pie', 'Textos y diseño', 'manage_options', 'pecadosvip-copy', 'pvc_copy_admin');
 });
 add_action('admin_notices', function() {
@@ -156,3 +157,4 @@ foreach (array_keys(pvc_types()) as $type) {
     add_filter('manage_' . $type . '_posts_columns', function($columns) { return $columns + array('pvc_locale' => 'Idioma', 'pvc_key' => 'Clave'); });
     add_action('manage_' . $type . '_posts_custom_column', function($column, $id) { if ($column === 'pvc_locale') { echo esc_html(pvc_locales()[get_post_meta($id, 'pv_locale', true)] ?? 'Sin idioma'); } if ($column === 'pvc_key') { echo esc_html(get_post_meta($id, 'pv_key', true)); } }, 10, 2);
 }
+
