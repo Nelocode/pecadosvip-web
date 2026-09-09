@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) { exit; }
 
 function pvc_watermark_config(): array {
     return (array) apply_filters('pvc_watermark_config', array(
-        'version' => '1', 'logo' => PVC_DIR . '/assets/pecadosvip-watermark.png',
+        'version' => '2', 'logo' => PVC_DIR . '/assets/pecadosvip-watermark.png',
         'ffmpeg' => '/usr/bin/ffmpeg', 'ffprobe' => '/usr/bin/ffprobe',
         'image_max_bytes' => 30 * 1024 * 1024, 'image_max_pixels' => 24000000,
         'image_max_edge' => 2560, 'video_max_bytes' => 128 * 1024 * 1024,
@@ -217,6 +217,9 @@ function pvc_wm_load_image(string $file) {
     $loaders = array('image/jpeg' => 'imagecreatefromjpeg', 'image/png' => 'imagecreatefrompng', 'image/webp' => 'imagecreatefromwebp');
     $loader = $loaders[$info['mime']]; if (!function_exists($loader)) { throw new RuntimeException('missing_image_runtime'); }
     $image = @$loader($file); if (!$image) { throw new RuntimeException('image_decode'); }
+    // WordPress/Imagick may produce indexed PNG crops. Alpha blending onto a
+    // palette replaces background pixels with transparency instead of blending.
+    if (!imageistruecolor($image) && !imagepalettetotruecolor($image)) { imagedestroy($image); throw new RuntimeException('image_decode'); }
     imagealphablending($image, false); imagesavealpha($image, true);
     return $image;
 }

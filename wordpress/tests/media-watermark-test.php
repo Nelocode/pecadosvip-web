@@ -96,6 +96,35 @@ function wm_mark_present(string $file): bool {
     for ($y = (int) (imagesy($image) * .65); $y < imagesy($image); $y += 2) { for ($x = (int) (imagesx($image) * .65); $x < imagesx($image); $x += 2) { $pixel = imagecolorat($image, $x, $y); $r = ($pixel >> 16) & 255; $g = ($pixel >> 8) & 255; if ($r > 130 && $r > $g + 40) { $found++; } } }
     imagedestroy($image); return $found > 5;
 }
+function wm_check_indexed_png_background(): void {
+    $config = $GLOBALS['wm_config']; $GLOBALS['wm_config']['logo'] = PVC_DIR . '/assets/pecadosvip-watermark.png';
+    $results = array();
+    try {
+        foreach (array('indexed', 'truecolor') as $kind) {
+            $image = $kind === 'indexed' ? imagecreate(150, 150) : imagecreatetruecolor(150, 150);
+            imagefill($image, 0, 0, imagecolorallocate($image, 20, 30, 50));
+            $file = $GLOBALS['wm_root'] . '/' . $kind . '-thumbnail.png'; imagepng($image, $file); imagedestroy($image);
+            $input = imagecreatefrompng($file);
+            wm_check(imageistruecolor($input) === ($kind === 'truecolor'), 'Regression fixture must exercise both indexed and truecolor PNG decoding.');
+            imagedestroy($input); pvc_wm_mark_image($file); $results[$kind] = imagecreatefrompng($file);
+        }
+        $background = 0; $mark = 0; $preserved = true; $equivalent = true;
+        for ($y = 0; $y < 150; $y++) { for ($x = 0; $x < 150; $x++) {
+            $expected = imagecolorsforindex($results['truecolor'], imagecolorat($results['truecolor'], $x, $y));
+            $actual = imagecolorsforindex($results['indexed'], imagecolorat($results['indexed'], $x, $y));
+            if ($expected === array('red' => 20, 'green' => 30, 'blue' => 50, 'alpha' => 0)) {
+                $background++; if ($actual !== $expected) { $preserved = false; }
+            } else { $mark++; }
+            if ($actual !== $expected) { $equivalent = false; }
+        } }
+        wm_check($background > 0 && $mark > 5, 'Reference thumbnail must contain both untouched background and a visible real brand mark.');
+        wm_check($preserved, 'Indexed PNG must preserve the opaque background beneath transparent parts of the watermark.');
+        wm_check($equivalent, 'Indexed PNG alpha compositing must match the equivalent truecolor thumbnail.');
+    } finally {
+        foreach ($results as $image) { imagedestroy($image); }
+        $GLOBALS['wm_config'] = $config;
+    }
+}
 function wm_clean(string $dir): void {
     $real = realpath($dir); $root = realpath($GLOBALS['wm_root']);
     if (!$real || !$root || ($real !== $root && !pvc_wm_under($real, $root))) { throw new RuntimeException('Unsafe fixture cleanup'); }
@@ -104,6 +133,8 @@ function wm_clean(string $dir): void {
 $wm_results = array();
 try {
     wm_check(extension_loaded('gd') && function_exists('exif_read_data'), 'GD and EXIF are required for this test.');
+    wm_check_indexed_png_background();
+    $wm_results[] = 'Indexed PNG thumbnail: transparent logo areas preserve the original opaque background and match truecolor compositing';
     $logo = imagecreatetruecolor(240, 60); imagefill($logo, 0, 0, imagecolorallocate($logo, 255, 0, 0)); imagestring($logo, 4, 40, 20, 'PecadosVip', imagecolorallocate($logo, 255, 255, 255)); imagepng($logo, $wm_root . '/logo.png'); imagedestroy($logo);
     $wm_config = array('logo' => $wm_root . '/logo.png', 'opacity' => .9, 'ffmpeg' => $wm_args['ffmpeg'] ?? '/usr/bin/ffmpeg', 'ffprobe' => $wm_args['ffprobe'] ?? '/usr/bin/ffprobe');
     $wm_posts[1] = array('post_type' => 'pv_profile', 'post_status' => 'publish');
@@ -148,6 +179,13 @@ try {
     $wm_config['version'] = 'fixture-v2'; pvc_watermark_queue_profile(1); pvc_watermark_process($source, 'image', $signature);
     wm_check(pvc_watermark_status($source)['attempts'] === 0, 'A stale generation must not execute.');
     wm_run($source); $media = pvc_watermark_media($source); wm_check($media !== null, 'Current generation must succeed.');
+    $old_derived = $media['id']; $original_sha = hash_file('sha256', get_attached_file($source));
+    $wm_config['version'] = 'fixture-v3'; pvc_watermark_queue_profile(1);
+    wm_check(pvc_watermark_status($source)['state'] === 'queued' && pvc_watermark_media($source) === null, 'A new generation must requeue already-ready media without serving its obsolete derivative.');
+    wm_run($source); $media = pvc_watermark_media($source);
+    wm_check($media !== null && $media['id'] !== $old_derived && hash_file('sha256', get_attached_file($source)) === $original_sha, 'A new generation must replace ready derivatives while preserving original bytes.');
+    pvc_watermark_queue_profile(1); wm_run($source);
+    wm_check(pvc_watermark_media($source)['id'] === $media['id'], 'Saving after a generation upgrade must preserve the same ready derivative.');
     wp_delete_attachment($media['id'], true); wm_check(pvc_watermark_media($source) === null, 'Deleting a derivative must stop public resolution.'); wm_run($source); wm_check(pvc_watermark_media($source) !== null, 'Deleted derivative must be recreated automatically.');
     $wm_can_edit = false; wm_check(!pvc_watermark_retry_profile(1), 'Retry must require edit capability.'); $wm_can_edit = true;
     $retry_source = wm_source('png'); set_post_thumbnail(1, $retry_source);

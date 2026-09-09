@@ -3,7 +3,7 @@ name: WordPress watermark Linux QA
 on:
   workflow_dispatch:
   push:
-    branches: [codex/profile-media-watermark]
+    branches: [main]
 
 permissions:
   contents: read

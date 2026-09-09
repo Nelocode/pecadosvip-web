@@ -30,7 +30,7 @@ function wm_qa_attachment(string $file, string $mime, array &$fixture): int {
     return $id;
 }
 function wm_qa_mark_visible(string $file): bool {
-    $image = pvc_wm_load_image($file); $marked = 0;
+    $image = pvc_wm_load_image($file); $marked = 0; $opaque = true;
     // Fixture is uniform dark blue. Gold/ivory high-luminance pixels must occur
     // in the bottom-right mark area in the actual encoded output/cropped size.
     for ($y = (int) (imagesy($image) * .65); $y < imagesy($image); $y += 2) {
@@ -38,18 +38,21 @@ function wm_qa_mark_visible(string $file): bool {
             // Imagick can emit indexed PNG crops. imagecolorat then returns a
             // palette index, not packed RGB; resolve either representation.
             $color = imagecolorsforindex($image, imagecolorat($image, $x, $y));
+            // The fixture is opaque: a transparent logo must never punch holes
+            // in the original background, even on an indexed WordPress crop.
+            if ($color['alpha'] !== 0) { $opaque = false; }
             if ($color['red'] > 115 && $color['green'] > 85) { $marked++; }
         }
     }
-    imagedestroy($image); return $marked > 5;
+    imagedestroy($image); return $marked > 5 && $opaque;
 }
 function wm_qa_check_image(int $id): void {
     $file = get_attached_file($id);
-    wm_qa_assert(is_file($file) && wm_qa_mark_visible($file), 'Full-size photo/poster must contain the visible mark.');
+    wm_qa_assert(is_file($file) && wm_qa_mark_visible($file), 'Full-size photo/poster must contain the visible mark and preserve its opaque background.');
     $metadata = wp_get_attachment_metadata($id);
     wm_qa_assert(!empty($metadata['sizes']['thumbnail']), 'A real WordPress cropped thumbnail must exist.');
     foreach ($metadata['sizes'] as $name => $size) {
-        wm_qa_assert(wm_qa_mark_visible(dirname($file) . '/' . $size['file']), 'Generated image subsize must retain the mark after cropping: ' . $name . ' (' . $size['width'] . 'x' . $size['height'] . ').');
+        wm_qa_assert(wm_qa_mark_visible(dirname($file) . '/' . $size['file']), 'Generated image subsize must retain the mark and opaque background after cropping: ' . $name . ' (' . $size['width'] . 'x' . $size['height'] . ').');
     }
 }
 function wm_qa_process(int $id, string $kind, array &$fixture): array {
