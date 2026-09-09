@@ -36,24 +36,57 @@ function pvc_select(string $name, array $options, string $value, string $id = ''
     foreach ($options as $key => $label) { echo '<option value="' . esc_attr($key) . '" ' . selected($value, (string) $key, false) . '>' . esc_html($label) . '</option>'; }
     echo '</select>';
 }
-function pvc_gallery_control(string $name, array $ids): void {
-    echo '<div class="pvc-gallery-control" data-name="' . esc_attr($name) . '"><input type="hidden" name="' . esc_attr($name) . '[]" value=""><ul class="pvc-gallery">';
-    foreach ($ids as $id) {
-        $media = pvc_media($id); if (!$media) { continue; }
-        echo '<li data-id="' . esc_attr((string) $id) . '"><img src="' . esc_url($media['url']) . '" alt="' . esc_attr($media['alt']) . '"><input type="hidden" name="' . esc_attr($name) . '[]" value="' . esc_attr((string) $id) . '"><div><button type="button" class="button pvc-earlier" aria-label="Mover antes">↑</button><button type="button" class="button pvc-later" aria-label="Mover después">↓</button><button type="button" class="button pvc-remove" aria-label="Quitar imagen de la galería">Quitar</button></div></li>';
+function pvc_watermark_admin_status(int $id, string $kind = 'image'): void {
+    $status = pvc_watermark_status($id, $kind); $state = $status['status'] ?? $status['state'] ?? 'not_queued';
+    $labels = array('not_queued' => 'Guarda la ficha para preparar la marca de agua.', 'queued' => 'En espera. Aparecerá en la web cuando termine de prepararse.', 'processing' => 'Preparando la marca de agua. Aún no aparece en la web.', 'ready' => 'Marca de agua lista para mostrarse en la web.', 'error' => 'No se pudo preparar este archivo. Aún no aparece en la web. Revisa el formato o contacta con soporte.');
+    $message = $labels[$state] ?? $labels['not_queued'];
+    if ($state === 'error' && !empty($status['message'])) { $message = $status['message'] . ' Aún no aparece en la web. Corrige el archivo o contacta con soporte.'; }
+    echo '<p class="pvc-watermark-status" data-state="' . esc_attr($state) . '" role="status">' . esc_html($message) . '</p>';
+}
+function pvc_watermark_admin_help(int $profile_id): void {
+    echo '<div class="pvc-watermark-help"><strong>Fotografías y vídeos con marca de agua</strong><p>Utiliza Imagen destacada, Galería de imágenes y Vídeos del perfil. Los archivos seleccionados se preparan al guardar y solo aparecen en la web cuando la marca está lista. Aquí puedes revisar los originales; no añadas archivos incrustados a la descripción.</p><p>Vuelve a abrir esta ficha para comprobar el estado. Los originales permanecen en la Biblioteca de medios.</p>';
+    $thumbnail = (int) get_post_thumbnail_id($profile_id);
+    if ($thumbnail) { echo '<strong>Imagen destacada</strong>'; pvc_watermark_admin_status($thumbnail); }
+    if ($profile_id && current_user_can('edit_post', $profile_id)) {
+        echo '<p><button type="button" class="button pvc-retry-watermark" data-profile-id="' . (int) $profile_id . '" data-nonce="' . esc_attr(wp_create_nonce('pvc_watermark_retry_' . $profile_id)) . '">Reintentar marca de agua</button></p><p class="pvc-retry-status" role="status" aria-live="polite">Guarda primero los cambios de la ficha. Reintentar revisa los archivos ya guardados que siguen pendientes o tienen un error.</p>';
     }
-    echo '</ul><button type="button" class="button pvc-add-gallery">Añadir imágenes</button><p class="description">Arrastra las imágenes o usa las flechas para cambiar el orden. Quitar de la galería conserva el archivo en la biblioteca de medios.</p></div>';
+    echo '</div>';
+}
+add_action('wp_ajax_pvc_retry_watermark', function() {
+    $id = absint($_POST['profile_id'] ?? 0);
+    if (!$id || get_post_type($id) !== 'pv_profile' || !current_user_can('edit_post', $id)) { wp_send_json_error(array('message' => 'No tienes permiso para preparar los archivos de esta ficha.'), 403); }
+    check_ajax_referer('pvc_watermark_retry_' . $id, 'nonce');
+    if (!pvc_watermark_retry_profile($id)) { wp_send_json_error(array('message' => 'No se pudo iniciar la revisión de los archivos.'), 400); }
+    wp_send_json_success(array('message' => 'Revisión solicitada. Las marcas que ya estaban listas se conservan. Vuelve a abrir la ficha más tarde para comprobar los archivos pendientes.'));
+});
+function pvc_gallery_control(string $name, array $ids, string $kind = 'image', bool $watermarked = false): void {
+    $video = $kind === 'video';
+    echo '<div class="pvc-gallery-control" data-name="' . esc_attr($name) . '" data-kind="' . esc_attr($kind) . '" data-watermarked="' . ($watermarked ? 'true' : 'false') . '"><input type="hidden" name="' . esc_attr($name) . '[]" value=""><ul class="pvc-gallery">';
+    foreach ($ids as $id) {
+        $media = $video ? (str_starts_with((string) get_post_mime_type((int) $id), 'video/') ? array('url' => wp_get_attachment_url((int) $id)) : null) : pvc_media($id);
+        if (!$watermarked && !$media) { continue; }
+        echo '<li data-id="' . esc_attr((string) $id) . '">';
+        if (!empty($media['url'])) {
+            if ($video) { echo '<video controls playsinline preload="metadata" src="' . esc_url($media['url']) . '"></video>'; }
+            else { echo '<img src="' . esc_url($media['url']) . '" alt="' . esc_attr($media['alt']) . '">'; }
+        } else { echo '<p>Archivo no disponible. Quítalo o selecciona otro.</p>'; }
+        echo '<input type="hidden" name="' . esc_attr($name) . '[]" value="' . esc_attr((string) $id) . '"><div><button type="button" class="button pvc-earlier" aria-label="Mover antes">↑</button><button type="button" class="button pvc-later" aria-label="Mover después">↓</button><button type="button" class="button pvc-remove" aria-label="Quitar ' . ($video ? 'vídeo' : 'imagen') . ' de la galería">Quitar</button></div>';
+        if ($watermarked) { pvc_watermark_admin_status((int) $id, $kind); }
+        echo '</li>';
+    }
+    echo '</ul><button type="button" class="button pvc-add-gallery">Añadir ' . ($video ? 'vídeos' : 'imágenes') . '</button><p class="description">Arrastra los archivos o usa las flechas para cambiar el orden. Quitar de la galería conserva el archivo en la biblioteca de medios.</p></div>';
 }
 function pvc_meta_box(WP_Post $post): void {
     wp_nonce_field('pvc_meta', 'pvc_meta_nonce');
     $locale = get_post_meta($post->ID, 'pv_locale', true) ?: 'es'; $key = get_post_meta($post->ID, 'pv_key', true); $data = pvc_sanitize_data(get_post_meta($post->ID, 'pv_data', true), $post->post_type);
+    if ($post->post_type === 'pv_profile') { pvc_watermark_admin_help((int) $post->ID); }
     echo '<div class="pvc-admin"><p><label for="pvc-locale"><strong>Idioma</strong></label><br>';
     pvc_select('pvc_locale', pvc_locales(), $locale, 'pvc-locale');
     echo '</p><p><label for="pvc-key"><strong>Clave de la ruta</strong></label><br><input id="pvc-key" type="text" name="pvc_key" value="' . esc_attr($key) . '" pattern="[a-z0-9]+(-[a-z0-9]+)*" required placeholder="ejemplo-valeria"><span class="description">Misma clave para las traducciones del mismo contenido. No uses espacios ni acentos.</span></p><div class="pvc-fields">';
     foreach (pvc_fields($post->post_type) as $field => $schema) {
         $value = $data[$field] ?? ($schema['type'] === 'array' ? array() : ''); $name = 'pvc_data[' . $field . ']'; $id = 'pvc-field-' . $field;
         echo '<div class="pvc-field"><label for="' . esc_attr($id) . '"><strong>' . esc_html($schema['label']) . '</strong></label><br>';
-        if (($schema['control'] ?? '') === 'gallery') { pvc_gallery_control($name, (array) $value); }
+        if (in_array($schema['control'] ?? '', array('gallery', 'videos'), true)) { pvc_gallery_control($name, (array) $value, ($schema['control'] === 'videos' ? 'video' : 'image'), $post->post_type === 'pv_profile'); }
         elseif (in_array($schema['control'] ?? '', array('cities', 'services', 'profiles'), true)) {
             echo '<input type="hidden" name="' . esc_attr($name) . '[]" value="">';
             $related_type = array('cities' => 'city', 'services' => 'service', 'profiles' => 'profile')[$schema['control']];

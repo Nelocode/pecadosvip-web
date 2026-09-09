@@ -12,8 +12,21 @@ RUN cd wordpress && npm install
 # Build the theme and plugin
 RUN cd wordpress && npm run build
 
-# Final WordPress Image
-FROM wordpress:php8.3-apache
+# Shared production/QA runtime: image editing and asynchronous video watermarking.
+FROM wordpress:7.1.0-php8.3-apache@sha256:5a93c470ae8220fddf71f6ebe3bc94e615ddc2ae4d9810f795b830fb11c41a17 AS runtime
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/* \
+    && php -r 'exit(extension_loaded("gd") && extension_loaded("exif") ? 0 : 1);' \
+    && ffmpeg -version >/dev/null \
+    && ffprobe -version >/dev/null
+
+# Allow profile video uploads within the processor's bounded input limit.
+RUN printf 'upload_max_filesize=128M\npost_max_size=136M\nmemory_limit=512M\n' \
+    > /usr/local/etc/php/conf.d/pecadosvip-media.ini
+
+FROM runtime AS production
 
 # We copy the compiled theme and plugin directly to the default WordPress directory
 COPY --from=builder /app/wordpress/dist/pecadosvip /usr/src/wordpress/wp-content/themes/pecadosvip

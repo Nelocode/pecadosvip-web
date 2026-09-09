@@ -1,5 +1,7 @@
 # Pruebas locales con Docker
 
+La imagen del servicio `wordpress` se construye ahora con el target `runtime` del Dockerfile raíz. Producción y QA comparten WordPress/PHP, GD y FFmpeg/FFprobe para procesar las marcas de agua. Después de cambiar dependencias del Dockerfile ejecuta `docker compose -f wordpress/docker-compose.yml build wordpress`. El servicio WP-CLI sigue siendo una imagen auxiliar; las pruebas que invoquen FFmpeg deben ejecutarse dentro del servicio `wordpress`.
+
 Este entorno usa WordPress y MariaDB reales en contenedores separados. Requiere Docker Desktop con contenedores Linux, el tema generado en `wordpress/dist/pecadosvip` y el plugin en `wordpress/dist/pecadosvip-content`. Al iniciar activa ambos e importa `content/seed.json` a entradas, ajustes y biblioteca de medios de la base de datos local.
 
 Desde la carpeta principal del proyecto:

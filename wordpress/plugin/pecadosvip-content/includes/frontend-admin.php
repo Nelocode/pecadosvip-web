@@ -35,6 +35,18 @@ function pvc_frontend_admin_route() {
             'post_type'    => $type,
             'post_status'  => 'publish'
         );
+        if ($type === 'pv_profile') {
+            if ($post_id && (!current_user_can('edit_post', $post_id) || get_post_type($post_id) !== $type)) { wp_die('No tienes permiso para editar esta ficha.', '', array('response' => 403)); }
+            $locale = sanitize_key(wp_unslash($_POST['pvc_locale'] ?? 'es'));
+            $key = sanitize_title(wp_unslash($_POST['pvc_key'] ?? '')) ?: sanitize_title($post_data['post_title']);
+            $raw_profile = wp_unslash($_POST['pvc_data'] ?? array());
+            $raw_profile['synthetic'] = isset($raw_profile['synthetic']) ? 1 : 0;
+            $profile_data = pvc_sanitize_data($raw_profile, $type);
+            $valid = pvc_validate_profile_content($type, $post_data['post_content']);
+            if (!is_wp_error($valid)) { $valid = pvc_validate($type, $locale, $key, $profile_data, $post_id); }
+            if (is_wp_error($valid)) { wp_die(esc_html($valid->get_error_message()), 'Revisa la ficha', array('response' => 400, 'back_link' => true)); }
+            $post_data['meta_input'] = array('pv_locale' => $locale, 'pv_key' => $key, 'pv_data' => $profile_data);
+        }
 
         if ($post_id) {
             $post_data['ID'] = $post_id;
@@ -81,6 +93,10 @@ function pvc_frontend_admin_route() {
 
     require_once ABSPATH . 'wp-admin/includes/media.php';
     nocache_headers();
+    wp_enqueue_media();
+    wp_enqueue_script('pecadosvip-content-admin', plugins_url('../assets/admin.js', __FILE__), array('jquery', 'jquery-ui-sortable', 'wp-data'), PVC_VERSION, true);
+    wp_localize_script('pecadosvip-content-admin', 'pvcAdmin', array('ajaxUrl' => admin_url('admin-ajax.php')));
+    wp_enqueue_style('pecadosvip-content-admin', plugins_url('../assets/admin.css', __FILE__), array(), PVC_VERSION);
     
     $pvwp_locale = 'es';
     $types_labels = array(
@@ -183,6 +199,7 @@ function pvc_frontend_admin_route() {
                         ?>
                             <form method="post" action="" class="pvn-filters">
                                 <?php wp_nonce_field('pvc_save_model', 'pvc_frontend_admin_nonce'); ?>
+                                <?php if ($type === 'pv_profile') { pvc_watermark_admin_help((int) $post_id); } ?>
                                 <input type="hidden" name="post_ID" value="<?php echo esc_attr($post_id); ?>">
                                 <input type="hidden" name="pvc_locale" value="<?php echo esc_attr($locale); ?>">
                                 <input type="hidden" name="pvc_key" value="<?php echo esc_attr($key); ?>">
@@ -204,6 +221,7 @@ function pvc_frontend_admin_route() {
                                     <div style="flex-basis: 100%;">
                                         <button type="button" class="pvn-button pvn-add-media" style="border: 1px solid var(--pvn-gold); background: transparent; color: var(--pvn-gold); margin-bottom: 1rem;" data-target="pvn-featured-preview" data-multiple="false">Establecer Imagen Destacada</button>
                                         <div class="pvn-gallery-preview" id="pvn-featured-preview">
+                                            <input type="hidden" name="post_thumbnail_id" value="">
                                             <?php if ($thumbnail_id): $img = wp_get_attachment_image_src($thumbnail_id, 'thumbnail'); if ($img): ?>
                                                 <div class="pvn-gallery-item">
                                                     <img src="<?php echo esc_url($img[0]); ?>" alt="">
@@ -247,6 +265,11 @@ function pvc_frontend_admin_route() {
                                                 <?php echo esc_html($label); ?>
                                                 <input type="text" name="pvc_data[<?php echo esc_attr($fk); ?>]" value="<?php echo esc_attr($val); ?>">
                                             </label>
+                                        <?php elseif ($type === 'pv_profile' && in_array($field['control'] ?? '', array('gallery', 'videos'), true)): ?>
+                                            <div class="pvn-profile-media-editor" style="flex-basis: 100%; margin-top: 1rem;">
+                                                <strong><?php echo esc_html($label); ?></strong>
+                                                <?php pvc_gallery_control('pvc_data[' . $fk . ']', (array) $val, $field['control'] === 'videos' ? 'video' : 'image', true); ?>
+                                            </div>
                                         <?php elseif ($field['type'] === 'array' && ($field['control'] ?? '') === 'gallery'): ?>
                                             <div style="flex-basis: 100%; margin-top: 1rem;">
                                                 <label><?php echo esc_html($label); ?></label>
@@ -306,10 +329,10 @@ function pvc_frontend_admin_route() {
                                     var isMultiple = btn.data('multiple') === true;
                                     var fieldName = isMultiple ? targetId.replace('pvn-gallery-', 'pvc_data[') + '][]' : 'post_thumbnail_id';
                                     
-                                    var mediaUploader = wp.media({ title: 'Seleccionar Fotos', button: { text: 'Usar imagen' }, multiple: isMultiple });
+                                    var mediaUploader = wp.media({ title: 'Seleccionar Fotos', library: { type: 'image' }, button: { text: 'Usar imagen' }, multiple: isMultiple });
                                     mediaUploader.on('select', function() {
                                         var selection = mediaUploader.state().get('selection');
-                                        if (!isMultiple) { $('#' + targetId).empty(); }
+                                        if (!isMultiple) { $('#' + targetId).empty().append($('<input type="hidden">').attr({ name: 'post_thumbnail_id', value: '' })); }
                                         selection.map(function(attachment) {
                                             attachment = attachment.toJSON();
                                             var url = attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url;

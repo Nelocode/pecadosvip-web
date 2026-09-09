@@ -80,7 +80,7 @@ export async function runHttpSmoke(baseUrl, fixture) {
     check('all seeded database routes and dynamic filters render in WordPress', { routeCount, seedCounts: fixture.seedCounts });
 
     let mediaCount = 0;
-    for (const mediaUrl of new Set([...fixture.seedMedia, fixture.gallery.url])) {
+    for (const mediaUrl of new Set([...fixture.seedMedia, fixture.gallery.url, fixture.markedGallery.url])) {
       const media = new URL(mediaUrl);
       assert.equal(media.origin, target.origin, 'Seed media must remain inside local WordPress');
       assert.ok(media.pathname.startsWith(`${target.pathname === '/' ? '' : target.pathname}/wp-content/uploads/`), 'Media must be real WordPress library uploads');
@@ -127,6 +127,20 @@ export async function runHttpSmoke(baseUrl, fixture) {
     const mutate = (item, data) => request(`/?rest_route=/wp/v2/pecadosvip-${item.type}/${item.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': restNonce }, body: JSON.stringify(data) }, true);
     check('anonymous, nonce-free and invalid-nonce REST writes rejected');
 
+    const retryForm = new URLSearchParams({ action: 'pvc_retry_watermark', profile_id: String(sample.id), nonce: 'invalid' });
+    assert.ok([400, 401, 403].includes((await request('/wp-admin/admin-ajax.php', { method: 'POST', body: retryForm })).response.status), 'Anonymous watermark retry must fail');
+    assert.equal((await request('/wp-admin/admin-ajax.php', { method: 'POST', body: retryForm }, true)).response.status, 403, 'Invalid watermark retry nonce must fail');
+    const editor = await request(`/wp-admin/post.php?post=${sample.id}&action=edit`, {}, true);
+    const retryButton = editor.body.match(/class="button pvc-retry-watermark"[^>]*data-profile-id="(\d+)"[^>]*data-nonce="([^"]+)"/);
+    assert.ok(retryButton && Number(retryButton[1]) === sample.id, 'Profile editor must expose a nonce-protected retry button');
+    retryForm.set('nonce', retryButton[2]);
+    const retryResponse = await request('/wp-admin/admin-ajax.php', { method: 'POST', body: retryForm }, true);
+    assert.equal(retryResponse.response.status, 200, 'Authorized watermark retry request');
+    assert.equal(JSON.parse(retryResponse.body).success, true, 'Authorized retry should acknowledge queued work');
+    const readyAfterRetry = (await getCatalog(sample.locale)).profiles.find((profile) => profile.id === sample.id);
+    assert.ok(readyAfterRetry.gallery.some((image) => image.id === fixture.markedGallery.id), 'Retry must preserve existing ready derivatives');
+    check('watermark retry rejects anonymous and invalid-nonce requests and preserves ready media');
+
     const invalidAge = await mutate(sample, { meta: { pv_data: { age: 17 } } });
     assert.equal(invalidAge.response.status, 400, 'Invalid adult age must be rejected by REST schema');
     for (const item of fixture.published) {
@@ -145,7 +159,11 @@ export async function runHttpSmoke(baseUrl, fixture) {
     assert.equal(galleryUpdate.response.status, 200);
     const galleryPage = await request(`${sample.path}?foto=0`);
     assert.equal(galleryPage.response.status, 200);
-    assert.ok(galleryPage.body.includes(fixture.gallery.url), 'New WordPress gallery image not reflected on profile');
+    assert.ok(galleryPage.body.includes(fixture.markedGallery.url), 'Processed gallery image not reflected on profile');
+    assert.ok(!galleryPage.body.includes(fixture.gallery.url), 'Profile must not expose the original gallery URL');
+    const changedProfile = (await getCatalog(sample.locale)).profiles.find((profile) => profile.id === sample.id);
+    assert.equal(changedProfile.image.id, fixture.markedGallery.id, 'Featured image must use its marked derivative');
+    assert.deepEqual(changedProfile.gallery.map((image) => image.id), [fixture.markedGallery.id], 'Gallery must retain the selected source order through derivative IDs');
     assert.equal((await request(`${sample.path}?foto=1`)).response.status, 404, 'Removed gallery item must no longer resolve');
     check('Media Library featured image and gallery edits update the page and valid photo indexes');
 

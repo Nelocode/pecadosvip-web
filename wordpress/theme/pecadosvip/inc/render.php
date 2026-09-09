@@ -187,10 +187,25 @@ function pvwp_services(array $page): void {
 function pvwp_breadcrumb(string $section, string $label, string $title): void { ?>
     <nav class="pvn-breadcrumb" aria-label="<?php echo esc_attr(pvwp_text('profile.breadcrumbAria')); ?>"><a href="<?php echo esc_url(pvwp_url()); ?>"><?php pvwp_label('navigation.home'); ?></a><span aria-hidden="true">/</span><a href="<?php echo esc_url(pvwp_url($section)); ?>"><?php echo esc_html($label); ?></a><span aria-hidden="true">/</span><span aria-current="page"><?php echo esc_html($title); ?></span></nav>
 <?php }
+function pvwp_profile_videos(array $profile): void {
+    if (empty($profile['videos'])) { return; }
+    $locale = pvwp_context()['locale'];
+    $label = array('es' => 'Vídeo', 'en' => 'Video', 'fr' => 'Vidéo', 'it' => 'Video')[$locale] ?? 'Vídeo';
+    echo '<div class="pvn-gallery-videos">';
+    foreach ($profile['videos'] as $index => $video) {
+        if (empty($video['url']) || !str_starts_with((string) ($video['mime'] ?? ''), 'video/')) { continue; }
+        $caption = $label . ' ' . ($index + 1) . ' · ' . $profile['title'];
+        echo '<figure><video controls playsinline preload="metadata" aria-label="' . esc_attr($caption) . '"';
+        if (!empty($video['poster']['url'])) { echo ' poster="' . esc_url($video['poster']['url']) . '"'; }
+        if (!empty($video['width']) && !empty($video['height'])) { echo ' width="' . (int) $video['width'] . '" height="' . (int) $video['height'] . '"'; }
+        echo '><source src="' . esc_url($video['url']) . '" type="' . esc_attr($video['mime']) . '"></video><figcaption>' . esc_html($caption) . '</figcaption></figure>';
+    }
+    echo '</div>';
+}
 function pvwp_profile(array $profile): void {
     $data = $profile['data']; $gallery = $profile['gallery'] ?? array(); if (!$gallery && !empty($profile['image'])) { $gallery = array($profile['image']); }
     $photo = pvwp_context()['query']['foto'] ?? '0'; $index = $photo === 'cover' ? 0 : (strpos($photo, 'gallery-') === 0 ? (int) substr($photo, 8) : (int) $photo); $selected = $gallery[$index] ?? ($gallery[0] ?? null);
-    ?><section class="pvn-section"><?php pvwp_breadcrumb('perfiles', pvwp_text('navigation.profiles'), $profile['title']); ?><div class="pvn-profile-detail"><div class="pvn-gallery"><figure class="pvn-gallery-main"><?php pvwp_media($selected, '', true, '(max-width:700px) 100vw, 48vw'); ?><figcaption class="pvn-disclosure"><?php pvwp_label('profile.imageGenerated'); ?></figcaption></figure><nav class="pvn-gallery-thumbs" aria-label="<?php echo esc_attr(pvwp_text('profile.galleryAria')); ?>"><?php foreach ($gallery as $i => $image) { ?><a href="<?php echo esc_url(pvwp_url('perfiles/' . $profile['key'], null, array('foto' => (string) $i))); ?>" <?php if ($i === $index) { echo 'aria-current="true"'; } ?> aria-label="<?php echo esc_attr(pvwp_text('profile.selectPhotoAria') . ' ' . ($i + 1) . ': ' . $profile['title']); ?>"><?php pvwp_media($image, '', false, '100px'); ?></a><?php } ?></nav></div>
+    ?><section class="pvn-section"><?php pvwp_breadcrumb('perfiles', pvwp_text('navigation.profiles'), $profile['title']); ?><div class="pvn-profile-detail"><div class="pvn-gallery"><figure class="pvn-gallery-main"><?php pvwp_media($selected, '', true, '(max-width:700px) 100vw, 48vw'); ?><figcaption class="pvn-disclosure"><?php pvwp_label('profile.imageGenerated'); ?></figcaption></figure><nav class="pvn-gallery-thumbs" aria-label="<?php echo esc_attr(pvwp_text('profile.galleryAria')); ?>"><?php foreach ($gallery as $i => $image) { ?><a href="<?php echo esc_url(pvwp_url('perfiles/' . $profile['key'], null, array('foto' => (string) $i))); ?>" <?php if ($i === $index) { echo 'aria-current="true"'; } ?> aria-label="<?php echo esc_attr(pvwp_text('profile.selectPhotoAria') . ' ' . ($i + 1) . ': ' . $profile['title']); ?>"><?php pvwp_media($image, '', false, '100px'); ?></a><?php } ?></nav><?php pvwp_profile_videos($profile); ?></div>
     <div class="pvn-profile-info"><p class="pvn-eyebrow"><?php pvwp_label('profile.statusBanner'); ?></p><h1><?php echo esc_html($profile['title']); ?></h1><p class="pvn-profile-age"><?php echo esc_html((string) ($data['age'] ?? '')); ?> <?php pvwp_label('profile.ageYears'); ?></p><div class="pvn-tags"><?php foreach (($data['cities'] ?? array()) as $key) { $city = pvc_record('city', pvwp_context()['locale'], $key); if ($city) { ?><a href="<?php echo esc_url(pvwp_url($key)); ?>"><?php echo esc_html($city['title']); ?></a><?php } } ?></div><p class="pvn-availability" data-status="<?php echo esc_attr($data['availability'] ?? 'on-request'); ?>"><?php pvwp_label('profile.availability.' . ($data['availability'] ?? 'on-request')); ?></p>
     <?php if (!empty($data['height'])) { ?><p><?php echo esc_html($data['height']); ?></p><?php } pvwp_rich($profile); ?><div class="pvn-tags"><?php foreach (array_merge($data['tags'] ?? array(), $data['conceptTags'] ?? array(), $data['languages'] ?? array()) as $tag) { ?><span><?php echo esc_html($tag); ?></span><?php } ?></div>
     <aside class="pvn-notice"><p><?php pvwp_label('profile.syntheticNotice'); ?></p><h2><?php pvwp_label('profile.contactDisabledTitle'); ?></h2><p><?php pvwp_label('profile.contactDisabledBody'); ?></p><button class="pvn-button" type="button" disabled><?php pvwp_label('profile.contactDisabledButton'); ?></button></aside></div></div>

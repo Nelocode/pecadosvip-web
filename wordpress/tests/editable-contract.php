@@ -28,10 +28,43 @@ try {
 }
 $qa_assert(is_wp_error(pvc_validate('pv_profile', 'es', 'qa-invalid-age', array('age' => 17))), 'Adult profile constraint must reject an invalid age.');
 $qa_assert(is_wp_error(pvc_validate('pv_profile', 'es', $qa_profile['key'], array('age' => 30))), 'Duplicate published locale/key must be rejected.');
+$qa_sources = array_values($qa_original_data['gallery']);
+$qa_hashes = array();
+foreach ($qa_sources as $qa_source_id) {
+    $qa_hashes[$qa_source_id] = hash_file('sha256', get_attached_file($qa_source_id));
+    if (pvc_watermark_status($qa_source_id)['state'] !== 'ready') {
+        $qa_pending = pvc_record('profile', 'es', $qa_profile['key']);
+        $qa_assert(!in_array($qa_source_id, array_column($qa_pending['gallery'], 'id'), true), 'Pending gallery sources must not appear as original public attachments.');
+        $qa_assert(strpos(wp_json_encode($qa_pending, JSON_UNESCAPED_SLASHES), wp_get_attachment_url($qa_source_id)) === false, 'Pending profile projection leaked an original URL.');
+    }
+    // Run only the jobs belonging to this isolated fixture. Do not bypass the
+    // processor: asynchronous publication is checked using real marked files.
+    pvc_wm_queue($qa_source_id, 'image');
+    for ($qa_attempt = 0; $qa_attempt < (int) pvc_watermark_config()['max_attempts'] && pvc_watermark_status($qa_source_id)['state'] !== 'ready'; $qa_attempt++) {
+        $qa_job = (array) get_post_meta($qa_source_id, pvc_wm_key('image'), true);
+        $qa_assert(!empty($qa_job['signature']), 'Fixture image must have a queued processing signature.');
+        pvc_watermark_process($qa_source_id, 'image', $qa_job['signature']);
+    }
+    $qa_assert(pvc_watermark_status($qa_source_id)['state'] === 'ready', 'Real fixture image processing did not finish ready.');
+    $qa_assert(hash_file('sha256', get_attached_file($qa_source_id)) === $qa_hashes[$qa_source_id], 'Processing must preserve the original fixture attachment bytes.');
+}
 $qa_normalized = pvc_record('profile', 'es', $qa_profile['key']);
-$qa_assert(count($qa_normalized['gallery']) === 2, 'Gallery must resolve real WordPress attachments.');
-$qa_assert($qa_normalized['gallery'][1]['id'] === $qa_fixture['gallery']['id'], 'Gallery ordering must survive WordPress metadata normalization.');
+$qa_assert(count($qa_normalized['gallery']) === 2, 'Gallery must resolve two ready WordPress derivatives.');
+foreach ($qa_normalized['gallery'] as $qa_index => $qa_image) {
+    $qa_assert($qa_image['id'] !== $qa_sources[$qa_index], 'Profile gallery must expose a derivative, not its original attachment ID.');
+    $qa_assert((int) get_post_meta($qa_image['id'], '_pvc_watermark_source', true) === (int) $qa_sources[$qa_index], 'Gallery source order must survive asynchronous derivative normalization.');
+}
+$qa_fixture['markedGallery'] = pvc_watermark_media($qa_fixture['gallery']['id']);
+$qa_assert(!empty($qa_fixture['markedGallery']['url']), 'HTTP fixtures require the real marked gallery URL.');
+$qa_fixture['attachments'][] = $qa_fixture['markedGallery']['id'];
+update_option('pvc_qa_fixture', $qa_fixture, false);
+foreach ($qa_fixture['published'] as $qa_item) {
+    if ($qa_item['type'] !== 'service') { continue; }
+    $qa_service = pvc_record('service', $qa_item['locale'], $qa_item['key']);
+    $qa_assert(array_column($qa_service['gallery'], 'id') === $qa_sources, 'Services must retain their original image-gallery behavior.');
+}
+foreach ($qa_fixture['hidden'] as $qa_item) { $qa_assert(pvc_record($qa_item['type'], $qa_item['locale'], $qa_item['key']) === null, 'Processing media must not publish draft/private/password-protected content.'); }
 foreach (array_keys(pvc_locales()) as $qa_locale) {
     $qa_assert(isset(pvc_copy($qa_locale)['hero']['titlePrimary']), 'Editable hero copy must exist: ' . $qa_locale);
 }
-WP_CLI::success('Metadata permissions, invalid/valid nonce, validation, multilingual copy and attachment gallery contracts passed.');
+WP_CLI::success('Metadata permissions, nonce, validation, multilingual copy, asynchronous marked galleries and publication boundaries passed.');

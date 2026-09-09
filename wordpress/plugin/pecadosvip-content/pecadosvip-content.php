@@ -2,13 +2,13 @@
 /**
  * Plugin Name: PecadosVip — Contenido editable
  * Description: Perfiles, servicios, ciudades, páginas y textos multilingües de presentación, editables en WordPress.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Requires at least: 6.4
  * Requires PHP: 8.0
  * Text Domain: pecadosvip-content
  */
 if (!defined('ABSPATH')) { exit; }
-define('PVC_VERSION', '1.0.0');
+define('PVC_VERSION', '1.1.0');
 define('PVC_DIR', __DIR__);
 
 function pvc_types(): array {
@@ -29,6 +29,7 @@ function pvc_fields(string $type): array {
             'services' => array('label' => 'Servicios relacionados', 'type' => 'array', 'items' => array('type' => 'string'), 'control' => 'services'),
             'conceptTags' => array('label' => 'Características del perfil (una por línea)', 'type' => 'array', 'items' => array('type' => 'string')),
             'gallery' => array('label' => 'Galería de imágenes', 'type' => 'array', 'items' => array('type' => 'integer'), 'control' => 'gallery'),
+            'videos' => array('label' => 'Vídeos del perfil', 'type' => 'array', 'items' => array('type' => 'integer'), 'control' => 'videos'),
         ),
         'pv_service' => array('group' => array('label' => 'Grupo del servicio', 'type' => 'string', 'control' => 'service-group'), 'relatedProfiles' => array('label' => 'Perfiles relacionados', 'type' => 'array', 'items' => array('type' => 'string'), 'control' => 'profiles'), 'gallery' => array('label' => 'Galería de imágenes', 'type' => 'array', 'items' => array('type' => 'integer'), 'control' => 'gallery')),
         'pv_city' => array('zone' => array('label' => 'Zona', 'type' => 'string', 'enum' => array('madrid', 'barcelona'), 'default' => 'madrid'), 'coverage' => array('label' => 'Nota de cobertura', 'type' => 'string')),
@@ -101,10 +102,21 @@ function pvc_validate(string $type, string $locale, string $key, array $data, in
     }
     return true;
 }
+function pvc_validate_profile_content(string $type, string $content) {
+    if ($type !== 'pv_profile') { return true; }
+    // Media must enter through the dedicated attachment fields so every public
+    // rendition is processed. Reject unsupported inline media without deleting it.
+    if (preg_match('/<(?:img|picture|video|audio|source|iframe|embed|object)\b|\[(?:gallery|video|audio|embed|caption)\b|url\s*\(|https?:\/\/[^\s<>"\x27]+\.(?:jpe?g|png|gif|webp|avif|mp4|webm|mov|m4v|ogg|avi)(?:[?#\s<>"\x27]|$)|(?:^|\n|>)\s*https?:\/\/[^\s<>]+\s*(?:\n|<|$)/i', $content)) {
+        return new WP_Error('pvc_profile_inline_media', 'Para aplicar la marca de agua, añade las fotografías y los vídeos mediante Imagen destacada, Galería de imágenes o Vídeos del perfil. Conserva aquí la descripción en texto y retira los archivos incrustados antes de guardar.', array('status' => 400));
+    }
+    return true;
+}
 function pvc_rest_validate($post, WP_REST_Request $request) {
     $id = (int) ($request['id'] ?? 0); $type = $post->post_type ?? get_post_type($id); $meta = (array) ($request->get_param('meta') ?? array());
     $locale = (string) ($meta['pv_locale'] ?? get_post_meta($id, 'pv_locale', true)); $key = (string) ($meta['pv_key'] ?? get_post_meta($id, 'pv_key', true));
     $data = pvc_sanitize_data($meta['pv_data'] ?? get_post_meta($id, 'pv_data', true), $type);
+    $content_valid = pvc_validate_profile_content($type, (string) ($post->post_content ?? get_post_field('post_content', $id)));
+    if (is_wp_error($content_valid)) { return $content_valid; }
     $publishing = ($request['status'] ?? get_post_status($id)) === 'publish';
     // Gutenberg first creates a blank auto-draft; validation applies when identity/content is saved.
     if (!$publishing && $key === '' && $locale === '') { return $post; }
@@ -119,6 +131,8 @@ function pvc_insert_guard(array $data, array $postarr): array {
     }
     // REST validates its incoming metadata before calling wp_insert_post, then writes metadata afterwards.
     if (defined('REST_REQUEST') && REST_REQUEST) { return $data; }
+    $content_valid = pvc_validate_profile_content($data['post_type'], (string) ($data['post_content'] ?? ''));
+    if (is_wp_error($content_valid)) { $data['post_status'] = 'draft'; set_transient('pvc_notice_' . get_current_user_id(), $content_valid->get_error_message(), 120); return $data; }
     $locale = (string) ($meta['pv_locale'] ?? get_post_meta($id, 'pv_locale', true)); $key = (string) ($meta['pv_key'] ?? get_post_meta($id, 'pv_key', true));
     $valid = pvc_validate($data['post_type'], $locale, $key, pvc_sanitize_data($meta['pv_data'] ?? get_post_meta($id, 'pv_data', true), $data['post_type']), $id);
     if (is_wp_error($valid)) { $data['post_status'] = 'draft'; set_transient('pvc_notice_' . get_current_user_id(), $valid->get_error_message(), 120); }
@@ -146,7 +160,12 @@ function pvc_media($id): ?array {
 }
 function pvc_normalize(WP_Post $post): array {
     $data = pvc_sanitize_data(get_post_meta($post->ID, 'pv_data', true), $post->post_type);
-    return array('id' => $post->ID, 'key' => (string) get_post_meta($post->ID, 'pv_key', true), 'locale' => (string) get_post_meta($post->ID, 'pv_locale', true), 'title' => get_the_title($post), 'content' => apply_filters('the_content', $post->post_content), 'excerpt' => $post->post_excerpt, 'image' => pvc_media(get_post_thumbnail_id($post)), 'gallery' => array_values(array_filter(array_map('pvc_media', $data['gallery'] ?? array()))), 'data' => $data, 'order' => (int) $post->menu_order);
+    $profile = $post->post_type === 'pv_profile';
+    $image = $profile ? pvc_watermark_media(get_post_thumbnail_id($post), 'image') : pvc_media(get_post_thumbnail_id($post));
+    $gallery = array_values(array_filter(array_map($profile ? static fn($id) => pvc_watermark_media($id, 'image') : 'pvc_media', $data['gallery'] ?? array())));
+    $record = array('id' => $post->ID, 'key' => (string) get_post_meta($post->ID, 'pv_key', true), 'locale' => (string) get_post_meta($post->ID, 'pv_locale', true), 'title' => get_the_title($post), 'content' => apply_filters('the_content', $post->post_content), 'excerpt' => $post->post_excerpt, 'image' => $image, 'gallery' => $gallery, 'data' => $data, 'order' => (int) $post->menu_order);
+    if ($profile) { $record['videos'] = array_values(array_filter(array_map(static fn($id) => pvc_watermark_media($id, 'video'), $data['videos'] ?? array()))); }
+    return $record;
 }
 function pvc_records(string $type, string $locale): array {
     $type = pvc_type($type); if (!isset(pvc_types()[$type]) || !isset(pvc_locales()[$locale])) { return array(); }
@@ -202,7 +221,7 @@ add_action('rest_api_init', function() {
         $response->header('Cache-Control', 'no-store'); $response->header('X-Robots-Tag', 'noindex, nofollow'); return $response;
     }));
 });
+require_once PVC_DIR . '/includes/media-watermark.php';
 require_once PVC_DIR . '/includes/admin.php';
 require_once PVC_DIR . '/includes/import.php';
-require_once PVC_DIR . '/includes/frontend-admin.php';
 require_once PVC_DIR . '/includes/frontend-admin.php';

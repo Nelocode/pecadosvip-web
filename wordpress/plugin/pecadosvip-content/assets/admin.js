@@ -1,6 +1,16 @@
 (function ($) {
   'use strict';
   const config = window.pvcAdmin || {};
+  $(document).on('click', '.pvc-retry-watermark', async function () {
+    const button = $(this); const status = button.closest('.pvc-watermark-help').find('.pvc-retry-status');
+    button.prop('disabled', true); status.text('Solicitando la preparación de los archivos…');
+    try {
+      const response = await $.post(config.ajaxUrl, { action: 'pvc_retry_watermark', profile_id: button.attr('data-profile-id'), nonce: button.attr('data-nonce') });
+      if (!response.success) throw new Error(response.data?.message || 'No se pudo iniciar la revisión.');
+      status.text(response.data.message);
+    } catch (error) { status.text(error.responseJSON?.data?.message || error.message || 'No se pudo iniciar la revisión. Vuelve a abrir la ficha e inténtalo de nuevo.'); }
+    finally { button.prop('disabled', false); }
+  });
   // Keep the block editor's REST save and the visual fields in sync. Without this,
   // a new record could publish before WordPress submits its legacy meta-box form.
   function syncEditorMeta() {
@@ -20,22 +30,26 @@
     wp.data.dispatch('core/editor').editPost({ meta: { ...(store.getEditedPostAttribute('meta') || {}), pv_key: document.getElementById('pvc-key').value, pv_locale: document.getElementById('pvc-locale').value, pv_data: data } });
   }
   $(document).on('input change', '#pvc-identity input, #pvc-identity textarea, #pvc-identity select', syncEditorMeta);
-  function mediaItem(item, name) {
+  function mediaItem(item, name, kind, watermarked) {
     const li = $('<li>').attr('data-id', item.id);
-    $('<img>').attr({ src: item.sizes?.thumbnail?.url || item.url, alt: item.alt || '' }).appendTo(li);
+    if (kind === 'video') $('<video>').attr({ src: item.url, controls: '', playsinline: '', preload: 'metadata' }).appendTo(li);
+    else $('<img>').attr({ src: item.sizes?.thumbnail?.url || item.url, alt: item.alt || '' }).appendTo(li);
     $('<input type="hidden">').attr({ name: name + '[]', value: item.id }).appendTo(li);
     const controls = $('<div>').appendTo(li);
-    [['pvc-earlier', '↑', 'Mover antes'], ['pvc-later', '↓', 'Mover después'], ['pvc-remove', 'Quitar', 'Quitar imagen de la galería']].forEach(([cls, label, aria]) => {
+    [['pvc-earlier', '↑', 'Mover antes'], ['pvc-later', '↓', 'Mover después'], ['pvc-remove', 'Quitar', 'Quitar ' + (kind === 'video' ? 'vídeo' : 'imagen') + ' de la galería']].forEach(([cls, label, aria]) => {
       $('<button type="button" class="button">').addClass(cls).text(label).attr('aria-label', aria).appendTo(controls);
     });
+    if (watermarked) $('<p class="pvc-watermark-status" data-state="not_queued" role="status">').text('Guarda la ficha para preparar la marca de agua.').appendTo(li);
     return li;
   }
-  $('.pvc-gallery').sortable({ items: '> li', tolerance: 'pointer', update: syncEditorMeta });
+  $('.pvc-gallery').sortable({ items: '> li', cancel: 'button,video,input', tolerance: 'pointer', update: syncEditorMeta });
   $(document).on('click', '.pvc-add-gallery', function () {
     const wrapper = $(this).closest('.pvc-gallery-control');
-    const frame = wp.media({ title: config.mediaTitle, library: { type: 'image' }, button: { text: config.mediaUse }, multiple: true });
+    const kind = wrapper.attr('data-kind') === 'video' ? 'video' : 'image';
+    const frame = wp.media({ title: kind === 'video' ? 'Seleccionar vídeos' : (config.mediaTitle || 'Seleccionar imágenes'), library: { type: kind }, button: { text: kind === 'video' ? 'Usar estos vídeos' : (config.mediaUse || 'Usar estas imágenes') }, multiple: true });
     frame.on('select', () => { frame.state().get('selection').toJSON().forEach(item => {
-      if (!wrapper.find('li[data-id="' + item.id + '"]').length) wrapper.find('.pvc-gallery').append(mediaItem(item, wrapper.attr('data-name')));
+      if (item.type !== kind && !String(item.mime || '').startsWith(kind + '/')) return;
+      if (!wrapper.find('li[data-id="' + item.id + '"]').length) wrapper.find('.pvc-gallery').append(mediaItem(item, wrapper.attr('data-name'), kind, wrapper.attr('data-watermarked') === 'true'));
     }); syncEditorMeta(); });
     frame.open();
   }).on('click', '.pvc-remove', function () { $(this).closest('li').remove(); syncEditorMeta(); })
