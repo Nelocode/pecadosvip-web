@@ -35,8 +35,10 @@ function wm_qa_mark_visible(string $file): bool {
     // in the bottom-right mark area in the actual encoded output/cropped size.
     for ($y = (int) (imagesy($image) * .65); $y < imagesy($image); $y += 2) {
         for ($x = (int) (imagesx($image) * .60); $x < imagesx($image); $x += 2) {
-            $pixel = imagecolorat($image, $x, $y);
-            if ((($pixel >> 16) & 255) > 115 && (($pixel >> 8) & 255) > 85) { $marked++; }
+            // Imagick can emit indexed PNG crops. imagecolorat then returns a
+            // palette index, not packed RGB; resolve either representation.
+            $color = imagecolorsforindex($image, imagecolorat($image, $x, $y));
+            if ($color['red'] > 115 && $color['green'] > 85) { $marked++; }
         }
     }
     imagedestroy($image); return $marked > 5;
@@ -46,8 +48,8 @@ function wm_qa_check_image(int $id): void {
     wm_qa_assert(is_file($file) && wm_qa_mark_visible($file), 'Full-size photo/poster must contain the visible mark.');
     $metadata = wp_get_attachment_metadata($id);
     wm_qa_assert(!empty($metadata['sizes']['thumbnail']), 'A real WordPress cropped thumbnail must exist.');
-    foreach ($metadata['sizes'] as $size) {
-        wm_qa_assert(wm_qa_mark_visible(dirname($file) . '/' . $size['file']), 'Every generated image subsize must retain the mark after cropping.');
+    foreach ($metadata['sizes'] as $name => $size) {
+        wm_qa_assert(wm_qa_mark_visible(dirname($file) . '/' . $size['file']), 'Generated image subsize must retain the mark after cropping: ' . $name . ' (' . $size['width'] . 'x' . $size['height'] . ').');
     }
 }
 function wm_qa_process(int $id, string $kind, array &$fixture): array {
