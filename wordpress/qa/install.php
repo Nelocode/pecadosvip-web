@@ -12,7 +12,10 @@ if (!is_string($qa_url) || !preg_match('~^http://127\.0\.0\.1:\d+(?:/demo)?$~', 
 update_option('home', $qa_url);
 update_option('siteurl', $qa_url);
 update_option('blog_public', 0);
-update_option('permalink_structure', '/%postname%/');
+// Keep the already initialized rewrite object in sync with the database. A raw
+// update_option on the first CLI install leaves its in-memory structure empty.
+global $wp_rewrite;
+$wp_rewrite->set_permalink_structure('/%postname%/');
 require_once ABSPATH . 'wp-admin/includes/plugin.php';
 $qa_admin = get_user_by('login', 'pecadosvip_qa');
 if (!$qa_admin) {
@@ -39,8 +42,11 @@ flush_rewrite_rules(false);
 // WP-CLI runs under PHP CLI, where Apache detection is unavailable. The QA web
 // container is explicitly Apache; use WordPress's own generated rewrite rules.
 require_once ABSPATH . 'wp-admin/includes/misc.php';
-global $wp_rewrite;
-if (!insert_with_markers(ABSPATH . '.htaccess', 'WordPress', explode("\n", $wp_rewrite->mod_rewrite_rules()))) {
+$qa_apache_rules = $wp_rewrite->mod_rewrite_rules();
+if (!str_contains($qa_apache_rules, 'RewriteEngine On') || !str_contains($qa_apache_rules, 'index.php')) {
+    throw new RuntimeException('WordPress did not generate usable Apache permalink rules.');
+}
+if (!insert_with_markers(ABSPATH . '.htaccess', 'WordPress', explode("\n", $qa_apache_rules))) {
     throw new RuntimeException('Could not persist Apache permalink rules in the QA WordPress volume.');
 }
 
