@@ -17,6 +17,7 @@ export async function sourceCommit(repository) {
 export async function buildInputs(repository, assetPaths) {
   const paths = new Set(assetPaths);
   paths.add('Dockerfile');
+  paths.add('.dockerignore');
   paths.add('wordpress/docker-compose.yml');
   async function visit(directory) {
     for (const entry of await readdir(resolve(repository, directory), { withFileTypes: true })) {

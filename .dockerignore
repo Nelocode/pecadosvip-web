@@ -150,6 +150,16 @@
 # Final sensitive-file denials must remain after every allowlist negation.
 # Docker applies the last matching rule, so these prevent files nested below
 # app/, lib/ or public/ from being reintroduced by the broad source allowlist.
+wordpress/node_modules
+wordpress/node_modules/**
+wordpress/dist
+wordpress/dist/**
+wordpress/output
+wordpress/output/**
+wordpress/qa
+wordpress/qa/**
+wordpress/tests
+wordpress/tests/**
 **/.env
 **/.env.*
 **/.netrc

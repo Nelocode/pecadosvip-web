@@ -9,6 +9,9 @@ x-wordpress-environment: &wordpress-environment
     define('WP_ENVIRONMENT_TYPE', 'local');
     define('WP_AUTO_UPDATE_CORE', false);
     define('WP_HTTP_BLOCK_EXTERNAL', true);
+    // QA invokes only its queued fixture callbacks explicitly. Prevent requests
+    // from spawning seed-media workers that contend with deterministic tests.
+    define('DISABLE_WP_CRON', true);
 
 services:
   db:

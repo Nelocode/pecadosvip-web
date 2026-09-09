@@ -1,0 +1,71 @@
+name: WordPress watermark Linux QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/profile-media-watermark]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: watermark-qa-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  wordpress-mariadb-ffmpeg:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: wordpress/package-lock.json
+      - name: Build and verify native theme and plugin
+        working-directory: wordpress
+        run: |
+          npm ci
+          npm run build
+          npm run verify
+      - name: WordPress, MariaDB, editorial permissions and HTTP QA
+        run: |
+          # Compose mounts file secrets with host permissions. The isolated CI
+          # container users differ; keep the host directory private while making
+          # only these disposable, read-only fixture secrets readable in mounts.
+          node --input-type=module -e 'import {mkdirSync,writeFileSync} from "node:fs"; import {randomBytes} from "node:crypto"; const dir="wordpress/output/docker-secrets"; mkdirSync(dir,{recursive:true,mode:0o700}); for(const name of ["db-password","db-root-password","admin-password"]) writeFileSync(`${dir}/${name}.txt`,randomBytes(32).toString("base64url"),{flag:"wx",mode:0o444});'
+          node wordpress/qa/docker.mjs test
+      - name: Real image and video processing in the production runtime
+        run: node wordpress/qa/watermark-docker.mjs
+      - name: Build final production image
+        run: docker build --target production --tag pecadosvip-watermark-qa:${{ github.sha }} .
+      - name: Contract and real GD/FFmpeg regression suites
+        run: |
+          docker run --rm --entrypoint php --volume "$PWD/wordpress:/qa-src:ro" pecadosvip-watermark-qa:${{ github.sha }} /qa-src/tests/profile-media-contract-test.php
+          docker run --rm --entrypoint php --volume "$PWD/wordpress:/qa-src:ro" pecadosvip-watermark-qa:${{ github.sha }} /qa-src/tests/media-watermark-test.php
+      - name: Verify production image tools and packaged watermark
+        run: |
+          docker run --rm --entrypoint php pecadosvip-watermark-qa:${{ github.sha }} -r 'exit(extension_loaded("gd") && extension_loaded("exif") && is_file("/usr/src/wordpress/wp-content/plugins/pecadosvip-content/assets/pecadosvip-watermark.png") ? 0 : 1);'
+          docker run --rm --entrypoint ffmpeg pecadosvip-watermark-qa:${{ github.sha }} -version
+          docker run --rm --entrypoint ffprobe pecadosvip-watermark-qa:${{ github.sha }} -version
+      - name: Collect container diagnostics
+        if: always()
+        run: |
+          mkdir -p wordpress/output/linux-qa
+          docker compose -f wordpress/docker-compose.yml ps --all > wordpress/output/linux-qa/containers.txt
+          docker compose -f wordpress/docker-compose.yml logs --no-color --tail 150 db wordpress > wordpress/output/linux-qa/containers.log
+      - name: Publish QA evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: watermark-linux-qa-${{ github.sha }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            wordpress/output/docker-http-smoke.json
+            wordpress/output/watermark-runtime-qa/**
+            wordpress/output/linux-qa/**
+      - name: Stop disposable QA containers
+        if: always()
+        run: node wordpress/qa/docker.mjs down

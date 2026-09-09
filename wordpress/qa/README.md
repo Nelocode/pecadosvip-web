@@ -38,6 +38,23 @@ Las imágenes están fijadas por versión y digest inmutable: WordPress 7.1.0 co
 
 Fuentes: [imagen oficial WordPress](https://hub.docker.com/_/wordpress), [imagen oficial MariaDB](https://hub.docker.com/_/mariadb), [secretos de Compose](https://docs.docker.com/compose/how-tos/use-secrets/).
 
+## Marca de agua en Linux y GitHub Actions
+
+El workflow `WordPress watermark Linux QA` se puede ejecutar manualmente desde Actions; también se ejecuta al subir a la rama `codex/profile-media-watermark`. Utiliza un runner efímero Ubuntu, secretos locales aleatorios y MariaDB en Compose. No despliega, publica imágenes ni utiliza credenciales de producción.
+
+El workflow compila y verifica el tema/plugin, ejecuta la QA editorial y HTTP anterior, procesa una foto y un vídeo de color generados localmente y construye la imagen final de producción. Las pruebas del procesador se ejecutan con PHP/GD/FFmpeg reales en esa misma imagen. Se comprueban los eventos encolados en WordPress y sus callbacks registrados, derivados y originales distintos, conservación SHA-256 de los originales, miniaturas recortadas con marca, el fotograma decodificado, H.264/AAC, imagen del póster, URLs HTTP y persistencia de base de datos/medios tras reiniciar ambos contenedores.
+
+Solo el Compose de QA define `DISABLE_WP_CRON`: las peticiones HTTP no deben lanzar procesadores del contenido semilla mientras el contrato ejecuta sus fixtures y usa el mismo bloqueo de procesamiento. Los eventos siguen encolándose normalmente; los tests invocan explícitamente sus callbacks registrados. Esta decisión no cambia el runtime de producción. La ejecución automática del cron del alojamiento debe comprobarse después con una subida de prueba en el sitio desplegado.
+
+Para ejecutar la comprobación de medios sobre el entorno raíz ya iniciado:
+
+```powershell
+node wordpress/qa/docker.mjs test
+node wordpress/qa/watermark-docker.mjs
+```
+
+El segundo comando solo acepta la instalación QA `http://127.0.0.1:8088`, ejecuta PHP como `www-data` dentro de `wordpress` y limpia únicamente sus propios registros y adjuntos etiquetados. Sus informes y dos imágenes de muestra quedan en `wordpress/output/watermark-runtime-qa/`. Los artefactos de Actions incluyen esos resultados y el informe HTTP; excluyen contraseñas, cookies y bases de datos. Un resultado correcto valida el entorno de CI, no demuestra por sí solo el despliegue ni la ejecución automática del cron en el alojamiento real.
+
 ## Estado de comprobación del 4 de septiembre de 2026
 
 Docker Desktop 4.89.0 se instaló correctamente; su cliente informa Docker 29.7.2. Node comprobó la sintaxis de los dos ayudantes JavaScript y Docker Compose validó las configuraciones principal y de subdirectorio con `config --quiet`.
