@@ -35,7 +35,7 @@ COPY wordpress/protection/apache-public-protection.conf /etc/apache2/conf-availa
 COPY wordpress/protection/sync-protection.sh /usr/local/bin/sync-pecadosvip-protection.sh
 COPY wordpress/protection/protection-entrypoint.sh /usr/local/bin/pecadosvip-protection-entrypoint.sh
 RUN a2enmod headers \
-    && a2enconf pecadosvip-public-protection \
+    # && a2enconf pecadosvip-public-protection \
     && chmod +x /usr/local/bin/sync-pecadosvip-protection.sh /usr/local/bin/pecadosvip-protection-entrypoint.sh \
     && php -l /usr/local/share/pecadosvip-protection/00-pecadosvip-protection.php \
     && apache2ctl -t

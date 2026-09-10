@@ -73,13 +73,13 @@ function pvp_guard_request(): void {
     }
     exit;
 }
-add_action('init', 'pvp_guard_request', -PHP_INT_MAX);
+// add_action('init', 'pvp_guard_request', -PHP_INT_MAX);
 function pvp_guard_rest($response, $server, $request) {
     if (pvp_guard_is_editor()) { return $response; }
     pvp_guard_headers();
     return new WP_Error('pvp_public_closed', 'Public access temporarily unavailable.', array('status'=>503));
 }
-add_filter('rest_pre_dispatch', 'pvp_guard_rest', -PHP_INT_MAX, 3);
+// add_filter('rest_pre_dispatch', 'pvp_guard_rest', -PHP_INT_MAX, 3);
 add_action('admin_menu', function () {
     add_management_page('Protección pública', 'Protección pública', 'manage_options', 'pvp-public-protection', function () {
         if (!current_user_can('manage_options')) { return; }
