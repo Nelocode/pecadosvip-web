@@ -56,9 +56,11 @@ function pvc_watermark_media($id, $kind = 'image'): ?array {
 }
 $plugin = dirname(__DIR__) . '/plugin/pecadosvip-content';
 $source = file_get_contents($plugin . '/pecadosvip-content.php');
-// Load the core with its real functions; the processor API above controls readiness.
-$module_boundary = strpos($source, "require_once PVC_DIR . '/includes/media-watermark.php';");
-if ($module_boundary === false) { throw new RuntimeException('Watermark module is not required by the plugin.'); }
+// Load core functions only: the fixtures above replace module APIs. Stop at the
+// first module, even when new migration/localization modules precede watermark.
+// Otherwise eval resolves the plugin's __DIR__ to this test and loads wrong paths.
+$module_boundary = strpos($source, "require_once PVC_DIR . '/includes/");
+if ($module_boundary === false) { throw new RuntimeException('Plugin module boundary was not found.'); }
 eval(substr($source, 5, $module_boundary - 5));
 require $plugin . '/includes/admin.php';
 require dirname(__DIR__) . '/theme/pecadosvip/inc/render.php';
