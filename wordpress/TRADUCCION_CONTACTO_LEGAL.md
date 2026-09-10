@@ -213,3 +213,38 @@ explícitamente, valida cada registro con las reglas del plugin, guarda la proce
 (`_pvc_lt_engine = offline-map`) y **se niega** si el cuerpo tiene un número de nodos de
 texto distinto del mapa en vez de adivinar. Cubierto por
 `tests/apply-translations-test.php` (23 aserciones).
+
+## Traducción automática al publicar una modelo nueva
+
+`plugin/pecadosvip-content/includes/auto-translation.php`. Al publicar por primera vez un
+perfil en español que no sea Legacy, se crean solas las versiones que falten. Dos caminos,
+ambos opcionales:
+
+1. **Motor en servidor** (sin intervención ninguna). Configura un endpoint compatible con
+   OpenAI en la opción `pvc_lt_engine` (`provider`, `endpoint`, `model`, `api_key`), o
+   conecta tu propio traductor con el filtro:
+
+   ```php
+   add_filter('pvc_lt_translate_text', fn($v, $texto, $origen, $destino) => mi_api($texto, $origen, $destino), 10, 4);
+   ```
+
+2. **Motor del navegador** (gratis y privado). En **PecadosVip → Traducción automática**,
+   marca **«Traducir automáticamente lo nuevo mientras esta pestaña siga abierta»** y
+   pulsa el botón una vez para preparar el traductor. A partir de ahí cada modelo nueva se
+   traduce sola mientras la pestaña siga abierta; al cerrarla, se detiene.
+
+Garantías, con cualquier motor:
+
+- Solo se dispara en la **primera publicación** de un registro de origen no Legacy.
+- Una traducción generada lleva `_pvc_lt_source` y **no puede disparar otra ejecución**: no
+  hay bucles.
+- Una versión existente **nunca** se sobrescribe, en ningún estado.
+- Al motor solo se le envía **texto del editor**, segmento a segmento, nunca la página.
+- Si el motor devuelve el texto sin cambios (o falla), **no se escribe nada**: una copia
+  del original jamás se guarda como traducción. Sin motor, el módulo queda inerte y la
+  visibilidad la cubre el respaldo de idioma descrito arriba.
+- Se respeta el modo de publicación de la política: borradores salvo que la publicación
+  automática esté activada.
+
+Cubierto por `tests/auto-translation-test.php` (18 aserciones), que detectó que el hook
+ignoraba un proveedor conectado por filtro.
