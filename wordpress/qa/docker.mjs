@@ -64,6 +64,8 @@ try {
     await run([...compose, 'run', '--rm', '-e', 'PVWP_THEME_DIR=/var/www/html/wp-content/themes/pecadosvip', '--entrypoint', 'php', 'cli', '/theme-tests/router-test.php']);
     await run([...compose, 'run', '--rm', 'cli', 'wp', 'eval-file', '/qa/cleanup.php']);
     try {
+      await run([...compose, 'run', '--rm', 'cli', 'php', '/theme-tests/seo-growth-test.php']);
+      await run([...compose, 'run', '--rm', 'cli', 'wp', 'eval-file', '/qa/seo-runtime.php']);
       const runtimeOutput = await run([...compose, 'run', '--rm', 'cli', 'wp', 'eval-file', '/qa/runtime-check.php'], { capture: true });
       const fixtureLine = runtimeOutput.split(/\r?\n/).find((line) => line.startsWith('PVWP_QA_FIXTURE:'));
       if (!fixtureLine) throw new Error('WordPress no devolvió las fixtures de contenido editable.');

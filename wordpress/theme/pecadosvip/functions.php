@@ -3,6 +3,7 @@
 if (!defined('ABSPATH')) { exit; }
 require_once __DIR__ . '/inc/router.php';
 require_once __DIR__ . '/inc/render.php';
+require_once __DIR__ . '/inc/seo.php';
 
 function pvwp_setup(): void {
     add_theme_support('title-tag');
@@ -93,14 +94,14 @@ add_filter('pre_handle_404', 'pvwp_handle_404', 10, 2);
 function pvwp_template_redirect(): void {
     $c = pvwp_context(); if (empty($c['owned'])) { return; }
     remove_action('template_redirect', 'redirect_canonical'); remove_action('template_redirect', 'wp_old_slug_redirect'); remove_action('wp_head', 'rel_canonical');
-    if (!headers_sent()) { header('X-Robots-Tag: noindex, nofollow, noarchive', true); header('X-Content-Type-Options: nosniff', true); header('X-PecadosVip-Content-Revision: ' . (function_exists('pvc_revision') ? (string) pvc_revision() : 'uninstalled'), true); }
+    if (!headers_sent()) { header('X-Robots-Tag: ' . pvwp_seo_robots(), true); header('X-Content-Type-Options: nosniff', true); header('X-PecadosVip-Content-Revision: ' . (function_exists('pvc_revision') ? (string) pvc_revision() : 'uninstalled'), true); }
     if (!defined('DONOTCACHEPAGE')) { define('DONOTCACHEPAGE', true); } nocache_headers();
     if (isset($c['redirect'])) { wp_safe_redirect(home_url($c['redirect']), $c['status'], 'PecadosVip'); exit; } status_header($c['status'] ?? 404);
 }
 add_action('template_redirect', 'pvwp_template_redirect', 0);
 add_filter('template_include', static function ($template) { return !empty(pvwp_context()['owned']) ? get_template_directory() . '/index.php' : $template; }, 99);
-add_filter('pre_get_document_title', static function ($title) { $c = pvwp_context(); return !empty($c['owned']) ? (($c['route']['title'] ?? pvwp_error_copy($c['locale'] ?? 'es')['notFound']) . ' · ' . get_bloginfo('name')) : $title; }, 20);
-add_filter('wp_robots', static function ($robots) { if (!empty(pvwp_context()['owned'])) { unset($robots['index'], $robots['follow']); $robots['noindex'] = true; $robots['nofollow'] = true; $robots['noarchive'] = true; } return $robots; });
+add_filter('pre_get_document_title', static function ($title) { $c = pvwp_context(); if (empty($c['owned'])) { return $title; } if (isset($c['route']['record']) && function_exists('pvc_seo_metadata') && pvc_seo_informational($c['route']['record']) && !pvc_seo_conflict()) { return pvc_seo_metadata($c['route']['record'])['title']; } return ($c['route']['title'] ?? pvwp_error_copy($c['locale'] ?? 'es')['notFound']) . ' · ' . get_bloginfo('name'); }, 20);
+add_filter('wp_robots', static function ($robots) { if (!empty(pvwp_context()['owned'])) { foreach (array('index', 'follow', 'noindex', 'nofollow', 'noarchive', 'max-image-preview') as $key) { unset($robots[$key]); } if (str_starts_with(pvwp_seo_robots(), 'noindex')) { $robots['noindex'] = true; $robots['nofollow'] = true; $robots['noarchive'] = true; } else { $robots['index'] = true; $robots['follow'] = true; $robots['max-image-preview'] = 'large'; } } return $robots; });
 function pvwp_assets(): void {
     $base = get_template_directory_uri();
     foreach (array('style.css', 'assets/frontend.css', 'assets/native.css') as $i => $asset) { $file = get_template_directory() . '/' . $asset; if (is_file($file)) { wp_enqueue_style('pecadosvip-' . $i, $base . '/' . $asset, array(), (string) filemtime($file)); } }
@@ -112,11 +113,10 @@ function pvwp_assets(): void {
 add_action('wp_enqueue_scripts', 'pvwp_assets');
 add_action('wp_head', static function () {
     $c = pvwp_context(); if (empty($c['owned']) || ($c['status'] ?? 0) !== 200) { return; }
-    echo '<meta name="description" content="' . esc_attr($c['route']['description'] ?? '') . '">' . "\n";
+    if (!function_exists('pvc_seo_metadata')) { echo '<meta name="description" content="' . esc_attr($c['route']['description'] ?? '') . '">' . "\n"; }
     $site = function_exists('pvc_site') ? pvc_site($c['locale']) : array();
     $icon = $site['icon'] ?? ($site['logo'] ?? null);
     if (!has_site_icon() && !empty($icon['url'])) { echo '<link rel="icon" href="' . esc_url($icon['url']) . '">' . "\n"; }
-    foreach (array('es', 'en', 'fr', 'it') as $locale) { $href = pvwp_language_url($locale); if ($href !== null) { echo '<link rel="alternate" hreflang="' . esc_attr($locale) . '" href="' . esc_url($href) . '">' . "\n"; } }
 });
 function pvwp_error_copy(string $locale): array {
     $copy = array(
