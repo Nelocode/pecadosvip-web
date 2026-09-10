@@ -1,8 +1,9 @@
 # Traducción automática, botones de contacto y mecánica legal
 
-Estado: implementado y verificado de forma estática sobre `62d4ee4` (main local).
-Los servicios PHP no se pudieron ejecutar en este entorno (no hay PHP ni Docker
-disponibles); las pruebas están escritas y hay que ejecutarlas en la QA Docker.
+Estado: implementado, integrado en `main` y verificado sobre `86925da`. Las pruebas PHP
+se ejecutan en local con PHP 8.3.33 y pasan (66 + 49 + 31 aserciones), y `php -l` no
+encuentra errores en los 20 archivos del tema y del plugin. El paso 8 del CI sigue
+fallando, pero es una rotura previa de `77ea878` ajena a esta entrega.
 No es asesoría jurídica, no incluye los datos del titular y no activa nada por sí solo.
 
 ## 1. Traducción automática de contenido no Legacy
@@ -56,8 +57,8 @@ destinos y sin proveedor.
 
 ### Límites
 
-- Sin PHP ni Docker en este entorno, `php tests/selective-translation-test.php` está
-  escrito y no ejecutado aquí.
+- `tests/selective-translation-test.php` pasa en local con PHP 8.3.33 (66 aserciones) y en
+  el CI, pero la QA completa de WordPress Docker sigue sin ejecutarse en local.
 - La QA de WordPress real no se ejecutó: no está acreditado el guardado y refresco en
   una instalación completa.
 - Los perfiles Legacy ya existen traducidos porque la semilla los creó en los cuatro

@@ -77,20 +77,37 @@ integrado en el checkout compartido, sin commit ni push. Detalle funcional en
   navegador; el módulo de contacto no contiene ningún destino real; el gate de adultos no
   lee cookie, parámetro ni autodeclaración; el intake legal aprueba en falso por defecto.
 
+## Pruebas PHP ejecutadas
+
+- `php -l` sobre los **20 archivos PHP** del tema y del plugin, el mismo lint que ejecuta
+  `qa/runtime-check.php`: **0 errores**, con PHP 8.3.33 CLI (NTS) x64 en local.
+- `tests/selective-translation-test.php`: **PASS**, 66 aserciones.
+- `tests/contact-legal-test.php`: **PASS**, 49 aserciones.
+- `tests/age-access-test.php`: **PASS**, 31 aserciones.
+- `tests/router-test.php`: **PASS**, 49 aserciones; `tests/seo-growth-test.php`: **PASS**,
+  62 comprobaciones.
+- CI sobre `86925da`: pasos 1–7 correctos, incluidos «Build and verify native theme and
+  plugin» y «WordPress, MariaDB, editorial permissions and HTTP QA».
+
+La primera publicación (`baa8206`) **falló el paso 5** y sirvió para encontrar dos
+defectos reales en las pruebas nuevas, ya corregidos en `86925da`: la prueba de traducción
+medía la publicación de borradores sobre la misma ficha que acababa de dejar retirada la
+simulación de carrera —es decir, leía como fallo el comportamiento fail-closed que acababa
+de demostrar—, y la de acceso adulto redeclaraba las funciones nativas de PHP
+`headers_sent()` y `header()`, lo que abortaba la suite antes de su primera aserción.
+
 ## NO EJECUTADO
 
-- **PHP no está disponible en este entorno** (ni intérprete local ni Docker con motor
-  Linux), y **no hay red saliente** desde el shell. Por tanto no se ejecutaron
-  `php -l`, ni `tests/selective-translation-test.php`, `tests/contact-legal-test.php`,
-  `tests/age-access-test.php`, ni `node qa/docker.mjs test`. Las tres pruebas están
-  escritas y añadidas a la QA Docker; su sintaxis no está acreditada por un intérprete,
-  solo por la comprobación de delimitadores del verificador.
-- No se ejecutó la QA de WordPress real: guardar y refrescar, nonces, permisos, la
-  importación, ni la navegación HTTP en los cuatro idiomas.
-- No se ejecutó ninguna traducción real, ninguna publicación y ningún despliegue.
-- No se verificó `origin/main` en remoto (sin red). El registro compartido informa de un
-  cambio externo posterior en `main` que desactiva los hooks de cierre público y Apache;
-  **no está comprobado desde aquí** y debe revisarse antes de integrar.
+- La QA Docker completa: el paso 8 «Production containment, real authentication and
+  restart persistence» **falla**, pero es una rotura previa y ajena a esta entrega: falla
+  igual en `77ea878`, el commit que desactiva la protección pública, porque el QA espera
+  el marcador `closed-v1`. Esta entrega no toca `wordpress/protection/` ni el `Dockerfile`.
+- No se ejecutó `node qa/docker.mjs test` en local (no hay motor Linux disponible) ni la
+  navegación HTTP en los cuatro idiomas contra WordPress real: guardar y refrescar,
+  nonces, permisos e importación siguen sin acreditarse en una instalación completa.
+- No se ejecutó ninguna traducción real ni ninguna publicación editorial.
+- El despliegue de producción lo dispara el push a `main`; su efecto público se comprueba
+  por separado y no lo acredita el CI.
 
 ## Límites
 
