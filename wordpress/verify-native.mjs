@@ -235,6 +235,17 @@ for (const [base, relative] of phpSources) {
   const source = await readFile(resolve(base, relative), 'utf8');
   assert.ok(phpDelimitersBalanced(source), `Unbalanced PHP delimiters in ${relative}`);
 }
+// Every path a QA test includes must be mounted into the QA container. A test that
+// includes an unmounted directory passes locally and fails in Docker.
+const composeSource = await readFile(resolve(root, 'docker-compose.yml'), 'utf8');
+const mountedDirectories = new Set([...composeSource.matchAll(/^\s*-\s*\.\/([A-Za-z0-9_-]+):\//gm)].map((match) => match[1]));
+assert.ok(mountedDirectories.has('tests'), 'The QA container must mount the test directory');
+for (const name of (await readdir(resolve(root, 'tests'))).filter((entry) => entry.endsWith('.php'))) {
+  const source = await readFile(resolve(root, 'tests', name), 'utf8');
+  for (const match of source.matchAll(/__DIR__\s*\.\s*'\/\.\.\/([A-Za-z0-9_-]+)\//g)) {
+    assert.ok(mountedDirectories.has(match[1]), `tests/${name} includes ../${match[1]}/, which the QA container does not mount`);
+  }
+}
 // The WordPress runtime and its focused CI workflow belong to this delivery.
 // Keep unrelated application/backend source outside the allowed change surface.
 const coreDiff = hasOwnGit(repository) ? execFileSync('git', ['diff', '--name-only', 'HEAD', '--', '.', ':(exclude)wordpress', ':(exclude)Dockerfile', ':(exclude).dockerignore', ':(exclude).github/workflows/watermark-qa.yml', ':(exclude)tsconfig.json', ':(exclude)eslint.config.mjs'], { cwd: repository, encoding: 'utf8' }).trim() : '';
