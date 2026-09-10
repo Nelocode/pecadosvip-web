@@ -8,6 +8,7 @@
     "build": "node build-native.mjs",
     "verify": "node verify-native.mjs",
     "test:copy-upgrade": "php tests/copy-upgrade-test.php",
+    "test:copy-coverage": "node tests/copy-coverage.mjs",
     "package": "powershell -NoProfile -ExecutionPolicy Bypass -File package.ps1"
   },
   "devDependencies": { "esbuild": "0.28.2" }

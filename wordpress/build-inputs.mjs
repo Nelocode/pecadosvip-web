@@ -28,7 +28,7 @@ export async function buildInputs(repository, assetPaths) {
     }
   }
   for (const directory of ['app', 'lib', 'compliance/multilingual/catalogs', 'wordpress/src', 'wordpress/theme', 'wordpress/plugin']) await visit(directory);
-  for (const file of ['build-native.mjs', 'build-inputs.mjs', 'verify-native.mjs', 'package.ps1', 'artifact-info.mjs', 'package.json', 'package-lock.json', 'source-version.json']) paths.add(`wordpress/${file}`);
+  for (const file of ['build-native.mjs', 'build-inputs.mjs', 'verify-native.mjs', 'verify-copy-coverage.mjs', 'package.ps1', 'artifact-info.mjs', 'package.json', 'package-lock.json', 'source-version.json']) paths.add(`wordpress/${file}`);
   const inputs = {};
   for (const path of [...paths].sort()) {
     const full = resolve(repository, path);

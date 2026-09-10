@@ -6,6 +6,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
 import { buildInputs, hasOwnGit } from './build-inputs.mjs';
+import { auditEditableCopy } from './verify-copy-coverage.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const repository = resolve(root, '..');
@@ -88,22 +89,28 @@ async function verifyCopy(source, destination) {
 }
 await verifyCopy(resolve(root, 'theme/pecadosvip'), theme);
 await verifyCopy(resolve(root, 'plugin/pecadosvip-content'), resolve(root, 'dist/pecadosvip-content'));
-// Every editable template path used by the theme must exist in all four locales, so a
-// partly translated interface cannot ship. Scan the whole theme, not only one file.
-const themePhp = ['index.php', 'functions.php', ...(await readdir(resolve(theme, 'inc'))).filter((name) => name.endsWith('.php')).map((name) => `inc/${name}`)];
-const literalTextPaths = new Set();
-for (const file of themePhp) {
-  const source = await readFile(resolve(theme, file), 'utf8');
-  for (const match of source.matchAll(/pvwp_(?:text|label|value)\('([^']+)'/g)) {
-    if (!match[1].endsWith('.')) literalTextPaths.add(match[1]);
+// Literal calls alone cannot see concatenated paths, map dispatch, list children or
+// the whole copy groups exported to JS. Audit those finite domains in all locales.
+async function textSources(directory, extension, prefix) {
+  const sources = {};
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    assert.ok(!entry.isSymbolicLink());
+    const path = `${prefix}/${entry.name}`;
+    if (entry.isDirectory()) Object.assign(sources, await textSources(resolve(directory, entry.name), extension, path));
+    else if (entry.name.endsWith(extension)) sources[path] = await readFile(resolve(directory, entry.name), 'utf8');
   }
+  return sources;
 }
-for (const locale of Object.keys(seed.copy)) {
-  for (const key of literalTextPaths) {
-    const value = key.split('.').reduce((object, part) => object?.[part], seed.copy[locale]);
-    assert.notEqual(value, undefined, `Missing editable text: ${locale}:${key}`);
-  }
-}
+const copyCoverage = auditEditableCopy({ copy: seed.copy, records: seed.records,
+  phpSources: await textSources(theme, '.php', 'wordpress/theme/pecadosvip'),
+  javascriptSources: await textSources(resolve(theme, 'assets'), '.js', 'wordpress/theme/pecadosvip/assets'),
+  pluginSources: {
+    main: await readFile(resolve(root, 'dist/pecadosvip-content/pecadosvip-content.php'), 'utf8'),
+    contact: await readFile(resolve(root, 'dist/pecadosvip-content/includes/contact.php'), 'utf8'),
+    legal: await readFile(resolve(root, 'dist/pecadosvip-content/includes/legal.php'), 'utf8'),
+  },
+});
+assert.deepEqual(copyCoverage.problems, [], `Editable copy coverage failed:\n${JSON.stringify(copyCoverage.problems, null, 2)}`);
 // Contact channels, legal mechanics and the adult access shell are part of the contract.
 const contactKeys = ['eyebrow', 'title', 'lead', 'groupAria', 'disabledTitle', 'disabledBody', 'disabledButton', 'safetyTitle', 'safetyItem1', 'safetyItem2', 'safetyItem3', 'privacyNote', 'responseNote'];
 const legalCookieKeys = ['title', 'intro', 'essential', 'none', 'inventoryTitle', 'inventoryPending', 'column1', 'column2', 'column3', 'column4', 'column5', 'analyticsTitle', 'analyticsNone', 'analyticsInfo', 'accept', 'reject', 'configure', 'save', 'revoke', 'revoked', 'reviewNeeded'];
@@ -254,6 +261,7 @@ assert.equal(coreDiff, '', 'Unrelated application/backend files were modified');
 const tsconfig = await json(resolve(repository, 'tsconfig.json'));
 assert.ok(tsconfig.exclude.includes('wordpress'));
 assert.ok((await readFile(resolve(repository, 'eslint.config.mjs'), 'utf8')).includes("'wordpress/**'"));
-console.log(JSON.stringify({ result: 'PASS_STATIC', mode: manifest.mode, seedRecords: seed.records.length, locales: manifest.locales, mediaAssets: assets.length, referencedMedia: references.size, editableTemplatePaths: literalTextPaths.size,
+console.log(JSON.stringify({ result: 'PASS_STATIC', mode: manifest.mode, seedRecords: seed.records.length, locales: manifest.locales, mediaAssets: assets.length, referencedMedia: references.size, editableTemplatePaths: copyCoverage.paths.length,
+  editableCopyCoverage: { literalCalls: copyCoverage.literalCalls, dynamicCalls: copyCoverage.dynamicCalls, dynamicFamilies: copyCoverage.dynamicFamilies, warnings: copyCoverage.warnings },
   checks: ['unique localized records', 'adult synthetic initial profiles', 'media bytes and SHA-256', 'current build inputs', 'source and package parity', 'JS syntax', 'no snapshot/hydration output', 'editorial plugin contracts', 'editable text parity in es/en/fr/it', 'contact, legal and adult-access contracts', 'PHP delimiter balance (not a PHP lint)', 'original application/backend unchanged'],
   runtimeWordPress: 'NOT_VERIFIED_BY_THIS_SCRIPT: run Docker QA including save-refresh test; static checks do not prove runtime editability' }, null, 2));
