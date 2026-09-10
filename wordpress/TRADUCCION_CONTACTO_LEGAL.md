@@ -181,5 +181,35 @@ los contratos de contacto, legal y acceso adulto, y un equilibrio de delimitador
 node qa/docker.mjs test
 ```
 
-que ahora incluye `selective-translation-test.php`, `contact-legal-test.php` y
-`age-access-test.php`.
+que ahora incluye `localized-records-test.php`, `apply-translations-test.php`,
+`selective-translation-test.php`, `contact-legal-test.php` y `age-access-test.php`.
+
+## Perfiles en todos los idiomas
+
+Un perfil publicado solo en español **no desaparece** de los demás idiomas. El listado, la
+ficha y el selector de idioma completan el idioma con el registro de origen y lo declaran
+como no traducido (`Sin traducir` / `Not translated`), en lugar de ocultarlo o devolver
+404. Vive en `plugin/pecadosvip-content/includes/localized-records.php`, se aplica solo a
+perfiles y el catálogo público conserva la semántica estricta por idioma.
+
+Eso garantiza **visibilidad**, no traducción. Para tener los textos traducidos hay dos
+caminos:
+
+1. **Traductor del navegador** — `PecadosVip → Traducción automática` desde una sesión con
+   Chrome o Edge de escritorio. Es el camino normal.
+2. **Aplicador offline** — `tools/apply-profile-translations.php`, para cuando no hay
+   navegador disponible:
+
+```powershell
+wp eval-file wordpress/tools/apply-profile-translations.php
+PVC_TRANSLATE_PUBLISH=1 wp eval-file wordpress/tools/apply-profile-translations.php
+PVC_TRANSLATIONS=/ruta/al/mapa.json wp eval-file wordpress/tools/apply-profile-translations.php
+```
+
+Lee `tools/profile-translations.json` (mapa revisable con el cuerpo, el extracto y los
+idiomas hablados mapeados por valor de origen). Nunca sobrescribe una versión existente en
+ningún estado, crea **borradores** salvo que `PVC_TRANSLATE_PUBLISH=1` lo pida
+explícitamente, valida cada registro con las reglas del plugin, guarda la procedencia
+(`_pvc_lt_engine = offline-map`) y **se niega** si el cuerpo tiene un número de nodos de
+texto distinto del mapa en vez de adivinar. Cubierto por
+`tests/apply-translations-test.php` (23 aserciones).

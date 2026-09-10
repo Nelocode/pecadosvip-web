@@ -209,6 +209,7 @@ const phpSources = [
   ...(await readdir(resolve(root, 'plugin/pecadosvip-content/includes'))).map((name) => [root, `plugin/pecadosvip-content/includes/${name}`]),
   [root, 'plugin/pecadosvip-content/pecadosvip-content.php'],
   ...(await readdir(resolve(root, 'tests'))).filter((name) => name.endsWith('.php')).map((name) => [root, `tests/${name}`]),
+  ...(await readdir(resolve(root, 'tools'))).filter((name) => name.endsWith('.php')).map((name) => [root, `tools/${name}`]),
 ];
 for (const [base, relative] of phpSources) {
   const source = await readFile(resolve(base, relative), 'utf8');

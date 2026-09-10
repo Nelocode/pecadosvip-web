@@ -1,0 +1,31 @@
+{
+  "schema": "pecadosvip.profile-translations",
+  "version": 1,
+  "sourceLocale": "es",
+  "createdAtUtc": "2026-09-10T19:00:00Z",
+  "reviewNote": "Borradores redactados sin el traductor del navegador. Requieren revisión editorial humana antes de publicarse: son propuestas, no traducciones aprobadas.",
+  "fieldHelp": {
+    "content": "Texto plano del cuerpo. Solo se aplica si la ficha de origen tiene exactamente un nodo de texto; si tiene más, hay que aportar las claves content:0, content:1… y el aplicador se niega si falta alguna.",
+    "excerpt": "Extracto. Se omite si la ficha de origen no tiene extracto.",
+    "languages": "Idiomas hablados, mapeados por valor de origen para no depender del orden. Las claves no presentes se conservan tal cual."
+  },
+  "profiles": {
+    "maria": {
+      "en": {
+        "content": "Charismatic, romantic.",
+        "excerpt": "Charismatic, romantic.",
+        "languages": { "Inglés": "English", "Español": "Spanish", "Italiano": "Italian", "Francés": "French" }
+      },
+      "fr": {
+        "content": "Charismatique, romantique.",
+        "excerpt": "Charismatique, romantique.",
+        "languages": { "Inglés": "Anglais", "Español": "Espagnol", "Italiano": "Italien", "Francés": "Français" }
+      },
+      "it": {
+        "content": "Carismatica, romantica.",
+        "excerpt": "Carismatica, romantica.",
+        "languages": { "Inglés": "Inglese", "Español": "Spagnolo", "Italiano": "Italiano", "Francés": "Francese" }
+      }
+    }
+  }
+}
