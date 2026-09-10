@@ -166,7 +166,7 @@ for (const locale of ['es', 'en', 'fr', 'it']) assert.ok(themeRender.includes(`'
 assert.ok(plugin.includes("pvc_records('profile', $locale)"), 'The public catalog must stay strictly per-locale');
 // Automatic translation of a newly published model.
 const autoTranslation = await readFile(resolve(root, 'dist/pecadosvip-content/includes/auto-translation.php'), 'utf8');
-for (const contract of ['function pvc_lt_auto_available(', 'function pvc_lt_auto_translate(', "add_action('transition_post_status'", "'_pvc_lt_source'", "'_pvc_lt_engine' => 'auto'"]) assert.ok(autoTranslation.includes(contract), `Missing automatic translation contract: ${contract}`);
+for (const contract of ['function pvc_lt_auto_available(', 'function pvc_lt_auto_translate(', "add_action('transition_post_status'", "'_pvc_lt_source'", "['_pvc_lt_engine'] = 'auto'"]) assert.ok(autoTranslation.includes(contract), `Missing automatic translation contract: ${contract}`);
 assert.ok(autoTranslation.includes("if (!pvc_lt_auto_available()) { return; }"), 'The automatic path must stay inert without a translation source');
 assert.ok(autoTranslation.includes("if (!$changed) {"), 'An unchanged engine output must never be stored as a translation');
 assert.ok(autoTranslation.includes("if (get_post_meta($post->ID, '_pvc_lt_source', true)) { return; }"), 'A generated translation must never trigger another run');
