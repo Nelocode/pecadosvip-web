@@ -84,6 +84,7 @@ export type Profile = {
   media: MediaAsset[];
   availability: Availability;
   citySlugs: CitySlug[];
+  blockedCountry?: string;
   status: PublicationStatus;
   approval: ApprovalRecord;
   verificationEvidenceReference?: string;

@@ -20,6 +20,7 @@ function pvc_fields(string $type): array {
     $common = array('synthetic' => array('label' => 'Contenido generado con IA / identidad ficticia', 'type' => 'boolean', 'default' => true), 'tags' => array('label' => 'Etiquetas (una por línea)', 'type' => 'array', 'items' => array('type' => 'string')));
     $specific = array(
         'pv_profile' => array(
+            'blockedCountry' => array('label' => 'Bloquear visitantes de este país (Código ISO 2 letras, ej: CO)', 'type' => 'string'),
             'age' => array('label' => 'Edad (solo personas adultas)', 'type' => 'integer', 'minimum' => 18, 'maximum' => 100, 'default' => 25),
             'cities' => array('label' => 'Ciudades', 'type' => 'array', 'items' => array('type' => 'string'), 'control' => 'cities'),
             'homeZone' => array('label' => 'Zona principal', 'type' => 'string', 'enum' => array('madrid', 'barcelona'), 'default' => 'madrid'),
