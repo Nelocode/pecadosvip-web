@@ -231,4 +231,5 @@ require_once PVC_DIR . '/includes/frontend-admin.php';
 require_once PVC_DIR . '/includes/legal.php';
 require_once PVC_DIR . '/includes/contact.php';
 require_once PVC_DIR . '/includes/selective-translation.php';
+require_once PVC_DIR . '/includes/offline-translation.php';
 require_once PVC_DIR . '/includes/auto-translation.php';

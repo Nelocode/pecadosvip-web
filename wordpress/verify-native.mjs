@@ -175,6 +175,15 @@ const translationUi = await readFile(resolve(root, 'dist/pecadosvip-content/asse
 assert.ok(translationUi.includes('pvc-lt-auto'), 'The translation screen must offer the automatic mode');
 assert.ok(translationUi.includes('function schedulePoll()'), 'The automatic mode must poll instead of running unconditionally');
 assert.ok(translationUi.includes('function startHandsFree()'), 'The automatic mode must try to prepare the translator without a click');
+// Offline engine: no API, no key, no network.
+const offlineEngine = await readFile(resolve(root, 'dist/pecadosvip-content/includes/offline-translation.php'), 'utf8');
+for (const contract of ['function pvc_lt_offline_dictionary(', 'function pvc_lt_offline_translate(', 'function pvc_lt_offline_case(', 'function pvc_lt_offline_key(']) assert.ok(offlineEngine.includes(contract), `Missing offline engine contract: ${contract}`);
+assert.ok(offlineEngine.includes('pvc_lt_offline_key((string) $source)'), 'Dictionary keys must be normalised exactly like lookups');
+assert.ok(offlineEngine.includes('(float) ($known / $words)'), 'Coverage must be reported as a float');
+assert.ok(!/wp_remote_|curl_|file_get_contents\(['"]https?:/i.test(offlineEngine), 'The offline engine must never reach the network');
+assert.ok(autoTranslation.includes('pvc_lt_offline_translate($text, $to)'), 'The automatic path must fall back to the offline glossary');
+assert.ok(autoTranslation.includes('$locale_publish = $publish && $complete;'), 'A partial translation must never be published');
+assert.ok(plugin.includes('includes/offline-translation.php'), 'The plugin must load the offline engine');
 assert.ok(themeCompliance.includes("pvwp_legal_report('contact')"), 'The reporting channel must stay on the contact page');
 /**
  * Structural check for the PHP sources. This is NOT a PHP parser or a substitute for

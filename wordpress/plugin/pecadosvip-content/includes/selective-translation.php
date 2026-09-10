@@ -325,11 +325,16 @@ function pvc_lt_page(): void {
     echo '<button class="button" id="pvc-lt-refresh">Consultar contenido pendiente</button>';
     echo '<p><label for="pvc-lt-source">Traducir solo un elemento </label><select id="pvc-lt-source"><option value="">Toda la cola pendiente (automático)</option></select></p>';
     echo '<button class="button button-primary" id="pvc-lt-run">Traducir automáticamente lo pendiente</button> <button class="button" id="pvc-lt-stop" disabled>Detener</button><pre id="pvc-lt-status" role="status" aria-live="polite" style="white-space:pre-wrap">Sin iniciar.</pre>';
-    $engine_ready = function_exists('pvc_lt_auto_available') && pvc_lt_auto_available();
+    $mode = function_exists('pvc_lt_auto_mode') ? pvc_lt_auto_mode() : 'glossary';
+    $size = function_exists('pvc_lt_offline_dictionary_size') ? pvc_lt_offline_dictionary_size() : 0;
+    $modes = array(
+        'engine' => 'Motor en servidor configurado: cada modelo nueva se traduce sola al publicarse, sin abrir nada.',
+        'filter' => 'Proveedor propio conectado por filtro: cada modelo nueva se traduce sola al publicarse.',
+        'glossary' => 'Traductor propio en el servidor, sin APIs ni servicios externos: glosario editorial de ' . $size . ' entradas. Cada modelo nueva se traduce sola al publicarse. Si una frase usa vocabulario que no está en el glosario, la traducción queda en borrador marcada para revisar, y el perfil sigue visible con el respaldo de idioma.',
+    );
     echo '<h2>Traducción automática al publicar</h2>';
-    echo '<p id="pvc-lt-engine">' . ($engine_ready
-        ? 'Motor en servidor configurado: cada modelo nueva se traduce sola en cuanto se publica, sin abrir nada.'
-        : 'Sin motor en servidor configurado. Deja esta pestaña abierta y marca la casilla: cada modelo nueva se traducirá sola mientras la pestaña siga abierta. Para que funcione sin ninguna pestaña hace falta un proveedor de traducción con clave.') . '</p>';
+    echo '<p id="pvc-lt-engine">' . esc_html($modes[$mode] ?? $modes['glossary']) . '</p>';
+    echo '<p class="description">El glosario se amplía sin tocar código con la opción <code>pvc_lt_glossary</code> (español → en/fr/it). Traduce vocabulario, no prosa: no reordena la frase.</p>';
     echo '<p><label><input type="checkbox" id="pvc-lt-auto" value="1"> Traducir automáticamente lo nuevo mientras esta pestaña siga abierta</label></p>';
     echo '</div>';
 }

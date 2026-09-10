@@ -40,24 +40,43 @@ function pvc_lt_engine_ready(): bool {
     return $engine['provider'] !== 'none' && trim((string) $engine['api_key']) !== '' && trim((string) $engine['model']) !== '';
 }
 /**
- * True when some translation source exists: a configured server engine or a provider
- * connected through the `pvc_lt_translate_text` filter. Without either of them the
- * automatic path stays inert, so a copy of the source text is never stored as a
- * translation.
+ * True when some translation source exists. The bundled glossary is always available, so
+ * the automatic path is always able to do something; it reports which source it used.
  */
-function pvc_lt_auto_available(): bool {
-    return pvc_lt_engine_ready() || (bool) has_filter('pvc_lt_translate_text');
+function pvc_lt_auto_available(): bool { return true; }
+function pvc_lt_auto_mode(): string {
+    if (has_filter('pvc_lt_translate_text')) { return 'filter'; }
+    if (pvc_lt_engine_ready()) { return 'engine'; }
+    return 'glossary';
+}
+/**
+ * Translates one segment and reports how much of it was resolved.
+ *
+ * Order: a provider plugged through the filter, then the configured server engine, then
+ * the bundled offline glossary. The glossary path reports its real coverage instead of
+ * pretending the result is complete.
+ */
+function pvc_lt_translate_segment(string $text, string $from, string $to, string $context = 'text'): array {
+    $translated = apply_filters('pvc_lt_translate_text', null, $text, $from, $to, $context);
+    if (is_string($translated) && trim($translated) !== '') {
+        return array('text' => $translated, 'coverage' => 1.0, 'complete' => true, 'source' => 'filter');
+    }
+    if (pvc_lt_engine_ready()) {
+        $engine = pvc_lt_engine_request($text, $from, $to, $context);
+        if (trim($engine) !== '' && $engine !== $text) {
+            return array('text' => $engine, 'coverage' => 1.0, 'complete' => true, 'source' => 'engine');
+        }
+    }
+    $offline = pvc_lt_offline_translate($text, $to);
+    return array('text' => $offline['text'], 'coverage' => (float) $offline['coverage'], 'complete' => (bool) $offline['complete'], 'source' => 'glossary');
 }
 /**
  * Translates one text segment. A site can plug its own provider:
  *   add_filter('pvc_lt_translate_text', fn($text, $from, $to, $context) => my_api(...), 10, 4);
- * The source text is returned unchanged when no engine is available.
  */
 function pvc_lt_translate_text(string $text, string $from, string $to, string $context = 'text'): string {
-    $translated = apply_filters('pvc_lt_translate_text', null, $text, $from, $to, $context);
-    if (is_string($translated) && trim($translated) !== '') { return $translated; }
-    if (!pvc_lt_engine_ready()) { return $text; }
-    return pvc_lt_engine_request($text, $from, $to, $context);
+    $result = pvc_lt_translate_segment($text, $from, $to, $context);
+    return (string) $result['text'];
 }
 /** Minimal OpenAI-compatible chat completion. Any provider speaking that shape works. */
 function pvc_lt_engine_request(string $text, string $from, string $to, string $context): string {
@@ -101,27 +120,38 @@ function pvc_lt_auto_translate($post, bool $publish = false): array {
     foreach (pvc_lt_languages() as $locale) {
         if (pvc_lt_targets($post, $locale)) { ++$skipped; continue; }
         $translations = array();
-        $changed = false;
+        $changed = false; $complete = true; $coverage = 1.0; $method = 'glossary';
         foreach ($segments as $key => $text) {
-            $value = pvc_lt_translate_text((string) $text, $source, $locale, (string) $key);
-            if (trim($value) === '') { $value = (string) $text; }
+            // A segment with no letters (a date, a separator) needs no translation.
+            if (!pvc_lt_offline_has_words((string) $text)) { $translations[$key] = (string) $text; continue; }
+            $segment = pvc_lt_translate_segment((string) $text, $source, $locale, (string) $key);
+            $value = trim((string) $segment['text']) === '' ? (string) $text : (string) $segment['text'];
             if ($value !== (string) $text) { $changed = true; }
+            if (empty($segment['complete'])) { $complete = false; }
+            $coverage = min($coverage, (float) $segment['coverage']);
+            if (($segment['source'] ?? '') === 'engine' || ($segment['source'] ?? '') === 'filter') { $method = $segment['source']; }
             $translations[$key] = $value;
         }
-        // Without an engine every segment comes back unchanged: creating the record would
-        // publish the source text under another locale and call it a translation.
-        if (!$changed) { $details[$locale] = 'no-engine'; ++$skipped; continue; }
-        $result = pvc_lt_payload($post, $translations, $locale, $publish);
-        $valid = pvc_validate('pv_profile', $locale, (string) get_post_meta($post->ID, 'pv_key', true), pvc_sanitize_data($result['meta_input']['pv_data'], 'pv_profile'), 0, $publish);
+        // Nothing at all was recognised: creating the record would store the source text
+        // under another locale and call it a translation. The locale fallback already keeps
+        // the profile visible and disclosed as untranslated.
+        if (!$changed) { $details[$locale] = 'nothing-translated'; ++$skipped; continue; }
+        // A partial glossary translation is never published: it stays a draft for a human.
+        $locale_publish = $publish && $complete;
+        $result = pvc_lt_payload($post, $translations, $locale, $locale_publish);
+        $valid = pvc_validate('pv_profile', $locale, (string) get_post_meta($post->ID, 'pv_key', true), pvc_sanitize_data($result['meta_input']['pv_data'], 'pv_profile'), 0, $locale_publish);
         if (is_wp_error($valid)) { $details[$locale] = $valid->get_error_message(); ++$skipped; continue; }
         $result['meta_input']['_pvc_lt_source'] = (int) $post->ID;
         $result['meta_input']['_pvc_lt_source_hash'] = pvc_lt_hash($post);
         $result['meta_input']['_pvc_lt_engine'] = 'auto';
+        $result['meta_input']['_pvc_lt_method'] = $method;
+        $result['meta_input']['_pvc_lt_coverage'] = $coverage;
+        $result['meta_input']['_pvc_lt_review'] = $complete ? '' : 'incomplete';
         $id = wp_insert_post(wp_slash($result), true);
         if (is_wp_error($id)) { $details[$locale] = $id->get_error_message(); ++$skipped; continue; }
         $thumbnail = get_post_thumbnail_id($post);
         if ($thumbnail) { set_post_thumbnail($id, $thumbnail); }
-        $details[$locale] = (int) $id;
+        $details[$locale] = array('id' => (int) $id, 'status' => get_post_status($id), 'coverage' => $coverage, 'complete' => $complete, 'method' => $method);
         ++$created;
     }
     if ($created) { pvc_bump(); }
