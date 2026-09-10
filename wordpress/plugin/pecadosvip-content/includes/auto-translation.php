@@ -158,6 +158,29 @@ function pvc_lt_auto_translate($post, bool $publish = false): array {
     return array('created' => $created, 'skipped' => $skipped, 'reason' => 'ok', 'details' => $details);
 }
 /**
+ * Provisions the translation policy on its own the first time a model is published, so
+ * nobody has to open the translation screen first. The Legacy inventory is frozen at that
+ * exact moment, which is strictly conservative: everything already in the site becomes
+ * protected and only content published afterwards can be translated.
+ *
+ * Returns the policy, or an empty array when it cannot be provisioned: without an anchor
+ * nothing is invented and the automatic path stays inert.
+ */
+function pvc_lt_auto_policy(): array {
+    $policy = pvc_lt_policy();
+    if ($policy) { return $policy; }
+    $anchor = pvc_lt_anchor();
+    if ($anchor === null) { return array(); }
+    $posts = get_posts(array('post_type' => array_keys(pvc_types()), 'post_status' => array('publish','draft','pending','private','future','trash'), 'posts_per_page' => -1));
+    $legacy = pvc_lt_baseline($posts, $anchor);
+    $anchor_post = get_post($anchor);
+    if ($anchor_post) { $legacy = array_values(array_diff($legacy, array(pvc_lt_identity($anchor_post)))); }
+    $provisioned = array('enabled' => true, 'mode' => pvc_lt_mode(), 'anchor_id' => $anchor, 'legacy' => $legacy,
+        'publish' => true, 'auto_provisioned_at_utc' => gmdate('c'));
+    if (!add_option('pvc_local_translation_policy', $provisioned, '', false)) { return pvc_lt_policy(); }
+    return $provisioned;
+}
+/**
  * Trigger: the first time a profile becomes published. A translation created by this
  * module carries `_pvc_lt_source`, so it can never trigger another run.
  */
@@ -165,6 +188,7 @@ add_action('transition_post_status', function($new_status, $old_status, $post) {
     if ($new_status !== 'publish' || $old_status === 'publish') { return; }
     if (!$post || $post->post_type !== 'pv_profile') { return; }
     if (get_post_meta($post->ID, '_pvc_lt_source', true)) { return; }
-    if (!pvc_lt_auto_available()) { return; }
+    if (!pvc_lt_enabled()) { pvc_lt_auto_policy(); }
+    if (!pvc_lt_enabled()) { return; }
     pvc_lt_auto_translate($post, pvc_lt_publishes());
 }, 20, 3);

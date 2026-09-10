@@ -69,10 +69,14 @@ check(pvc_lt_offline_translate('Inglés','fr')['text']==='Anglais','Spoken langu
 check(pvc_lt_offline_translate('inglés','fr')['text']==='anglais','A lowercase source stays lowercase');
 check(pvc_lt_offline_translate('Elegante','en')['text']==='Elegant','Capitalisation is preserved');
 
-// 2. Fail-closed: a disabled tool creates nothing.
+// 2. No administrator step: the first publication provisions the policy and translates.
 $post=source_profile(465);
 fire_transition('publish','draft',$post);
-check(made()===array(),'A disabled tool creates nothing');
+check(pvc_lt_enabled(),'The first publication provisions the translation policy on its own');
+check(count(made())===3,'The model is translated with no administrator step and no configuration');
+check((int)$options['pvc_local_translation_policy']['anchor_id']===465,'The anchor is the source profile of the reference model');
+check(!in_array('pv_profile:maria',$options['pvc_local_translation_policy']['legacy'],true),'The anchor model itself stays translatable');
+check(!empty($options['pvc_local_translation_policy']['publish']),'Provisioning publishes, so the model shows in every language');
 
 // 3. Enabled: publishing a model creates the three locales on its own.
 enable(false);
@@ -138,4 +142,15 @@ $GLOBALS['meta'][800]['pv_key']='otra-mas';
 $beforeOther=count($GLOBALS['posts']);
 fire_transition('publish','draft',$other);
 check(count($GLOBALS['posts'])===$beforeOther,'A record already in another locale is not treated as a source');
+
+// 8. Fail-closed without an anchor: nothing is invented, not even a policy.
+foreach ($GLOBALS['posts'] as $pv_id => $pv_post) { if (get_post_meta($pv_id,'pv_key',true)==='maria' && get_post_meta($pv_id,'pv_locale',true)==='es') { unset($GLOBALS['posts'][$pv_id]); } }
+foreach (made() as $p) { unset($GLOBALS['posts'][$p->ID]); }
+delete_option('pvc_local_translation_policy');
+$orphan=source_profile(950);
+$GLOBALS['meta'][950]['pv_key']='huerfana';
+$beforeOrphan=count($GLOBALS['posts']);
+fire_transition('publish','draft',$orphan);
+check(count($GLOBALS['posts'])===$beforeOrphan,'Without an anchor nothing is created');
+check(empty($GLOBALS['options']['pvc_local_translation_policy']),'Without an anchor no policy is provisioned either');
 echo json_encode(array('ok'=>true,'assertions'=>$checks),JSON_PRETTY_PRINT).PHP_EOL;
