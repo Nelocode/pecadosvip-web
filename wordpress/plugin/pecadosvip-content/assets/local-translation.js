@@ -15,6 +15,27 @@
   const publishNow = document.getElementById('pvc-lt-publish-now');
   if (!config || !status || !run) return;
   let active = false;
+  let pollTimer = 0;
+  const AUTO_INTERVAL_MS = 60000;
+  /* Re-checks the queue while the tab stays open. Called only from event handlers, once the
+     auto switch exists, so no timer is ever armed before the page is fully wired. */
+  function schedulePoll() {
+    clearTimeout(pollTimer);
+    if (!autoSwitch || !autoSwitch.checked) return;
+    pollTimer = setTimeout(async () => {
+      if (!active) {
+        try {
+          const pending = await request('pvc_lt_pending');
+          if (pending.jobs.length) {
+            log(`Modo automático: ${pending.jobs.length} traducciones pendientes.`);
+            active = true; run.disabled = true; stop.disabled = false;
+            await cycle('');
+          }
+        } catch (error) { log(`Modo automático: ${error.message}`); }
+      }
+      schedulePoll();
+    }, AUTO_INTERVAL_MS);
+  }
   const engines = new Map();
   const log = (message) => { status.textContent = (status.textContent + '\n' + message).slice(-12000); };
   const reset = () => { active = false; run.disabled = false; stop.disabled = true; };
@@ -107,6 +128,21 @@
       await Promise.all(['en', 'fr', 'it'].map(engine));
       if (active) await cycle(selectedId);
     } catch (error) { log(`Detenido: ${error.message}`); reset(); }
+    schedulePoll();
   });
-  stop?.addEventListener('click', () => { active = false; run.disabled = false; stop.disabled = true; log('Detenido. Las traducciones ya guardadas se conservan.'); });
+  stop?.addEventListener('click', () => { active = false; run.disabled = false; stop.disabled = true; clearTimeout(pollTimer); log('Detenido. Las traducciones ya guardadas se conservan.'); });
+
+  /* Automatic mode. A new model published while this tab stays open is translated without
+     anyone pressing anything again; the browser engine is already prepared, so no further
+     user gesture is needed. Closing the tab stops it, and nothing runs in the background. */
+  const autoSwitch = document.getElementById('pvc-lt-auto');
+  if (autoSwitch) {
+    try { autoSwitch.checked = localStorage.getItem('pvc-lt-auto') === '1'; } catch { /* no storage */ }
+    autoSwitch.addEventListener('change', () => {
+      try { localStorage.setItem('pvc-lt-auto', autoSwitch.checked ? '1' : '0'); } catch { /* no storage */ }
+      log(autoSwitch.checked ? 'Modo automático activado: lo nuevo se traducirá mientras esta pestaña siga abierta.' : 'Modo automático desactivado.');
+      schedulePoll();
+    });
+    if (autoSwitch.checked) log('Modo automático activo. Pulsa el botón una vez para preparar el traductor; después seguirá solo mientras la pestaña esté abierta.');
+  }
 })();
