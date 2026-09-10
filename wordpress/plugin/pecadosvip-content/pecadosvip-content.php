@@ -227,6 +227,7 @@ require_once PVC_DIR . '/includes/media-watermark.php';
 require_once PVC_DIR . '/includes/admin.php';
 require_once PVC_DIR . '/includes/seo.php';
 require_once PVC_DIR . '/includes/import.php';
+require_once PVC_DIR . '/includes/copy-upgrade.php';
 require_once PVC_DIR . '/includes/frontend-admin.php';
 require_once PVC_DIR . '/includes/legal.php';
 require_once PVC_DIR . '/includes/contact.php';
