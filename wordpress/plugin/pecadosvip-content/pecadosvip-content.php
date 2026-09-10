@@ -179,7 +179,9 @@ function pvc_records(string $type, string $locale): array {
     $posts = get_posts(array('post_type' => $type, 'post_status' => 'publish', 'has_password' => false, 'posts_per_page' => -1, 'orderby' => array('menu_order' => 'ASC', 'ID' => 'ASC'), 'meta_query' => array(array('key' => 'pv_locale', 'value' => $locale)), 'suppress_filters' => false));
     $records = array();
     foreach ($posts as $post) { $record = pvc_normalize($post); if (!is_wp_error(pvc_validate($type, $locale, $record['key'], $record['data'], $post->ID, false))) { $records[] = $record; } }
-    $memo[$cache_key] = $records; return $records;
+    // One filter, so every public projection agrees: listing, route index, canonical link,
+    // REST catalogue and informational records all read this function.
+    $memo[$cache_key] = apply_filters('pvc_records', $records, $type, $locale); return $memo[$cache_key];
 }
 function pvc_record(string $type, string $locale, string $key): ?array {
     foreach (pvc_records($type, $locale) as $record) { if ($record['key'] === $key) { return $record; } }
@@ -231,6 +233,7 @@ require_once PVC_DIR . '/includes/copy-upgrade.php';
 require_once PVC_DIR . '/includes/frontend-admin.php';
 require_once PVC_DIR . '/includes/legal.php';
 require_once PVC_DIR . '/includes/contact.php';
+require_once PVC_DIR . '/includes/geo-block.php';
 require_once PVC_DIR . '/includes/selective-translation.php';
 require_once PVC_DIR . '/includes/offline-glossary.php';
 require_once PVC_DIR . '/includes/offline-translation.php';
