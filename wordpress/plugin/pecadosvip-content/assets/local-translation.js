@@ -143,6 +143,27 @@
       log(autoSwitch.checked ? 'Modo automático activado: lo nuevo se traducirá mientras esta pestaña siga abierta.' : 'Modo automático desactivado.');
       schedulePoll();
     });
-    if (autoSwitch.checked) log('Modo automático activo. Pulsa el botón una vez para preparar el traductor; después seguirá solo mientras la pestaña esté abierta.');
+    if (autoSwitch.checked) {
+      log('Modo automático activo. Intentando preparar el traductor sin intervención…');
+      startHandsFree();
+    }
+  }
+
+  /* Hands-free start. Creating a translator may still require a user gesture, but the
+     browser usually keeps the downloaded model, so an already-prepared session can start
+     translating on its own. If the browser refuses, the button remains the fallback and
+     the log says so: nothing is assumed to have worked. */
+  async function startHandsFree() {
+    if (active || !autoSwitch || !autoSwitch.checked || !window.Translator) return;
+    try {
+      await Promise.all(['en', 'fr', 'it'].map(engine));
+    } catch (error) {
+      log(`El navegador pide una interacción: pulsa «Traducir automáticamente lo pendiente» una vez. (${error.message})`);
+      return;
+    }
+    log('Traductor preparado sin intervención. Modo automático en marcha.');
+    active = true; run.disabled = true; stop.disabled = false;
+    await cycle('');
+    schedulePoll();
   }
 })();

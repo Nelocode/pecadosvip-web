@@ -174,6 +174,7 @@ assert.ok(plugin.includes('includes/auto-translation.php'), 'The plugin must loa
 const translationUi = await readFile(resolve(root, 'dist/pecadosvip-content/assets/local-translation.js'), 'utf8');
 assert.ok(translationUi.includes('pvc-lt-auto'), 'The translation screen must offer the automatic mode');
 assert.ok(translationUi.includes('function schedulePoll()'), 'The automatic mode must poll instead of running unconditionally');
+assert.ok(translationUi.includes('function startHandsFree()'), 'The automatic mode must try to prepare the translator without a click');
 assert.ok(themeCompliance.includes("pvwp_legal_report('contact')"), 'The reporting channel must stay on the contact page');
 /**
  * Structural check for the PHP sources. This is NOT a PHP parser or a substitute for
