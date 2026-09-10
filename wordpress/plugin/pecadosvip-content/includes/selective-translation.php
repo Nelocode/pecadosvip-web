@@ -65,11 +65,32 @@ function pvc_lt_baseline(array $posts, int $anchor): array {
     }
     return array_values(array_unique($legacy));
 }
+/**
+ * Legacy cut-off anchor.
+ *
+ * Historical anchor 465 is used when it still matches. It does not in every
+ * installation: on the live site 465 is the English, private record while the published
+ * Spanish profile has a different id, so the hard-coded check made the tool impossible
+ * to enable. When the historical anchor does not match, the published-or-not source
+ * profile of the reference model is used instead, which is strictly more conservative:
+ * it freezes more content as Legacy, never less.
+ *
+ * Fail-closed: without any anchor nothing is enabled.
+ */
+function pvc_lt_anchor(): ?int {
+    $historical = get_post(465);
+    if ($historical && $historical->post_type === 'pv_profile'
+        && get_post_meta(465, 'pv_key', true) === 'maria' && get_post_meta(465, 'pv_locale', true) === 'es') { return 465; }
+    $candidates = get_posts(array('post_type' => 'pv_profile', 'post_status' => array('publish','draft','pending','private','future','trash'),
+        'posts_per_page' => 1, 'orderby' => 'ID', 'order' => 'ASC',
+        'meta_query' => array(array('key' => 'pv_key', 'value' => 'maria'), array('key' => 'pv_locale', 'value' => 'es'))));
+    return $candidates ? (int) $candidates[0]->ID : null;
+}
 add_action('wp_ajax_pvc_lt_enable', function() {
     pvc_lt_guard();
-    $anchor = get_post(465);
-    if (!$anchor || $anchor->post_type !== 'pv_profile' || get_post_meta(465, 'pv_key', true) !== 'maria' || get_post_meta(465, 'pv_locale', true) !== 'es') {
-        wp_send_json_error(array('message' => 'No coincide la ficha inicial Maria (465). No se cambió el alcance.'), 409);
+    $anchor = pvc_lt_anchor();
+    if ($anchor === null) {
+        wp_send_json_error(array('message' => 'No se encuentra la ficha inicial del proyecto. No se cambió el alcance.'), 409);
     }
     $publish = !empty($_POST['publish']);
     $policy = pvc_lt_policy();
@@ -86,7 +107,13 @@ add_action('wp_ajax_pvc_lt_enable', function() {
     }
     if (!$policy) {
         $posts = get_posts(array('post_type' => array_keys(pvc_types()), 'post_status' => array('publish','draft','pending','private','future','trash'), 'posts_per_page' => -1));
-        $policy = array('enabled' => true, 'mode' => pvc_lt_mode(), 'anchor_id' => 465, 'legacy' => pvc_lt_baseline($posts, 465), 'publish' => $publish, 'created_at_utc' => gmdate('c'));
+        // The anchor model is the first translatable content, exactly as it was when the
+        // historical anchor was Maria: its logical identity is removed from the frozen
+        // inventory even if an older record shares that identity.
+        $legacy = pvc_lt_baseline($posts, $anchor);
+        $anchor_post = get_post($anchor);
+        if ($anchor_post) { $legacy = array_values(array_diff($legacy, array(pvc_lt_identity($anchor_post)))); }
+        $policy = array('enabled' => true, 'mode' => pvc_lt_mode(), 'anchor_id' => $anchor, 'legacy' => $legacy, 'publish' => $publish, 'created_at_utc' => gmdate('c'));
         if (!add_option('pvc_local_translation_policy', $policy, '', false)) { wp_send_json_error(array('message' => 'El alcance cambió en otra sesión. Recarga.'), 409); }
     } else {
         $policy['enabled'] = true;

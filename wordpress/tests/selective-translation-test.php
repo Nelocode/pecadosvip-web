@@ -119,5 +119,28 @@ $options['pvc_local_translation_policy']['mode']='informational-drafts-v1';
 $_POST=[];$r=action('wp_ajax_pvc_lt_enable');check($r->success&&!empty($r->data['upgraded']),'Previous scope is upgraded explicitly');
 check($options['pvc_local_translation_policy']['mode']==='content-drafts-v2','Upgraded policy uses scope v2');
 check($savedLegacy===$options['pvc_local_translation_policy']['legacy'],'Upgrade preserves the frozen Legacy inventory');
+// The historical anchor is not guaranteed to be Maria in Spanish. The live site has it as
+// English and private, with the published Spanish profile at another id, so the tool must
+// still resolve a cut-off instead of refusing to enable itself.
+$historical=$posts[465];
+unset($posts[465]);
+$options['pvc_local_translation_policy']=array();
+check(pvc_lt_anchor()===531,'A missing historical anchor falls back to the Spanish source profile');
+fixture(900,'maria','en','private','pv_profile');
+delete_option('pvc_local_translation_policy');
+$_POST=array();$r=action('wp_ajax_pvc_lt_enable');
+check($r->success&&$r->data['legacy_count']>0,'The tool enables itself without the historical anchor');
+check((int)$options['pvc_local_translation_policy']['anchor_id']===531,'The policy records the resolved anchor');
+check(!in_array('pv_profile:maria',$options['pvc_local_translation_policy']['legacy'],true),'The anchor model stays outside the frozen inventory, as with the historical anchor');
+check(pvc_lt_eligible($profile),'The resolved anchor is the first translatable content');
+check(in_array('pv_page:legado',$options['pvc_local_translation_policy']['legacy'],true),'Older content below the anchor stays frozen');
+check(!in_array('pv_page:informacion',$options['pvc_local_translation_policy']['legacy'],true),'Content above the anchor is not frozen');
+// With no candidate at all the tool must fail closed instead of inventing a cut-off.
+foreach ($posts as $pv_id => $pv_post) { if ($pv_post->post_type === 'pv_profile' && get_post_meta($pv_id,'pv_key',true) === 'maria' && get_post_meta($pv_id,'pv_locale',true) === 'es') { unset($posts[$pv_id]); } }
+delete_option('pvc_local_translation_policy');
+check(pvc_lt_anchor()===null,'Without any anchor no cut-off is invented');
+$r=action('wp_ajax_pvc_lt_enable');check(!$r->success&&$r->status===409,'Without an anchor enabling is refused');
+$posts[465]=$historical;
+check(pvc_lt_anchor()===465,'A matching historical anchor is still preferred');
 echo json_encode(['ok'=>true,'assertions'=>$checks],JSON_PRETTY_PRINT).PHP_EOL;
 }
