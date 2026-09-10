@@ -29,12 +29,13 @@ function wm_qa_attachment(string $file, string $mime, array &$fixture): int {
     if (str_starts_with($mime, 'image/')) { wp_update_attachment_metadata($id, wp_generate_attachment_metadata($id, $file)); }
     return $id;
 }
-function wm_qa_mark_visible(string $file): bool {
+function wm_qa_mark_visible(string $file, string $kind = 'image'): bool {
     $image = pvc_wm_load_image($file); $marked = 0; $opaque = true;
     // Fixture is uniform dark blue. Gold/ivory high-luminance pixels must occur
-    // in the bottom-right mark area in the actual encoded output/cropped size.
-    for ($y = (int) (imagesy($image) * .65); $y < imagesy($image); $y += 2) {
-        for ($x = (int) (imagesx($image) * .60); $x < imagesx($image); $x += 2) {
+    // in the photo corner or the lower center of a video and its poster crops.
+    $area = $kind === 'video' ? array(.20, .60, .80, .85) : array(.60, .65, 1, 1);
+    for ($y = (int) (imagesy($image) * $area[1]); $y < imagesy($image) * $area[3]; $y += 2) {
+        for ($x = (int) (imagesx($image) * $area[0]); $x < imagesx($image) * $area[2]; $x += 2) {
             // Imagick can emit indexed PNG crops. imagecolorat then returns a
             // palette index, not packed RGB; resolve either representation.
             $color = imagecolorsforindex($image, imagecolorat($image, $x, $y));
@@ -46,13 +47,13 @@ function wm_qa_mark_visible(string $file): bool {
     }
     imagedestroy($image); return $marked > 5 && $opaque;
 }
-function wm_qa_check_image(int $id): void {
+function wm_qa_check_image(int $id, string $kind = 'image'): void {
     $file = get_attached_file($id);
-    wm_qa_assert(is_file($file) && wm_qa_mark_visible($file), 'Full-size photo/poster must contain the visible mark and preserve its opaque background.');
+    wm_qa_assert(is_file($file) && wm_qa_mark_visible($file, $kind), 'Full-size photo/poster must contain the visible mark and preserve its opaque background.');
     $metadata = wp_get_attachment_metadata($id);
     wm_qa_assert(!empty($metadata['sizes']['thumbnail']), 'A real WordPress cropped thumbnail must exist.');
     foreach ($metadata['sizes'] as $name => $size) {
-        wm_qa_assert(wm_qa_mark_visible(dirname($file) . '/' . $size['file']), 'Generated image subsize must retain the mark and opaque background after cropping: ' . $name . ' (' . $size['width'] . 'x' . $size['height'] . ').');
+        wm_qa_assert(wm_qa_mark_visible(dirname($file) . '/' . $size['file'], $kind), 'Generated image subsize must retain the mark and opaque background after cropping: ' . $name . ' (' . $size['width'] . 'x' . $size['height'] . ').');
     }
 }
 function wm_qa_process(int $id, string $kind, array &$fixture): array {
@@ -139,8 +140,8 @@ foreach (array('image', 'video') as $kind) {
     wm_qa_assert(pvc_watermark_media($id, $kind)['id'] === $before['id'], 'Saving again must not create another marked generation.');
 }
 wm_qa_check_image($wm_fixture['image']['id']);
-wm_qa_check_image($wm_fixture['video']['poster']['id']);
-wm_qa_assert(wm_qa_mark_visible($wm_fixture['frame']), 'Decoded MP4 frame must contain the actual logo.');
+wm_qa_check_image($wm_fixture['video']['poster']['id'], 'video');
+wm_qa_assert(wm_qa_mark_visible($wm_fixture['frame'], 'video'), 'Decoded MP4 frame must contain the actual logo in its lower center.');
 $probe = json_decode(pvc_wm_exec(array($wm_config['ffprobe'], '-v', 'error', '-show_streams', '-show_format', '-of', 'json', get_attached_file($wm_fixture['video']['id'])), 20), true, 512, JSON_THROW_ON_ERROR);
 $video_streams = array_values(array_filter($probe['streams'], fn($stream) => $stream['codec_type'] === 'video'));
 $audio_streams = array_values(array_filter($probe['streams'], fn($stream) => $stream['codec_type'] === 'audio'));

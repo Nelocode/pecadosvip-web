@@ -96,6 +96,24 @@ function wm_mark_present(string $file): bool {
     for ($y = (int) (imagesy($image) * .65); $y < imagesy($image); $y += 2) { for ($x = (int) (imagesx($image) * .65); $x < imagesx($image); $x += 2) { $pixel = imagecolorat($image, $x, $y); $r = ($pixel >> 16) & 255; $g = ($pixel >> 8) & 255; if ($r > 130 && $r > $g + 40) { $found++; } } }
     imagedestroy($image); return $found > 5;
 }
+function wm_video_mark_centered(string $file): bool {
+    // Locate the red fixture logo in the encoded pixels, independently of the
+    // placement helper. An old corner mark or a clipped/doubled mark must fail.
+    $image = pvc_wm_load_image($file); $width = imagesx($image); $height = imagesy($image);
+    $left = $width; $top = $height; $right = -1; $bottom = -1; $bright = 0;
+    for ($y = 0; $y < $height; $y += 2) { for ($x = 0; $x < $width; $x += 2) {
+        $pixel = imagecolorat($image, $x, $y); $r = ($pixel >> 16) & 255; $g = ($pixel >> 8) & 255;
+        if ($r > 130 && $r > $g + 40) {
+            $left = min($left, $x); $right = max($right, $x); $top = min($top, $y); $bottom = max($bottom, $y);
+            if ($r > 230) { $bright++; }
+        }
+    } }
+    imagedestroy($image);
+    $center_x = ($left + $right) / (2 * $width); $center_y = ($top + $bottom) / (2 * $height);
+    return $right >= $left && $bright > 5 && $center_x >= .45 && $center_x <= .55
+        && $center_y >= .67 && $center_y <= .77 && ($right - $left) / $width >= .30
+        && $bottom / $height < .90;
+}
 function wm_check_indexed_png_background(): void {
     $config = $GLOBALS['wm_config']; $GLOBALS['wm_config']['logo'] = PVC_DIR . '/assets/pecadosvip-watermark.png';
     $results = array();
@@ -136,7 +154,7 @@ try {
     wm_check_indexed_png_background();
     $wm_results[] = 'Indexed PNG thumbnail: transparent logo areas preserve the original opaque background and match truecolor compositing';
     $logo = imagecreatetruecolor(240, 60); imagefill($logo, 0, 0, imagecolorallocate($logo, 255, 0, 0)); imagestring($logo, 4, 40, 20, 'PecadosVip', imagecolorallocate($logo, 255, 255, 255)); imagepng($logo, $wm_root . '/logo.png'); imagedestroy($logo);
-    $wm_config = array('logo' => $wm_root . '/logo.png', 'opacity' => .9, 'ffmpeg' => $wm_args['ffmpeg'] ?? '/usr/bin/ffmpeg', 'ffprobe' => $wm_args['ffprobe'] ?? '/usr/bin/ffprobe');
+    $wm_config = array('logo' => $wm_root . '/logo.png', 'ffmpeg' => $wm_args['ffmpeg'] ?? '/usr/bin/ffmpeg', 'ffprobe' => $wm_args['ffprobe'] ?? '/usr/bin/ffprobe');
     $wm_posts[1] = array('post_type' => 'pv_profile', 'post_status' => 'publish');
     $wm_posts[2] = array('post_type' => 'pv_city', 'post_status' => 'publish');
     $wm_posts[3] = array('post_type' => 'pv_profile', 'post_status' => 'trash');
@@ -225,26 +243,33 @@ try {
     $start = microtime(true); $timed_out = false; try { pvc_wm_exec(array(PHP_BINARY, '-r', 'sleep(5);'), 1); } catch (RuntimeException $error) { $timed_out = $error->getMessage() === 'video_timeout'; }
     wm_check($timed_out && microtime(true) - $start < 4, 'Subprocess timeout must terminate the child promptly.');
     if (is_file($wm_config['ffmpeg']) && is_file($wm_config['ffprobe'])) {
-        foreach (array(true, false) as $with_audio) {
-            $video_path = $wm_root . '/uploads/clip & space ' . ($with_audio ? 'audio' : 'silent') . '.mp4';
-            $args = array($wm_config['ffmpeg'], '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', 'color=c=0x142030:s=480x640:d=1.2:r=24');
+        $video_fixtures = array();
+        foreach (array('horizontal' => array(640, 360), 'vertical' => array(480, 640)) as $orientation => [$video_width, $video_height]) { foreach (array(true, false) as $with_audio) {
+            $fixture_name = $orientation . '-' . ($with_audio ? 'audio' : 'silent');
+            $video_path = $wm_root . '/uploads/clip & space ' . $fixture_name . '.mp4';
+            $args = array($wm_config['ffmpeg'], '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', 'color=c=0x142030:s=' . $video_width . 'x' . $video_height . ':d=1.2:r=24');
             if ($with_audio) { $args = array_merge($args, array('-f', 'lavfi', '-i', 'sine=frequency=800:duration=1.2', '-c:a', 'aac', '-shortest')); }
             $args = array_merge($args, array('-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-threads', '1', $video_path)); pvc_wm_exec($args, 30);
             $video = wp_insert_attachment(array('post_mime_type' => 'video/mp4', 'post_status' => 'inherit', 'post_title' => 'Video fixture'), $video_path); $before = hash_file('sha256', $video_path);
+            $video_fixtures[$orientation] = $video;
             update_post_meta(1, 'pv_data', array('gallery' => array(), 'videos' => array($video)));
             wm_check(pvc_watermark_media($video, 'video') === null, 'Queued video must not resolve to its source.'); wm_run($video, 'video'); $media = pvc_watermark_media($video, 'video');
             wm_check($media !== null && $media['mime'] === 'video/mp4' && $media['id'] !== $video, 'Video processing failed: ' . wp_json_encode(get_post_meta($video, pvc_wm_key('video'))));
             wm_check(str_starts_with(get_post_meta($media['id'], '_wp_attached_file'), 'pvc-watermarked/') && str_starts_with(get_post_meta($media['poster']['id'], '_wp_attached_file'), 'pvc-watermarked/'), 'Video and poster attachment paths must be stored relative to mixed-separator uploads.');
             wm_check(hash_file('sha256', $video_path) === $before, 'Original video changed.');
-            $probe = pvc_wm_probe(get_attached_file($media['id'])); wm_check($probe['audio'] === $with_audio && $probe['width'] === 480 && $probe['height'] === 640, 'Video must retain audio presence and portrait aspect.');
+            $probe = pvc_wm_probe(get_attached_file($media['id'])); wm_check($probe['audio'] === $with_audio && $probe['width'] === $video_width && $probe['height'] === $video_height, 'Video must retain audio presence and aspect: ' . $fixture_name);
+            wm_check(abs($probe['duration'] - 1.2) < .15, 'Video duration must survive watermark encoding: ' . $fixture_name);
             $frame = $wm_root . '/frame.jpg'; pvc_wm_exec(array($wm_config['ffmpeg'], '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-ss', '0.6', '-i', get_attached_file($media['id']), '-frames:v', '1', $frame), 20);
-            wm_check(wm_mark_present($frame), 'Watermark must be burned into video pixels.');
-            wm_check(wm_mark_present(get_attached_file($media['poster']['id'])), 'Video poster must contain the mark.');
-            $poster_meta = get_post_meta($media['poster']['id'], '_wp_attachment_metadata'); foreach ($poster_meta['sizes'] as $size) { wm_check(wm_mark_present(dirname(get_attached_file($media['poster']['id'])) . '/' . $size['file']), 'Video poster crops must contain a mark.'); }
+            wm_check(wm_video_mark_centered($frame), 'Encoded video must contain a bright, larger mark centered below the middle: ' . $fixture_name);
+            wm_check(wm_video_mark_centered(get_attached_file($media['poster']['id'])), 'Video poster must match the centered, bright video mark: ' . $fixture_name);
+            $poster_meta = get_post_meta($media['poster']['id'], '_wp_attachment_metadata'); foreach ($poster_meta['sizes'] as $size) { wm_check(wm_video_mark_centered(dirname(get_attached_file($media['poster']['id'])) . '/' . $size['file']), 'Video poster crops must retain a complete centered mark: ' . $fixture_name . ' / ' . $size['width'] . 'x' . $size['height']); }
+            $video_derived_id = $media['id']; $video_derived_hash = hash_file('sha256', get_attached_file($video_derived_id));
+            pvc_watermark_queue_profile(1); wm_run($video, 'video');
+            wm_check(pvc_watermark_media($video, 'video')['id'] === $video_derived_id && hash_file('sha256', get_attached_file($video_derived_id)) === $video_derived_hash, 'Repeated profile saves must not encode or deepen the video mark: ' . $fixture_name);
             update_post_meta($media['poster']['id'], '_wp_attachment_metadata', $poster_meta); wm_check(pvc_watermark_media($video, 'video') === null, 'Poster edits must invalidate the video generation.'); wm_run($video, 'video'); wm_check(pvc_watermark_media($video, 'video') !== null, 'Poster-edit recovery failed.');
             $wm_config['video_max_seconds'] = .5; pvc_wm_queue($video, 'video', true); wm_run($video, 'video'); wm_check(pvc_watermark_status($video, 'video')['state'] === 'error' && pvc_watermark_media($video, 'video') === null, 'Overlong videos must be rejected without source fallback.'); unset($wm_config['video_max_seconds']);
-        }
-        $wm_results[] = 'Real FFmpeg: portrait video with/without audio, burned-in frame, full+cropped posters, source SHA, poster-edit recovery and duration limit';
+        } }
+        $wm_results[] = 'Real FFmpeg: horizontal and vertical videos with/without audio; brighter, larger centered mark in encoded frames and full+cropped posters; duration, source SHA, idempotence, poster-edit recovery and duration limit';
     } else { $wm_results[] = 'SKIPPED: FFmpeg binary paths were not supplied or unavailable'; }
     if (!empty($wm_args['artifacts'])) {
         $artifacts = rtrim($wm_args['artifacts'], '/\\'); if (!wp_mkdir_p($artifacts)) { throw new RuntimeException('Cannot create artifact directory.'); }
@@ -256,11 +281,16 @@ try {
         copy(get_attached_file($sample_media['id']), $artifacts . '/imagen-sintetica-marcada.jpg');
         $sample_meta = get_post_meta($sample_media['id'], '_wp_attachment_metadata');
         copy(dirname(get_attached_file($sample_media['id'])) . '/' . $sample_meta['sizes']['thumbnail']['file'], $artifacts . '/miniatura-marcada.jpg');
-        if (!empty($video)) {
-            pvc_wm_queue($video, 'video', true); wm_run($video, 'video'); $sample_video = pvc_watermark_media($video, 'video'); wm_check($sample_video !== null, 'Actual brand asset must render onto video.');
-            copy(get_attached_file($sample_video['id']), $artifacts . '/video-sintetico-marcado.mp4');
-            copy(get_attached_file($sample_video['poster']['id']), $artifacts . '/portada-video-marcada.jpg');
-            pvc_wm_exec(array($wm_config['ffmpeg'], '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-ss', '0.6', '-i', get_attached_file($sample_video['id']), '-frames:v', '1', $artifacts . '/fotograma-video-marcado.jpg'), 20);
+        foreach ($video_fixtures ?? array() as $orientation => $fixture_video) {
+            pvc_wm_queue($fixture_video, 'video', true); wm_run($fixture_video, 'video'); $sample_video = pvc_watermark_media($fixture_video, 'video'); wm_check($sample_video !== null, 'Actual brand asset must render onto video: ' . $orientation);
+            copy(get_attached_file($sample_video['id']), $artifacts . '/video-' . $orientation . '-marcado.mp4');
+            copy(get_attached_file($sample_video['poster']['id']), $artifacts . '/portada-video-' . $orientation . '-marcada.jpg');
+            pvc_wm_exec(array($wm_config['ffmpeg'], '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-ss', '0.6', '-i', get_attached_file($sample_video['id']), '-frames:v', '1', $artifacts . '/fotograma-video-' . $orientation . '-marcado.jpg'), 20);
+            if ($orientation === 'vertical') {
+                copy(get_attached_file($sample_video['id']), $artifacts . '/video-sintetico-marcado.mp4');
+                copy(get_attached_file($sample_video['poster']['id']), $artifacts . '/portada-video-marcada.jpg');
+                copy($artifacts . '/fotograma-video-vertical-marcado.jpg', $artifacts . '/fotograma-video-marcado.jpg');
+            }
         }
         $wm_results[] = 'Review artifacts: real apple + PecadosVip brand mark on synthetic image, cropped thumbnail and video';
     }

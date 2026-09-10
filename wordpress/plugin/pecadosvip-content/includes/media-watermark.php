@@ -4,13 +4,15 @@ if (!defined('ABSPATH')) { exit; }
 
 function pvc_watermark_config(): array {
     return (array) apply_filters('pvc_watermark_config', array(
-        'version' => '2', 'logo' => PVC_DIR . '/assets/pecadosvip-watermark.png',
+        'version' => '3', 'logo' => PVC_DIR . '/assets/pecadosvip-watermark.png',
         'ffmpeg' => '/usr/bin/ffmpeg', 'ffprobe' => '/usr/bin/ffprobe',
         'image_max_bytes' => 30 * 1024 * 1024, 'image_max_pixels' => 24000000,
         'image_max_edge' => 2560, 'video_max_bytes' => 128 * 1024 * 1024,
         'video_max_seconds' => 180, 'video_max_pixels' => 17000000, 'video_max_edge' => 1920,
         'process_timeout' => 240, 'probe_timeout' => 20, 'max_attempts' => 3,
-        'opacity' => .78,
+        'opacity' => .95,
+        'image_width_ratio' => .30, 'image_width_max' => 640,
+        'video_width_ratio' => .38, 'video_width_max' => 720, 'video_center_y' => .72,
     ));
 }
 function pvc_wm_kind(string $kind): string { return $kind === 'video' ? 'video' : 'image'; }
@@ -43,7 +45,7 @@ function pvc_wm_generation(): string {
     $config = pvc_watermark_config(); $logo = (string) $config['logo'];
     if (!is_file($logo) || !is_readable($logo)) { throw new RuntimeException('missing_logo'); }
     $hash = hash_file('sha256', $logo);
-    return hash('sha256', (string) $config['version'] . ':' . $hash . ':' . wp_json_encode(array_intersect_key($config, array_flip(array('image_max_edge', 'video_max_edge', 'opacity')))));
+    return hash('sha256', (string) $config['version'] . ':' . $hash . ':' . wp_json_encode(array_intersect_key($config, array_flip(array('image_max_edge', 'video_max_edge', 'opacity', 'image_width_ratio', 'image_width_max', 'video_width_ratio', 'video_width_max', 'video_center_y')))));
 }
 function pvc_wm_signature(int $id, string $kind): string {
     $file = pvc_wm_source_file($id, $kind); clearstatcache(true, $file);
@@ -245,10 +247,11 @@ function pvc_wm_orient($image, string $file, string $mime) {
     }
     return $image;
 }
-function pvc_wm_scaled_logo(int $width, int $height) {
-    $config = pvc_watermark_config(); $logo = pvc_wm_load_image((string) $config['logo']);
+function pvc_wm_scaled_logo(int $width, int $height, string $kind = 'image') {
+    $config = pvc_watermark_config(); $kind = pvc_wm_kind($kind); $logo = pvc_wm_load_image((string) $config['logo']);
     $margin = max(2, (int) round(min($width, $height) * .03));
-    $target_width = min(max(80, (int) round($width * .22)), 400, max(1, $width - 2 * $margin));
+    $ratio = max(.1, min(.8, (float) $config[$kind . '_width_ratio']));
+    $target_width = min(max(80, (int) round($width * $ratio)), max(80, (int) $config[$kind . '_width_max']), max(1, $width - 2 * $margin));
     $target_height = max(1, (int) round(imagesy($logo) * $target_width / imagesx($logo)));
     if ($target_height > $height - 2 * $margin) { $target_height = max(1, $height - 2 * $margin); $target_width = max(1, (int) round(imagesx($logo) * $target_height / imagesy($logo))); }
     $scaled = imagecreatetruecolor($target_width, $target_height); imagealphablending($scaled, false); imagesavealpha($scaled, true);
@@ -261,17 +264,27 @@ function pvc_wm_scaled_logo(int $width, int $height) {
     } }
     return array($scaled, $margin);
 }
-function pvc_wm_mark_image(string $file): void {
+/** Shared placement keeps a video and all its poster crops visually consistent. */
+function pvc_wm_position(int $width, int $height, int $logo_width, int $logo_height, int $margin, string $kind = 'image'): array {
+    $max_x = max(0, $width - $logo_width); $max_y = max(0, $height - $logo_height);
+    if (pvc_wm_kind($kind) === 'video') {
+        $center_y = max(.1, min(.9, (float) pvc_watermark_config()['video_center_y']));
+        return array((int) round($max_x / 2), max(0, min($max_y, (int) round($height * $center_y - $logo_height / 2))));
+    }
+    return array(max(0, $max_x - $margin), max(0, $max_y - $margin));
+}
+function pvc_wm_mark_image(string $file, string $kind = 'image'): void {
     $info = pvc_wm_image_info($file); $image = pvc_wm_load_image($file);
     try {
-        [$logo, $margin] = pvc_wm_scaled_logo(imagesx($image), imagesy($image));
+        [$logo, $margin] = pvc_wm_scaled_logo(imagesx($image), imagesy($image), $kind);
+        [$x, $y] = pvc_wm_position(imagesx($image), imagesy($image), imagesx($logo), imagesy($logo), $margin, $kind);
         imagealphablending($image, true);
-        imagecopy($image, $logo, imagesx($image) - imagesx($logo) - $margin, imagesy($image) - imagesy($logo) - $margin, 0, 0, imagesx($logo), imagesy($logo));
+        imagecopy($image, $logo, $x, $y, 0, 0, imagesx($logo), imagesy($logo));
         imagedestroy($logo); pvc_wm_save_image($image, $file, $info['mime']);
     } finally { imagedestroy($image); }
 }
 /** Create/crop all public sizes BEFORE marking every final file. Nothing is registered yet. */
-function pvc_wm_render_image(string $source, string $stage, string $basename = 'image'): array {
+function pvc_wm_render_image(string $source, string $stage, string $basename = 'image', string $kind = 'image'): array {
     $info = pvc_wm_image_info($source); $mime = $info['mime'];
     $extension = array('image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp')[$mime];
     $image = pvc_wm_orient(pvc_wm_load_image($source), $source, $mime);
@@ -295,7 +308,7 @@ function pvc_wm_render_image(string $source, string $stage, string $basename = '
         if ($name === '' || $name !== basename($name) || !is_file($stage . '/' . $name)) { throw new RuntimeException('image_sizes'); }
         $files[] = $name;
     }
-    foreach (array_unique($files) as $name) { pvc_wm_mark_image($stage . '/' . $name); }
+    foreach (array_unique($files) as $name) { pvc_wm_mark_image($stage . '/' . $name, $kind); }
     foreach ($sizes as &$size) { clearstatcache(true, $stage . '/' . $size['file']); $size['filesize'] = filesize($stage . '/' . $size['file']); } unset($size);
     $final = pvc_wm_image_info($file); clearstatcache(true, $file);
     return array('file' => basename($file), 'width' => $final[0], 'height' => $final[1], 'mime' => $mime, 'filesize' => filesize($file), 'sizes' => $sizes, 'files' => array_values(array_unique($files)));
@@ -387,10 +400,11 @@ function pvc_wm_render_video(string $source, string $stage, float $deadline): ar
     if ($input['width'] * $input['height'] > (int) $config['video_max_pixels']) { throw new RuntimeException('video_dimensions'); }
     $scale = min(1, (int) $config['video_max_edge'] / max($input['display_width'], $input['display_height']));
     $width = max(2, (int) floor($input['display_width'] * $scale / 2) * 2); $height = max(2, (int) floor($input['display_height'] * $scale / 2) * 2);
-    [$logo, $margin] = pvc_wm_scaled_logo($width, $height); $logo_file = $stage . '/watermark-overlay.png';
+    [$logo, $margin] = pvc_wm_scaled_logo($width, $height, 'video'); $logo_file = $stage . '/watermark-overlay.png';
+    [$x, $y] = pvc_wm_position($width, $height, imagesx($logo), imagesy($logo), $margin, 'video');
     try { pvc_wm_save_image($logo, $logo_file, 'image/png'); } finally { imagedestroy($logo); }
     $video_file = $stage . '/video.mp4';
-    $filter = '[0:v:0]scale=' . $width . ':' . $height . ',setsar=1[base];[base][1:v:0]overlay=W-w-' . $margin . ':H-h-' . $margin . ':format=auto[out]';
+    $filter = '[0:v:0]scale=' . $width . ':' . $height . ',setsar=1[base];[base][1:v:0]overlay=' . $x . ':' . $y . ':format=auto[out]';
     pvc_wm_exec(array($config['ffmpeg'], '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-threads', '1', '-i', $source, '-i', $logo_file, '-filter_complex_threads', '1', '-filter_complex', $filter, '-map', '[out]', '-map', '0:a:0?', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '22', '-pix_fmt', 'yuv420p', '-threads', '1', '-c:a', 'aac', '-b:a', '128k', '-map_metadata', '-1', '-metadata:s:v:0', 'rotate=0', '-movflags', '+faststart', $video_file), pvc_wm_remaining($deadline, (int) $config['process_timeout']));
     $result = pvc_wm_probe($video_file, pvc_wm_remaining($deadline, (int) $config['probe_timeout']));
     if (abs($result['duration'] - $input['duration']) > max(.5, $input['duration'] * .02) || ($input['audio'] && !$result['audio']) || $result['width'] !== $width || $result['height'] !== $height) { throw new RuntimeException('video_verification'); }
@@ -398,7 +412,7 @@ function pvc_wm_render_video(string $source, string $stage, float $deadline): ar
     // receives its own mark, avoiding clipped or doubled logos on thumbnails.
     $poster_source = $stage . '/poster-source.jpg';
     pvc_wm_exec(array($config['ffmpeg'], '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-threads', '1', '-i', $source, '-ss', '0', '-frames:v', '1', '-vf', 'scale=' . $width . ':' . $height . ',setsar=1', '-q:v', '2', $poster_source), pvc_wm_remaining($deadline, (int) $config['process_timeout']));
-    $poster = pvc_wm_render_image($poster_source, $stage, 'poster');
+    $poster = pvc_wm_render_image($poster_source, $stage, 'poster', 'video');
     return array('file' => 'video.mp4', 'width' => $width, 'height' => $height, 'duration' => $result['duration'], 'poster' => $poster, 'files' => array_merge(array('video.mp4'), $poster['files']));
 }
 
