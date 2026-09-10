@@ -222,9 +222,41 @@ falta abrir nada, ni claves, ni pestañas**: el traductor vive en el servidor.
 
 ### Traductor propio, sin APIs ni servicios externos
 
-`plugin/pecadosvip-content/includes/offline-translation.php`. Es un traductor de glosario:
-el vocabulario editorial está empaquetado en el plugin y se amplía sin tocar código con la
-opción `pvc_lt_glossary` (español → en/fr/it).
+`plugin/pecadosvip-content/includes/offline-translation.php` es el motor y
+`plugin/pecadosvip-content/includes/offline-glossary.php` el vocabulario: **426 entradas**
+organizadas por temas (personas, carácter, aspecto físico, origen, servicios, lugares,
+sentimientos, conectores e idiomas hablados). Se amplía sin tocar código con la opción
+`pvc_lt_glossary` (español → en/fr/it).
+
+Reglas del glosario:
+
+- **Cada variante de género se escribe explícitamente.** El motor no deduce
+  concordancia: si falta `apasionado` porque solo está `apasionada`, la frase entera deja
+  de estar completa y la traducción se queda en borrador.
+- **Las frases compuestas ganan a sus palabras sueltas.** `a domicilio`, `masaje tántrico`
+  o `de ojos claros` se resuelven enteras, lo que evita que un conector suelto produzca
+  una traducción que cuenta como completa pero se lee mal en francés o italiano.
+- Las claves se normalizan al cargar, así que tildes y mayúsculas dan igual: `Espontánea`,
+  `espontanea` y `espontánea` resuelven a la misma entrada.
+
+Ejemplos reales:
+
+```
+ES: Carismática, romántica.
+   en: Charismatic, romantic.                      [100 %]
+   fr: Charismatique, romantique.                  [100 %]
+   it: Carismatica, romantica.                     [100 %]
+
+ES: Morena de ojos claros y piel clara
+   en: Brunette with light eyes and fair skin      [100 %]
+   fr: Brune aux yeux clairs et peau claire        [100 %]
+   it: Bruna con occhi chiari e pelle chiara       [100 %]
+
+ES: Reserva por horas, sin prisa
+   en: Booking by the hour, without rushing        [100 %]
+   fr: Réservation à l’heure, sans se presser      [100 %]
+   it: Prenotazione a ore, senza fretta            [100 %]
+```
 
 ```
 ES: Carismática, romántica y elegante.
