@@ -26,7 +26,22 @@ RUN apt-get update \
 RUN printf 'upload_max_filesize=128M\npost_max_size=136M\nmemory_limit=512M\n' \
     > /usr/local/etc/php/conf.d/pecadosvip-media.ini
 
-FROM runtime AS production
+# Production protection is mandatory; the base runtime is retained for isolated legacy QA.
+FROM runtime AS protected-runtime
+
+# Default-closed public protection, including persistent-volume starts.
+COPY wordpress/protection/00-pecadosvip-protection.php /usr/local/share/pecadosvip-protection/00-pecadosvip-protection.php
+COPY wordpress/protection/apache-public-protection.conf /etc/apache2/conf-available/pecadosvip-public-protection.conf
+COPY wordpress/protection/sync-protection.sh /usr/local/bin/sync-pecadosvip-protection.sh
+COPY wordpress/protection/protection-entrypoint.sh /usr/local/bin/pecadosvip-protection-entrypoint.sh
+RUN a2enmod headers \
+    && a2enconf pecadosvip-public-protection \
+    && chmod +x /usr/local/bin/sync-pecadosvip-protection.sh /usr/local/bin/pecadosvip-protection-entrypoint.sh \
+    && php -l /usr/local/share/pecadosvip-protection/00-pecadosvip-protection.php \
+    && apache2ctl -t
+ENTRYPOINT ["pecadosvip-protection-entrypoint.sh"]
+
+FROM protected-runtime AS production
 
 # We copy the compiled theme and plugin directly to the default WordPress directory
 COPY --from=builder /app/wordpress/dist/pecadosvip /usr/src/wordpress/wp-content/themes/pecadosvip
@@ -50,7 +65,7 @@ if [ -d "/var/www/html/wp-content" ]; then\n\
 fi\n\
 \n\
 # Execute the original WordPress entrypoint\n\
-exec docker-entrypoint.sh "$@"\n\
+exec pecadosvip-protection-entrypoint.sh "$@"\n\
 ' > /usr/local/bin/custom-entrypoint.sh \
     && chmod +x /usr/local/bin/custom-entrypoint.sh
 

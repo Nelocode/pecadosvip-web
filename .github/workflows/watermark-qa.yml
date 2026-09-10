@@ -40,6 +40,8 @@ jobs:
         run: node wordpress/qa/watermark-docker.mjs
       - name: Build final production image
         run: docker build --target production --tag pecadosvip-watermark-qa:${{ github.sha }} .
+      - name: Production containment, real authentication and restart persistence
+        run: node wordpress/protection/qa-docker.mjs pecadosvip-watermark-qa:${{ github.sha }}
       - name: Contract and real GD/FFmpeg regression suites
         run: |
           docker run --rm --entrypoint php --volume "$PWD/wordpress:/qa-src:ro" pecadosvip-watermark-qa:${{ github.sha }} /qa-src/tests/selective-translation-test.php
@@ -67,6 +69,8 @@ jobs:
             wordpress/output/docker-http-smoke.json
             wordpress/output/watermark-runtime-qa/**
             wordpress/output/linux-qa/**
+            output/containment-linux/result.json
+            output/containment-linux/seo-runtime.txt
       - name: Stop disposable QA containers
         if: always()
         run: node wordpress/qa/docker.mjs down
