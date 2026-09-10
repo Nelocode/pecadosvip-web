@@ -14,7 +14,7 @@ function pvc_legal_settings(){return $GLOBALS['settings'];}
 function pvwp_age_verified_session_default(){return null;}
 function check($ok,$m){++$GLOBALS['checks'];if(!$ok)throw new \RuntimeException($m);}
 function is_admin(){return false;} function wp_doing_ajax(){return false;} function wp_doing_cron(){return false;}
-function nocache_headers(){} function headers_sent(){return true;} function header(...$a){} function status_header(...$a){}
+function nocache_headers(){} function status_header(...$a){}
 function home_url($p=''){return 'https://example.test'.$p;} function esc_url($v){return $v;} function esc_html($v){return $v;}
 function esc_attr($v){return $v;} function bloginfo($v){}
 function pvwp_text($p,$vars=[]){return $p;} function pvwp_label($p,$vars=[]){echo $p;}

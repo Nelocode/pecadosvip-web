@@ -27,6 +27,7 @@ function check_ajax_referer(...$a){if(!$GLOBALS['validNonce'])throw new Response
 function wp_send_json_error($d,$s=400){throw new Response(false,$d,$s);} function wp_send_json_success($d){throw new Response(true,$d);}
 function is_wp_error($v){return false;} function pvc_validate(...$a){return true;} function pvc_sanitize_data($d,$t){return $d;}
 function pvc_types(){return array_fill_keys(['pv_profile','pv_service','pv_city','pv_page'],[]);}
+function pvc_bump(): void {} function pvc_revision(): string { return '1'; }
 function pvc_route($p){return '/'.get_post_meta($p->ID,'pv_locale',true).'/'.get_post_meta($p->ID,'pv_key',true);}
 function admin_url($v){return '/wp-admin/'.$v;} function clean_post_cache($id){if(!empty($GLOBALS['race']))$GLOBALS['posts'][$id]->post_status='private';}
 function set_post_thumbnail($id,$v){$GLOBALS['meta'][$id]['_thumbnail_id']=$v;}
@@ -83,6 +84,10 @@ $r=action('wp_ajax_pvc_lt_store');check($r->success&&$r->data['status']==='draft
 check($target->post_status==='draft','Stored post is a draft');check(!isset($options['pvc_lt_lock_600_en']),'Lock released');
 $count=count($posts);check(!action('wp_ajax_pvc_lt_store')->success,'Existing draft protected');check(count($posts)===$count,'No duplicate target');
 $race=true;$_POST['lang']='fr';$r=action('wp_ajax_pvc_lt_store');check(!$r->success,'Concurrent withdrawal detected');check(!isset($options['pvc_lt_lock_600_fr']),'Lock released after race');$race=false;
+// The race fixture left the source private on purpose, which is why the withdrawn save
+// was rejected. Restore it so the next block measures publication of drafts instead of
+// the frozen source it just simulated.
+$info->post_status='publish';
 // A profile translation published through the policy so the profile appears in every locale.
 $_POST=['id'=>531,'lang'=>'en','fingerprint'=>pvc_lt_hash($profile),'translations'=>json_encode(array_map(fn($v)=>'EN '.$v,$profileParts))];
 $options['pvc_local_translation_policy']['publish']=true;
