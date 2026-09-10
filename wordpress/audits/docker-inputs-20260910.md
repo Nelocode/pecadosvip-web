@@ -157,3 +157,9 @@ Salida relevante: línea 35 contiene el incidente CTL-034 y el SHA histórico an
 - No se editaron `wordpress/dist/**` ni resultados generados. No se introdujeron tokens, cookies ni credenciales en los archivos o informes.
 - El supuesto necesario es que el futuro contexto Docker sea la raíz de un checkout que incluya los commits entregados, con rutas y mayúsculas tal como están en Git. Elegir otro SHA o subdirectorio en EasyPanel queda fuera de esta inspección.
 - El agente auditor no hizo commit, push ni despliegue; el integrador conserva el único turno de Git y entregará el parche por tarea tras ejecutar el verificador del repositorio.
+
+## Conciliación con `main` antes del push autorizado
+
+La auditoría anterior describe la base `f939b926`. Durante el push entraron los commits `862d314` y `1877a41`, que se integran conservando su historial. `1877a41` añade `PECADOSVIP_CONTAINMENT=open` mediante ARG/ENV y cambios de protección y CI; esas modificaciones pertenecen a upstream y no añaden entradas de archivos al build. Las etapas del Dockerfile están ahora en las líneas 1, 16, 33 y 50; las copias de protección, en 39–42; las del producto, en 53–54.
+
+La comprobación repetida sobre la integración mantiene 254 entradas, 25 módulos, 72 archivos de catálogo/iconos, 6 CSS y 4 copias directas, sin entradas ausentes, excluidas o sin versionar. Persisten las advertencias de procedencia antigua y staging `.build` admitido; el número de archivos locales de staging es variable. Este resultado valida entradas, no la política de contención ni una imagen Docker construida. Los cambios de Dockerfile, protección y workflows de upstream se conservan sin modificaciones adicionales.

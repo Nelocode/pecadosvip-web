@@ -128,7 +128,10 @@ $excluded_record = fixture(90);
 $excluded_record['data']['kind'] = 'home';
 check(!pvc_seo_record_allowed($excluded_record), 'Home/catalog are outside informational scope');
 unset($posts[90]);
-if (!function_exists('pvp_guard_request')) { function pvp_guard_request() {} }
+$GLOBALS['pvqa_containment'] = true;
+if (!function_exists('pvp_containment_enabled')) { function pvp_containment_enabled() { return (bool) $GLOBALS['pvqa_containment']; } }
 check(in_array('La protección pública está activa. El SEO no puede reabrir el sitio ni habilitar su indexación.', pvc_seo_blockers(), true), 'Public protection cannot be overridden from SEO');
+$GLOBALS['pvqa_containment'] = false;
+check(!in_array('La protección pública está activa. El SEO no puede reabrir el sitio ni habilitar su indexación.', pvc_seo_blockers(), true), 'An open site is not reported as contained');
 define('WPSEO_VERSION', 'test'); check(!pvc_seo_indexable($context), 'Conflicting SEO plugin blocks activation'); ob_start(); pvwp_seo_head(); check(ob_get_clean() === '', 'Conflicting plugin produces no duplicate metadata');
 echo json_encode(array('result' => 'PASS', 'checks' => $count, 'adapter' => 'in-memory WordPress functions; production runtime not verified'), JSON_PRETTY_PRINT) . PHP_EOL;

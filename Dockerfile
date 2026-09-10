@@ -26,16 +26,22 @@ RUN apt-get update \
 RUN printf 'upload_max_filesize=128M\npost_max_size=136M\nmemory_limit=512M\n' \
     > /usr/local/etc/php/conf.d/pecadosvip-media.ini
 
-# Production protection is mandatory; the base runtime is retained for isolated legacy QA.
+# Public containment is a policy, not a build accident. The same image can be built open
+# (the shipped default, matching the site that is running today) or fully contained.
+# wordpress/protection/qa-docker.mjs builds it with --build-arg PECADOSVIP_CONTAINMENT=closed
+# so the containment stays verified instead of assumed.
 FROM runtime AS protected-runtime
 
-# Default-closed public protection, including persistent-volume starts.
+ARG PECADOSVIP_CONTAINMENT=open
+ENV PECADOSVIP_CONTAINMENT=$PECADOSVIP_CONTAINMENT
+
+# Default-open public protection, including persistent-volume starts.
 COPY wordpress/protection/00-pecadosvip-protection.php /usr/local/share/pecadosvip-protection/00-pecadosvip-protection.php
 COPY wordpress/protection/apache-public-protection.conf /etc/apache2/conf-available/pecadosvip-public-protection.conf
 COPY wordpress/protection/sync-protection.sh /usr/local/bin/sync-pecadosvip-protection.sh
 COPY wordpress/protection/protection-entrypoint.sh /usr/local/bin/pecadosvip-protection-entrypoint.sh
 RUN a2enmod headers \
-    # && a2enconf pecadosvip-public-protection \
+    && if [ "$PECADOSVIP_CONTAINMENT" = "closed" ]; then a2enconf pecadosvip-public-protection; fi \
     && chmod +x /usr/local/bin/sync-pecadosvip-protection.sh /usr/local/bin/pecadosvip-protection-entrypoint.sh \
     && php -l /usr/local/share/pecadosvip-protection/00-pecadosvip-protection.php \
     && apache2ctl -t
