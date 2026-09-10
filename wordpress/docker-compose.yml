@@ -77,6 +77,7 @@ services:
       - ./tools:/tools:ro
       - ./plugin:/plugin:ro
       - ./theme:/theme:ro
+      - ./protection:/protection:ro
 
 volumes:
   qa_database:

@@ -39,7 +39,7 @@ jobs:
       - name: Real image and video processing in the production runtime
         run: node wordpress/qa/watermark-docker.mjs
       - name: Build final production image
-        run: docker build --target production --tag pecadosvip-watermark-qa:${{ github.sha }} .
+        run: docker build --target production --build-arg PECADOSVIP_CONTAINMENT=closed --tag pecadosvip-watermark-qa:${{ github.sha }} .
       - name: Production containment, real authentication and restart persistence
         run: node wordpress/protection/qa-docker.mjs pecadosvip-watermark-qa:${{ github.sha }}
       - name: Contract and real GD/FFmpeg regression suites

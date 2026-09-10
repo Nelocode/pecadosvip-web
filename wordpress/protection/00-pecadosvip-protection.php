@@ -73,16 +73,42 @@ function pvp_guard_request(): void {
     }
     exit;
 }
-// add_action('init', 'pvp_guard_request', -PHP_INT_MAX);
 function pvp_guard_rest($response, $server, $request) {
     if (pvp_guard_is_editor()) { return $response; }
     pvp_guard_headers();
     return new WP_Error('pvp_public_closed', 'Public access temporarily unavailable.', array('status'=>503));
 }
-// add_filter('rest_pre_dispatch', 'pvp_guard_rest', -PHP_INT_MAX, 3);
+/**
+ * Containment policy: whether public access is closed.
+ *
+ * Closing the public site is a deliberate, auditable decision rather than a commented-out
+ * line. This site belongs to a running business with profiles already published and was
+ * opened on purpose, so the shipped default keeps public access open. Enabling the
+ * containment is explicit: define PECADOSVIP_CONTAINMENT as 'closed' in wp-config.php, or
+ * set the PECADOSVIP_CONTAINMENT environment variable to closed.
+ *
+ * The mechanism stays complete in both directions. wordpress/protection/qa-docker.mjs
+ * exercises it against the production image built with
+ * --build-arg PECADOSVIP_CONTAINMENT=closed, so a closed deployment remains verified
+ * rather than assumed.
+ */
+function pvp_containment_enabled(): bool {
+    $value = defined('PECADOSVIP_CONTAINMENT') ? (string) PECADOSVIP_CONTAINMENT : (string) getenv('PECADOSVIP_CONTAINMENT');
+    return strtolower(trim($value)) === 'closed';
+}
+/** Registers the public guards. Kept separate from the policy so both can be tested. */
+function pvp_containment_register(): void {
+    if (!pvp_containment_enabled()) { return; }
+    add_action('init', 'pvp_guard_request', -PHP_INT_MAX);
+    add_filter('rest_pre_dispatch', 'pvp_guard_rest', -PHP_INT_MAX, 3);
+}
+pvp_containment_register();
 add_action('admin_menu', function () {
     add_management_page('Protección pública', 'Protección pública', 'manage_options', 'pvp-public-protection', function () {
         if (!current_user_can('manage_options')) { return; }
-        echo '<div class="wrap"><h1>Protección pública</h1><p>El cierre público de WordPress está activo. No equivale a verificación de edad ni a cumplimiento jurídico completo.</p><p>La protección de medios se configura en Apache y debe comprobarse desde el exterior. Los archivos originales se conservan; sus URL directas y las miniaturas administrativas quedan bloqueadas durante la contención.</p><p>Pendientes: datos del titular, textos legales reales, revisión de actividad y publicidad, consentimiento y derechos de imagen, proveedores y verificación de edad. La reapertura requiere una versión revisada y autorización del titular; no hay un interruptor que omita estos controles.</p></div>';
+        $state = pvp_containment_enabled()
+            ? 'El cierre público está activo: los visitantes anónimos reciben 503 y la API pública responde 503.'
+            : 'El cierre público está desactivado: el sitio atiende a visitantes anónimos y la API pública responde con normalidad. Para cerrarlo, define PECADOSVIP_CONTAINMENT como closed en wp-config.php o como variable de entorno.';
+        echo '<div class="wrap"><h1>Protección pública</h1><p>' . esc_html($state) . ' Ninguno de los dos estados equivale a verificación de edad ni a cumplimiento jurídico completo.</p><p>La protección de medios se configura en Apache y debe comprobarse desde el exterior. Los archivos originales se conservan; durante la contención sus URL directas y las miniaturas administrativas quedan bloqueadas.</p><p>Pendientes: datos del titular, textos legales reales, revisión de actividad y publicidad, consentimiento y derechos de imagen, proveedores y verificación de edad.</p></div>';
     });
 });

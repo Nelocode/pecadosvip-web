@@ -18,7 +18,7 @@ function pvc_seo_blockers(): array {
     if (wp_parse_url(home_url(), PHP_URL_SCHEME) !== 'https' || !str_contains($host, '.') || filter_var($host, FILTER_VALIDATE_IP) || preg_match('/(?:^|\.)(?:localhost|test|local|invalid|example)$|\.easypanel\.host$/', $host)) { $issues[] = 'Configura un dominio público definitivo con HTTPS.'; }
     if (!function_exists('pvwp_ready') || !pvwp_ready()) { $issues[] = 'El tema PecadosVip y su contenido deben estar disponibles.'; }
     if (pvc_seo_conflict()) { $issues[] = 'Otro plugin SEO está activo. Elige un solo gestor SEO antes de activar este módulo.'; }
-    if (function_exists('pvp_guard_request')) { $issues[] = 'La protección pública está activa. El SEO no puede reabrir el sitio ni habilitar su indexación.'; }
+    if (function_exists('pvp_containment_enabled') && pvp_containment_enabled()) { $issues[] = 'La protección pública está activa. El SEO no puede reabrir el sitio ni habilitar su indexación.'; }
     return $issues;
 }
 function pvc_seo_text(string $text, int $limit = 0): string {
