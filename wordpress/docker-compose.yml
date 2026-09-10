@@ -74,6 +74,8 @@ services:
       - ./dist/pecadosvip-content:/var/www/html/wp-content/plugins/pecadosvip-content:ro
       - ./qa:/qa:ro
       - ./tests:/theme-tests:ro
+      - ./plugin:/plugin:ro
+      - ./theme:/theme:ro
 
 volumes:
   qa_database:
