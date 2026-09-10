@@ -1,16 +1,21 @@
 <?php
-/** Local browser translation into native records; TranslateRocket keeps the memory, not the routes. */
+/** Opt-in translation of informational pages to drafts; no publication or background polling. */
 if (!defined('ABSPATH')) { exit; }
 
 function pvc_lt_languages(): array { return array('en', 'fr', 'it'); }
 function pvc_lt_identity($post): string { return $post->post_type . ':' . (string) get_post_meta($post->ID, 'pv_key', true); }
 function pvc_lt_policy(): array { return (array) get_option('pvc_local_translation_policy', array()); }
+function pvc_lt_informational($post): bool {
+    if (!$post || $post->post_type !== 'pv_page') { return false; }
+    $data = (array) get_post_meta($post->ID, 'pv_data', true);
+    return in_array($data['kind'] ?? '', array('information', 'about', 'contact', 'legal'), true);
+}
 function pvc_lt_hash($post): string {
     return hash('sha256', wp_json_encode(array($post->post_type, $post->post_status, $post->post_password, $post->post_title, $post->post_content, $post->post_excerpt, (int) $post->menu_order, get_post_meta($post->ID, 'pv_locale', true), get_post_meta($post->ID, 'pv_key', true), get_post_meta($post->ID, 'pv_data', true), (int) get_post_thumbnail_id($post))));
 }
 function pvc_lt_eligible($post, ?array $policy = null): bool {
     $policy = $policy ?? pvc_lt_policy();
-    return !empty($policy['enabled']) && $post && isset(pvc_types()[$post->post_type])
+    return !empty($policy['enabled']) && ($policy['mode'] ?? '') === 'informational-drafts-v1' && pvc_lt_informational($post)
         && $post->post_status === 'publish' && $post->post_password === ''
         && get_post_meta($post->ID, 'pv_locale', true) === 'es'
         && preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', (string) get_post_meta($post->ID, 'pv_key', true))
@@ -41,12 +46,24 @@ add_action('wp_ajax_pvc_lt_enable', function() {
         wp_send_json_error(array('message' => 'No coincide la ficha inicial Maria (465). No se cambió el alcance.'), 409);
     }
     $policy = pvc_lt_policy();
+    if ($policy && ($policy['mode'] ?? '') !== 'informational-drafts-v1') {
+        wp_send_json_error(array('message' => 'Existe una política anterior de otro alcance. Debe revisarse antes de habilitar esta herramienta.'), 409);
+    }
     if (!$policy) {
         $posts = get_posts(array('post_type' => array_keys(pvc_types()), 'post_status' => array('publish','draft','pending','private','future','trash'), 'posts_per_page' => -1));
-        $policy = array('enabled' => true, 'anchor_id' => 465, 'legacy' => pvc_lt_baseline($posts, 465), 'created_at_utc' => gmdate('c'));
+        $policy = array('enabled' => true, 'mode' => 'informational-drafts-v1', 'anchor_id' => 465, 'legacy' => pvc_lt_baseline($posts, 465), 'created_at_utc' => gmdate('c'));
         if (!add_option('pvc_local_translation_policy', $policy, '', false)) { wp_send_json_error(array('message' => 'El alcance cambió en otra sesión. Recarga.'), 409); }
+    } elseif (empty($policy['enabled'])) {
+        $policy['enabled'] = true;
+        update_option('pvc_local_translation_policy', $policy, false);
     }
     wp_send_json_success(array('legacy_count' => count($policy['legacy']), 'enabled' => !empty($policy['enabled'])));
+});
+add_action('wp_ajax_pvc_lt_disable', function() {
+    pvc_lt_guard();
+    $policy = pvc_lt_policy();
+    if ($policy) { $policy['enabled'] = false; update_option('pvc_local_translation_policy', $policy, false); }
+    wp_send_json_success(array('enabled' => false));
 });
 /** Split HTML into text nodes; tags, attributes, links and Gutenberg comments are kept on the server. */
 function pvc_lt_document(string $html): array {
@@ -97,25 +114,19 @@ function pvc_lt_targets($source, string $lang): array {
     return get_posts(array('post_type' => $source->post_type, 'post_status' => array('publish','draft','pending','private','future','trash'), 'posts_per_page' => -1,
         'meta_query' => array(array('key' => 'pv_key', 'value' => get_post_meta($source->ID, 'pv_key', true)), array('key' => 'pv_locale', 'value' => $lang))));
 }
-function pvc_lt_can_update($target, $source): bool {
-    return $target->post_status === 'publish'
-        && (int) get_post_meta($target->ID, '_pvc_lt_source', true) === (int) $source->ID
-        && hash_equals(pvc_lt_hash($target), (string) get_post_meta($target->ID, '_pvc_lt_generated_hash', true));
-}
 function pvc_lt_pending(): array {
     $jobs = array(); $protected = 0; $complete = 0;
-    $sources = get_posts(array('post_type' => array_keys(pvc_types()), 'post_status' => 'publish', 'has_password' => false, 'posts_per_page' => -1, 'orderby' => 'ID', 'order' => 'ASC', 'meta_key' => 'pv_locale', 'meta_value' => 'es'));
+    $sources = get_posts(array('post_type' => 'pv_page', 'post_status' => 'publish', 'has_password' => false, 'posts_per_page' => -1, 'orderby' => 'ID', 'order' => 'ASC', 'meta_key' => 'pv_locale', 'meta_value' => 'es'));
     foreach ($sources as $source) {
         if (!pvc_lt_eligible($source)) { continue; }
         foreach (pvc_lt_languages() as $lang) {
             $targets = pvc_lt_targets($source, $lang);
-            $target_id = 0;
             if ($targets) {
-                if (count($targets) !== 1 || !pvc_lt_can_update($targets[0], $source)) { ++$protected; continue; }
-                if (get_post_meta($targets[0]->ID, '_pvc_lt_source_hash', true) === pvc_lt_hash($source)) { ++$complete; continue; }
-                $target_id = (int) $targets[0]->ID;
+                if (count($targets) === 1 && (int) get_post_meta($targets[0]->ID, '_pvc_lt_source', true) === (int) $source->ID && get_post_meta($targets[0]->ID, '_pvc_lt_source_hash', true) === pvc_lt_hash($source)) { ++$complete; }
+                else { ++$protected; }
+                continue;
             }
-            $jobs[] = array('id' => (int) $source->ID, 'target_id' => $target_id, 'title' => $source->post_title, 'lang' => $lang, 'fingerprint' => pvc_lt_hash($source), 'segments' => pvc_lt_segments($source));
+            $jobs[] = array('id' => (int) $source->ID, 'title' => $source->post_title, 'lang' => $lang, 'fingerprint' => pvc_lt_hash($source), 'segments' => pvc_lt_segments($source));
         }
     }
     return array('jobs' => $jobs, 'complete' => $complete, 'protected' => $protected, 'legacy' => count(pvc_lt_policy()['legacy'] ?? array()));
@@ -153,59 +164,39 @@ add_action('wp_ajax_pvc_lt_store', function() {
     if (!add_option($lock, gmdate('c'), '', false)) { wp_send_json_error(array('message' => 'Otra sesión está procesando esta traducción.'), 409); }
     $result = null; $error = null;
     try {
-        $target_id = absint($_POST['target_id'] ?? 0);
         $targets = pvc_lt_targets($source, $lang);
-        if ($targets && (count($targets) !== 1 || (int) $targets[0]->ID !== $target_id || !pvc_lt_can_update($targets[0], $source))) { throw new RuntimeException('La versión existente se conserva: cambió o no pertenece a la traducción automática.'); }
-        if (!$targets && $target_id) { throw new RuntimeException('La traducción fue retirada; no se restaura automáticamente.'); }
+        if ($targets) { throw new RuntimeException('Ya existe una versión en este idioma; se conserva sin cambios.'); }
         $payload = pvc_lt_payload($source, $translated, $lang);
-        $valid = pvc_validate($source->post_type, $lang, $payload['meta_input']['pv_key'], pvc_sanitize_data($payload['meta_input']['pv_data'], $source->post_type), $target_id);
+        $valid = pvc_validate($source->post_type, $lang, $payload['meta_input']['pv_key'], pvc_sanitize_data($payload['meta_input']['pv_data'], $source->post_type), 0);
         if (is_wp_error($valid)) { throw new RuntimeException($valid->get_error_message()); }
         $payload['meta_input']['_pvc_lt_source'] = $id;
         $payload['meta_input']['_pvc_lt_source_hash'] = $fingerprint;
         $payload['meta_input']['_pvc_lt_engine'] = 'browser';
-        if ($target_id) { $payload['ID'] = $target_id; }
         $target = wp_insert_post(wp_slash($payload), true);
         if (is_wp_error($target)) { throw new RuntimeException($target->get_error_message()); }
         $thumbnail = get_post_thumbnail_id($source); if ($thumbnail) { set_post_thumbnail($target, $thumbnail); }
         clean_post_cache($id); $fresh = get_post($id);
         if (!pvc_lt_eligible($fresh) || !hash_equals(pvc_lt_hash($fresh), $fingerprint)) { throw new RuntimeException('La fuente cambió durante el guardado. La traducción quedó en borrador.'); }
-        $published = wp_update_post(array('ID' => $target, 'post_status' => 'publish'), true);
-        if (is_wp_error($published)) { throw new RuntimeException($published->get_error_message()); }
-        update_post_meta($target, '_pvc_lt_generated_hash', pvc_lt_hash(get_post($target)));
         pvc_lt_remember($source, $lang, $segments, $translated);
-        $result = array('id' => $target, 'url' => pvc_route(get_post($target)), 'lang' => $lang);
+        $result = array('id' => $target, 'url' => admin_url('post.php?post=' . $target . '&action=edit'), 'lang' => $lang, 'status' => 'draft');
     } catch (Throwable $e) { $error = $e->getMessage(); }
     finally { delete_option($lock); }
     if ($error !== null) { wp_send_json_error(array('message' => $error), 409); }
     wp_send_json_success($result);
 });
-/** Withdraw generated versions when their source stops being public. Never restore deleted records. */
-function pvc_lt_withdraw($source): void {
-    if (!$source || !isset(pvc_types()[$source->post_type]) || get_post_meta($source->ID, 'pv_locale', true) !== 'es') { return; }
-    foreach (pvc_lt_languages() as $lang) {
-        foreach (pvc_lt_targets($source, $lang) as $target) {
-            if ($target->post_status === 'publish' && (int) get_post_meta($target->ID, '_pvc_lt_source', true) === (int) $source->ID) { wp_update_post(array('ID' => $target->ID, 'post_status' => 'draft')); }
-        }
-    }
-}
-add_action('transition_post_status', function($new, $old, $source) {
-    if ($old === 'publish' && $new !== 'publish') { pvc_lt_withdraw($source); }
-}, 50, 3);
-add_action('wp_after_insert_post', function($id, $post) {
-    if ($post->post_password !== '') { pvc_lt_withdraw($post); }
-}, 50, 2);
-add_action('before_delete_post', function($id, $post) { pvc_lt_withdraw($post); }, 50, 2);
-add_action('admin_menu', function() { add_submenu_page('pecadosvip-content', 'Traducción de contenido nuevo', 'Traducción de contenido nuevo', 'manage_options', 'pvc-local-translation', 'pvc_lt_page'); });
+add_action('admin_menu', function() { add_submenu_page('pecadosvip-content', 'Borradores de traducción', 'Borradores de traducción', 'manage_options', 'pvc-local-translation', 'pvc_lt_page'); });
 function pvc_lt_page(): void {
     if (!current_user_can('manage_options')) { return; }
     wp_enqueue_script('pvc-local-translation', plugins_url('../assets/local-translation.js', __FILE__), array(), PVC_VERSION, true);
     wp_localize_script('pvc-local-translation', 'PvcLocalTranslation', array('ajax' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('pvc_local_translation')));
     $policy = pvc_lt_policy();
-    echo '<div class="wrap"><h1>Traducción de contenido nuevo</h1><p>Español → inglés, francés e italiano. Maria y las altas posteriores. El contenido Legacy y las versiones existentes se conservan.</p>';
-    echo '<p>El navegador traduce localmente y guarda cada versión en WordPress y en la memoria de TranslateRocket. No usa una API de pago. Mantén esta pestaña abierta durante el proceso.</p>';
-    echo '<p>Las nuevas altas y sus cambios se revisan cada 30 segundos mientras el proceso está iniciado. Se actualizan solo las versiones automáticas que nadie haya editado. Las traducciones humanas y el contenido Legacy se conservan.</p>';
+    echo '<div class="wrap"><h1>Borradores de traducción</h1><p>Español → inglés, francés e italiano. Solo páginas informativas nuevas, seleccionadas individualmente. El contenido Legacy y las versiones existentes se conservan. Perfiles, servicios y ciudades quedan fuera del proceso.</p>';
+    echo '<p>El navegador traduce localmente y guarda borradores para revisión en WordPress y en la memoria de TranslateRocket. No usa una API de pago. La herramienta no publica, no sobrescribe versiones existentes ni procesa altas en segundo plano.</p>';
+    echo '<p>Las páginas elegibles deben ser de tipo information, about, contact o legal. El corte histórico del proyecto sigue siendo anterior a la introducción de Maria; Maria no se incluye porque es un perfil.</p>';
     if (!pvc_lt_ready()) { echo '<div class="notice notice-error"><p>Se requiere TranslateRocket con origen español, sin destinos globales ni proveedor API. No cambies las rutas del sitio.</p></div>'; }
-    echo '<p id="pvc-lt-policy">' . ($policy ? 'Alcance activo. Identidades Legacy protegidas: ' . count($policy['legacy']) : 'Alcance pendiente de activar. Referencia: primera ficha Maria, ID 465. Se congela el inventario anterior por tipo y clave.') . '</p>';
-    if (!$policy) { echo '<button class="button" id="pvc-lt-enable">Activar alcance desde Maria</button> '; }
-    echo '<button class="button button-primary" id="pvc-lt-run">Iniciar traducción local</button> <button class="button" id="pvc-lt-stop" disabled>Detener</button><pre id="pvc-lt-status" role="status" aria-live="polite" style="white-space:pre-wrap">Listo para comprobar el navegador.</pre></div>';
+    echo '<p id="pvc-lt-policy">' . ($policy ? 'Política guardada. Identidades Legacy protegidas: ' . count($policy['legacy']) : 'Herramienta desactivada. Habilitarla conserva el inventario Legacy; no traduce ni publica por sí solo.') . '</p>';
+    if (empty($policy['enabled'])) { echo '<button class="button" id="pvc-lt-enable">Habilitar herramienta de borradores</button> '; }
+    else { echo '<button class="button" id="pvc-lt-disable">Deshabilitar herramienta</button> '; }
+    echo '<button class="button" id="pvc-lt-refresh">Consultar páginas elegibles</button><p><label for="pvc-lt-source">Página informativa </label><select id="pvc-lt-source"><option value="">Selecciona una página</option></select></p>';
+    echo '<button class="button button-primary" id="pvc-lt-run">Preparar borradores de la página seleccionada</button> <button class="button" id="pvc-lt-stop" disabled>Detener</button><pre id="pvc-lt-status" role="status" aria-live="polite" style="white-space:pre-wrap">Sin iniciar.</pre></div>';
 }
