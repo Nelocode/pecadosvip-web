@@ -58,10 +58,13 @@ $plugin = dirname(__DIR__) . '/plugin/pecadosvip-content';
 $source = file_get_contents($plugin . '/pecadosvip-content.php');
 // Load core functions only: the fixtures above replace module APIs. Stop at the
 // first module, even when new migration/localization modules precede watermark.
-// Otherwise eval resolves the plugin's __DIR__ to this test and loads wrong paths.
 $module_boundary = strpos($source, "require_once PVC_DIR . '/includes/");
 if ($module_boundary === false) { throw new RuntimeException('Plugin module boundary was not found.'); }
-eval(substr($source, 5, $module_boundary - 5));
+// Inside eval() the plugin's own __DIR__ resolves to this test directory, so every require in
+// the prefix would look for includes/ next to the tests instead of next to the plugin. Bind the
+// plugin root explicitly, the way WordPress does, and drop the definition the copy would repeat.
+define('PVC_DIR', $plugin);
+eval(str_replace("define('PVC_DIR', __DIR__);", '', substr($source, 5, $module_boundary - 5)));
 require $plugin . '/includes/admin.php';
 require dirname(__DIR__) . '/theme/pecadosvip/inc/render.php';
 $count = 0;

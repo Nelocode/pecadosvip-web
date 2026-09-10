@@ -254,6 +254,30 @@ for (const name of (await readdir(resolve(root, 'tests'))).filter((entry) => ent
     assert.ok(mountedDirectories.has(match[1]), `tests/${name} includes ../${match[1]}/, which the QA container does not mount`);
   }
 }
+// Copy a template reaches through a dynamic prefix is invisible to the literal scan above:
+// a service group or an availability status is interpolated at render time, so a label
+// missing in one language renders empty there and nowhere else. Both sets are enumerable
+// from the shipped seed and from the plugin field definition, so they are checked directly.
+const copyAt = (locale, keys) => keys.reduce((value, key) => (value == null ? undefined : value[key]), seed.copy?.[locale]);
+const availabilityEnum = ((await readFile(resolve(root, 'plugin/pecadosvip-content/pecadosvip-content.php'), 'utf8'))
+  .match(/'availability' => array\([^;]*?'enum' => array\(([^)]*)\)/s)?.[1] ?? '')
+  .match(/'([a-z-]+)'/g)?.map((value) => value.slice(1, -1)) ?? [];
+assert.ok(availabilityEnum.length >= 2, 'The availability field must declare its enum');
+const serviceGroups = [...new Set(seed.records.filter((record) => record.type === 'service').map((record) => record.data?.group).filter(Boolean))].sort();
+assert.ok(serviceGroups.length > 0, 'The shipped services must declare their group');
+const declaredEnum = [...availabilityEnum].sort();
+for (const locale of manifest.locales) {
+  assert.deepEqual(Object.keys(copyAt(locale, ['filters', 'availability']) ?? {}).sort(), declaredEnum, `filters.availability does not match the field enum in ${locale}`);
+  assert.deepEqual(Object.keys(copyAt(locale, ['profile', 'availability']) ?? {}).sort(), declaredEnum, `profile.availability does not match the field enum in ${locale}`);
+  for (const group of serviceGroups) {
+    assert.ok(copyAt(locale, ['services', 'groups', group, 'label']), `Missing services.groups.${group}.label in ${locale}`);
+  }
+}
+for (const record of seed.records) {
+  const status = record.data?.availability;
+  if (!status) { continue; }
+  assert.ok(availabilityEnum.includes(status), `A shipped record declares the unknown availability "${status}"`);
+}
 // The WordPress runtime and its focused CI workflow belong to this delivery.
 // Keep unrelated application/backend source outside the allowed change surface.
 const coreDiff = hasOwnGit(repository) ? execFileSync('git', ['diff', '--name-only', 'HEAD', '--', '.', ':(exclude)wordpress', ':(exclude)Dockerfile', ':(exclude).dockerignore', ':(exclude).github/workflows/watermark-qa.yml', ':(exclude)tsconfig.json', ':(exclude)eslint.config.mjs'], { cwd: repository, encoding: 'utf8' }).trim() : '';
