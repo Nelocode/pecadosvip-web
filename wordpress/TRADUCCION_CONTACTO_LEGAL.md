@@ -1,0 +1,184 @@
+# Traducción automática, botones de contacto y mecánica legal
+
+Estado: implementado y verificado de forma estática sobre `62d4ee4` (main local).
+Los servicios PHP no se pudieron ejecutar en este entorno (no hay PHP ni Docker
+disponibles); las pruebas están escritas y hay que ejecutarlas en la QA Docker.
+No es asesoría jurídica, no incluye los datos del titular y no activa nada por sí solo.
+
+## 1. Traducción automática de contenido no Legacy
+
+### Qué hace
+
+Traduce del español al inglés, francés e italiano las **páginas informativas** y los
+**perfiles de modelos** que no forman parte del inventario Legacy. Al existir el perfil
+traducido y publicado, la ficha aparece en los cuatro idiomas y el selector de idioma
+deja de ocultar ese idioma.
+
+Evidencia del hueco que cierra, observada el 10/09/2026 en producción:
+
+| URL | Antes |
+| --- | --- |
+| `https://pecadosvip.com/es/perfiles/maria` | 200, único perfil publicado |
+| `https://pecadosvip.com/en/perfiles` | 200 con «No profiles match this selection.» |
+| `https://pecadosvip.com/en/perfiles/maria` | 404 |
+
+### Cómo se usa
+
+**PecadosVip → Traducción automática** (solo administradores):
+
+1. Pulsa **Habilitar traducción automática**. En ese momento se congela el inventario
+   Legacy (identidades anteriores a la ficha Maria, ID 465) y se guarda la política.
+2. Decide la casilla **Publicar automáticamente las traducciones creadas**:
+   - activada: el perfil traducido queda publicado y se muestra en los cuatro idiomas;
+   - vacía: se guardan borradores para revisión y el perfil no aparece hasta publicarlo.
+3. Pulsa **Traducir automáticamente lo pendiente**. Se traduce toda la cola sin
+   seleccionar página a página. Deja el selector en «Toda la cola pendiente».
+4. Con **Publicar borradores de traducción existentes** se publican de una vez los
+   borradores creados por esta herramienta.
+
+El motor es el traductor local del navegador (Chrome o Edge de escritorio). No usa API
+de pago, no hay traducción en segundo plano y **no hay que habilitar destinos en
+TranslateRocket**: los registros se crean como contenido nativo por `pv_locale`, que es
+justo lo que evita el conflicto conocido entre los destinos de TranslateRocket y el
+router del tema. La herramienta exige que TranslateRocket siga con origen español, sin
+destinos y sin proveedor.
+
+### Garantías
+
+- El inventario Legacy se congela por identidad lógica y nunca se traduce.
+- Una versión existente (borrador, privada, manual o antigua) **nunca** se reemplaza ni
+  se republica: se cuenta como «protegida».
+- Servicios y ciudades quedan fuera del proceso.
+- El nombre artístico del perfil es un nombre propio: se conserva sin traducir.
+- La publicación no se acepta desde el navegador; se lee de la política guardada.
+- Si la fuente cambia durante el proceso, la traducción no se publica y queda en borrador.
+- Una política de un alcance anterior se amplía conservando el inventario Legacy.
+
+### Límites
+
+- Sin PHP ni Docker en este entorno, `php tests/selective-translation-test.php` está
+  escrito y no ejecutado aquí.
+- La QA de WordPress real no se ejecutó: no está acreditado el guardado y refresco en
+  una instalación completa.
+- Los perfiles Legacy ya existen traducidos porque la semilla los creó en los cuatro
+  idiomas; esta función afecta al contenido creado después.
+
+## 2. Botones de contacto
+
+**PecadosVip → Botones de contacto**. Cinco canales (WhatsApp, Telegram, teléfono,
+correo y formulario) más un **canal de reporte**.
+
+Cada canal tiene un destino y un interruptor. Un destino se guarda **vacío** si no
+cumple el esquema, nunca se acepta un valor dudoso:
+
+| Canal | Formato admitido |
+| --- | --- |
+| WhatsApp | `https://wa.me/…` o `https://api.whatsapp.com/…` con ruta |
+| Telegram | `https://t.me/…` o `https://telegram.me/…` con ruta |
+| Teléfono | `tel:+…` |
+| Correo | `mailto:…` |
+| Formulario | `https://…` sin credenciales ni fragmento |
+| Reporte | `mailto:…` o `https://…` |
+
+Se convierte en enlace solo si el destino es válido **y**:
+
+- la aprobación de canales está marcada, **y**
+- la identificación del prestador está completa y aprobada (canales ordinarios).
+
+El **canal de reporte está exento del segundo requisito**: sirve para comunicar contenido
+usado sin permiso, suplantación, menores, explotación, coacción o vulneración de derechos
+de datos, y debe seguir accesible antes de cualquier barrera de edad. Sigue exigiendo la
+aprobación, para que ningún destino sin revisar se publique.
+
+Mientras falte algo, el tema muestra el bloque desactivado con aviso y sin abrir ningún
+canal. El estado y la lista de bloqueos aparecen en la propia pantalla de administración.
+
+## 3. Mecánica legal española
+
+**PecadosVip → Legal y privacidad**. Implementa el mecanismo; **no redacta** los
+documentos ni inventa datos.
+
+### Identificación del prestador (LSSI art. 10)
+
+Campos obligatorios: denominación social, NIF/CIF, domicilio y correo de contacto
+directo; además el responsable jurídico que aprueba. Opcionales: nombre comercial,
+teléfono, datos registrales y titular del dominio. Se muestran en el pie de todas las
+páginas y en el aviso legal, de forma permanente y gratuita, **solo** cuando están
+completos y la aprobación está marcada.
+
+### Documentos legales
+
+Aviso legal, privacidad, cookies y términos, en los cuatro idiomas, editables desde
+**Páginas de la web** y **Textos y diseño**. Mientras falte el intake, cada documento
+muestra «Documento pendiente de aprobación» con la lista de datos que faltan, y el
+documento legal **no es indexable**.
+
+La política de privacidad se publica **por capas**: resumen (extracto editable), detalle
+(contenido completo) y derechos, con acceso permanente al documento completo.
+
+### Cookies
+
+Inventario editable (nombre, proveedor, finalidad, duración y categoría) y
+documentación de la analítica prevista. El aviso con aceptar / rechazar / configurar
+**solo aparece si hay realmente una cookie no esencial inventariada y el intake está
+aprobado**: no se añade un banner ficticio. La política de cookies incluye un botón
+permanente de **cambio de decisión**. Ninguna cookie no esencial se carga antes del
+consentimiento; el JS solo registra la decisión y anuncia el evento
+`pvn:cookie-consent`, y expone `window.PecadosVipConsent.granted(category)`.
+
+El consentimiento se guarda en el navegador (`localStorage`), versionado por la versión
+de la política. **No hay prueba de consentimiento en servidor**: para analítica real hace
+falta un CMP y un contrato con el proveedor.
+
+### Control de acceso de personas adultas
+
+Implementado **en el servidor** en `theme/pecadosvip/inc/age-access.php`, desactivado por
+defecto.
+
+- Solo autoriza contenido un adaptador externo que confirme una sesión verificada
+  mediante el filtro `pvwp_age_verified_session`: `verified === true`,
+  `threshold === 18` y `expires_at` entero, futuro y con menos de 12 horas de validez.
+- **No** acepta cookie, parámetro, `User-Agent` ni autodeclaración como prueba, y no
+  recibe documentos de identidad ni fechas de nacimiento.
+- Falla cerrado ante adaptador ausente, excepción o resultado mal formado.
+- Sin autorización responde 403 con una pantalla neutra en el idioma de la ruta, sin
+  `wp_head`, sin scripts, sin imágenes y con CSP `default-src 'none'`.
+- Los **documentos legales y el canal de reporte siguen accesibles** sin probar la edad.
+- Añade `no-store`, `Referrer-Policy: no-referrer` y `X-Robots-Tag: noindex`.
+
+Diseño alineado con la propuesta previa `output/legal-ue-20260910/proposal/age-access.php`
+y con `output/legal-ue-20260910/REQUISITOS-OPERATIVOS.md`. Una casilla de 18+ en el
+navegador **no** se considera verificación de edad y no se ha implementado como tal.
+
+**Consecuencia de activarlo sin adaptador**: todo el contenido pasa a 403 y solo quedan
+visibles la pantalla neutra, los documentos legales y el canal de reporte. Es el
+comportamiento correcto y esperado, pero cierra el sitio a visitantes.
+
+### Lo que esta entrega NO hace
+
+- No identifica al prestador: los datos siguen pendientes por instrucción expresa.
+- No selecciona ni integra un verificador de edad.
+- No protege los archivos originales servidos por el servidor web: eso corresponde a la
+  capa de contención (`wordpress/protection/`) y a la revisión de proxy/CDN.
+- No cubre la información precontractual de reservas y pagos, ni la calificación de la
+  publicidad, ni derechos de imagen, ni consentimiento de las personas de los perfiles.
+- No acredita cumplimiento jurídico: toda implicación material requiere asesoría.
+
+## Verificación reproducible
+
+```powershell
+cd wordpress
+npm run build
+npm run verify
+```
+
+La verificación estática exige ahora paridad de **166 textos editables** en es/en/fr/it,
+los contratos de contacto, legal y acceso adulto, y un equilibrio de delimitadores PHP
+(no es un lint de PHP). Las pruebas funcionales se ejecutan en la QA Docker:
+
+```powershell
+node qa/docker.mjs test
+```
+
+que ahora incluye `selective-translation-test.php`, `contact-legal-test.php` y
+`age-access-test.php`.

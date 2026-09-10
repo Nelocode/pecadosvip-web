@@ -1,7 +1,18 @@
 <?php
-/** Opt-in translation of informational pages to drafts; no publication or background polling. */
+/**
+ * Opt-in automatic translation of non-Legacy content.
+ *
+ * Scope v2: informational pages (information, about, contact, legal) plus model
+ * profiles. Every other content type stays out. The Legacy inventory captured when
+ * the tool is enabled is frozen by logical identity and is never translated, and an
+ * existing translation in any status is never replaced or republished by this module.
+ *
+ * The browser performs the translation and the server independently re-checks
+ * eligibility, source fingerprint, permissions and destination before writing.
+ */
 if (!defined('ABSPATH')) { exit; }
 
+function pvc_lt_mode(): string { return 'content-drafts-v2'; }
 function pvc_lt_languages(): array { return array('en', 'fr', 'it'); }
 function pvc_lt_identity($post): string { return $post->post_type . ':' . (string) get_post_meta($post->ID, 'pv_key', true); }
 function pvc_lt_policy(): array { return (array) get_option('pvc_local_translation_policy', array()); }
@@ -10,12 +21,27 @@ function pvc_lt_informational($post): bool {
     $data = (array) get_post_meta($post->ID, 'pv_data', true);
     return in_array($data['kind'] ?? '', array('information', 'about', 'contact', 'legal'), true);
 }
+/** Scope v2 adds model profiles. Services and cities remain outside the process. */
+function pvc_lt_scoped($post): bool {
+    if (!$post) { return false; }
+    if ($post->post_type === 'pv_profile') { return true; }
+    return pvc_lt_informational($post);
+}
+function pvc_lt_enabled(?array $policy = null): bool {
+    $policy = $policy ?? pvc_lt_policy();
+    return !empty($policy['enabled']) && ($policy['mode'] ?? '') === pvc_lt_mode();
+}
+/** Publication is an explicit, revocable choice stored with the policy. Disabled by default. */
+function pvc_lt_publishes(?array $policy = null): bool {
+    $policy = $policy ?? pvc_lt_policy();
+    return pvc_lt_enabled($policy) && !empty($policy['publish']);
+}
 function pvc_lt_hash($post): string {
-    return hash('sha256', wp_json_encode(array($post->post_type, $post->post_status, $post->post_password, $post->post_title, $post->post_content, $post->post_excerpt, (int) $post->menu_order, get_post_meta($post->ID, 'pv_locale', true), get_post_meta($post->ID, 'pv_key', true), get_post_meta($post->ID, 'pv_data', true), (int) get_post_thumbnail_id($post))));
+    return hash('sha256', wp_json_encode(array($post->post_type, $post->post_status, $post->post_password, $post->post_title, $post->post_content, $post->post_excerpt, (int) $post->menu_order, get_post_meta($post->ID, 'pv_locale', true), get_post_meta($post->ID, 'pv_key', true), get_post_meta($post->ID, 'pv_data', true), (int) get_post_thumbnail_id($post->ID))));
 }
 function pvc_lt_eligible($post, ?array $policy = null): bool {
     $policy = $policy ?? pvc_lt_policy();
-    return !empty($policy['enabled']) && ($policy['mode'] ?? '') === 'informational-drafts-v1' && pvc_lt_informational($post)
+    return pvc_lt_enabled($policy) && pvc_lt_scoped($post)
         && $post->post_status === 'publish' && $post->post_password === ''
         && get_post_meta($post->ID, 'pv_locale', true) === 'es'
         && preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', (string) get_post_meta($post->ID, 'pv_key', true))
@@ -45,25 +71,44 @@ add_action('wp_ajax_pvc_lt_enable', function() {
     if (!$anchor || $anchor->post_type !== 'pv_profile' || get_post_meta(465, 'pv_key', true) !== 'maria' || get_post_meta(465, 'pv_locale', true) !== 'es') {
         wp_send_json_error(array('message' => 'No coincide la ficha inicial Maria (465). No se cambió el alcance.'), 409);
     }
+    $publish = !empty($_POST['publish']);
     $policy = pvc_lt_policy();
-    if ($policy && ($policy['mode'] ?? '') !== 'informational-drafts-v1') {
-        wp_send_json_error(array('message' => 'Existe una política anterior de otro alcance. Debe revisarse antes de habilitar esta herramienta.'), 409);
+    // A policy from an earlier scope is upgraded in place: the frozen Legacy inventory
+    // is preserved verbatim and only the scope and publication flags change.
+    if ($policy && ($policy['mode'] ?? '') !== pvc_lt_mode()) {
+        $policy['mode'] = pvc_lt_mode();
+        $policy['enabled'] = true;
+        $policy['publish'] = $publish;
+        $policy['upgraded_at_utc'] = gmdate('c');
+        $policy['legacy'] = array_values((array) ($policy['legacy'] ?? array()));
+        update_option('pvc_local_translation_policy', $policy, false);
+        wp_send_json_success(array('legacy_count' => count($policy['legacy']), 'enabled' => true, 'publish' => $publish, 'upgraded' => true));
     }
     if (!$policy) {
         $posts = get_posts(array('post_type' => array_keys(pvc_types()), 'post_status' => array('publish','draft','pending','private','future','trash'), 'posts_per_page' => -1));
-        $policy = array('enabled' => true, 'mode' => 'informational-drafts-v1', 'anchor_id' => 465, 'legacy' => pvc_lt_baseline($posts, 465), 'created_at_utc' => gmdate('c'));
+        $policy = array('enabled' => true, 'mode' => pvc_lt_mode(), 'anchor_id' => 465, 'legacy' => pvc_lt_baseline($posts, 465), 'publish' => $publish, 'created_at_utc' => gmdate('c'));
         if (!add_option('pvc_local_translation_policy', $policy, '', false)) { wp_send_json_error(array('message' => 'El alcance cambió en otra sesión. Recarga.'), 409); }
-    } elseif (empty($policy['enabled'])) {
+    } else {
         $policy['enabled'] = true;
+        $policy['publish'] = $publish;
         update_option('pvc_local_translation_policy', $policy, false);
     }
-    wp_send_json_success(array('legacy_count' => count($policy['legacy']), 'enabled' => !empty($policy['enabled'])));
+    wp_send_json_success(array('legacy_count' => count($policy['legacy']), 'enabled' => true, 'publish' => !empty($policy['publish'])));
 });
 add_action('wp_ajax_pvc_lt_disable', function() {
     pvc_lt_guard();
     $policy = pvc_lt_policy();
     if ($policy) { $policy['enabled'] = false; update_option('pvc_local_translation_policy', $policy, false); }
-    wp_send_json_success(array('enabled' => false));
+    wp_send_json_success(array('enabled' => false, 'publish' => !empty($policy['publish'])));
+});
+/** Publication can be switched without losing the frozen Legacy inventory or the drafts. */
+add_action('wp_ajax_pvc_lt_settings', function() {
+    pvc_lt_guard();
+    $policy = pvc_lt_policy();
+    if (!pvc_lt_enabled($policy)) { wp_send_json_error(array('message' => 'Habilita primero la traducción automática.'), 409); }
+    $policy['publish'] = !empty($_POST['publish']);
+    update_option('pvc_local_translation_policy', $policy, false);
+    wp_send_json_success(array('publish' => (bool) $policy['publish']));
 });
 /** Split HTML into text nodes; tags, attributes, links and Gutenberg comments are kept on the server. */
 function pvc_lt_document(string $html): array {
@@ -78,6 +123,8 @@ function pvc_lt_document(string $html): array {
 }
 function pvc_lt_segments($post): array {
     $segments = array();
+    // A profile title is the public stage name: a proper noun carried over unchanged,
+    // exactly like a city key. Its biography travels through the excerpt and content.
     if (!in_array($post->post_type, array('pv_profile', 'pv_city'), true) && trim($post->post_title) !== '') { $segments['title'] = $post->post_title; }
     if (trim($post->post_excerpt) !== '') { $segments['excerpt'] = $post->post_excerpt; }
     [, , $nodes] = pvc_lt_document($post->post_content);
@@ -89,7 +136,7 @@ function pvc_lt_segments($post): array {
     if (!empty($data['coverage']) && is_string($data['coverage'])) { $segments['coverage'] = $data['coverage']; }
     return $segments;
 }
-function pvc_lt_payload($source, array $translations, string $lang): array {
+function pvc_lt_payload($source, array $translations, string $lang, bool $publish = false): array {
     $data = (array) get_post_meta($source->ID, 'pv_data', true);
     [$doc, $root, $nodes] = pvc_lt_document($source->post_content);
     foreach ($nodes as $i => $node) {
@@ -106,7 +153,7 @@ function pvc_lt_payload($source, array $translations, string $lang): array {
     if (isset($translations['coverage'])) { $data['coverage'] = $translations['coverage']; }
     return array('post_type' => $source->post_type, 'post_title' => $translations['title'] ?? $source->post_title,
         'post_excerpt' => $translations['excerpt'] ?? $source->post_excerpt, 'post_content' => wp_kses_post($content),
-        'menu_order' => (int) $source->menu_order, 'post_status' => 'draft',
+        'menu_order' => (int) $source->menu_order, 'post_status' => $publish ? 'publish' : 'draft',
         'meta_input' => array('pv_locale' => $lang, 'pv_key' => get_post_meta($source->ID, 'pv_key', true), 'pv_data' => $data));
 }
 /** All statuses count: a draft/private/manual translation must never be replaced or republished. */
@@ -114,11 +161,22 @@ function pvc_lt_targets($source, string $lang): array {
     return get_posts(array('post_type' => $source->post_type, 'post_status' => array('publish','draft','pending','private','future','trash'), 'posts_per_page' => -1,
         'meta_query' => array(array('key' => 'pv_key', 'value' => get_post_meta($source->ID, 'pv_key', true)), array('key' => 'pv_locale', 'value' => $lang))));
 }
+function pvc_lt_type_labels(): array {
+    return array('pv_profile' => 'Perfil', 'pv_page' => 'Página informativa', 'pv_service' => 'Servicio', 'pv_city' => 'Ciudad');
+}
+/**
+ * Every pending pair for the current scope, in a stable order.
+ *   jobs      source is eligible and no version exists yet in that language
+ *   complete  the only version was created by this tool for the current source text
+ *   protected any other version exists (draft, private, manual or stale) and is kept
+ */
 function pvc_lt_pending(): array {
     $jobs = array(); $protected = 0; $complete = 0;
-    $sources = get_posts(array('post_type' => 'pv_page', 'post_status' => 'publish', 'has_password' => false, 'posts_per_page' => -1, 'orderby' => 'ID', 'order' => 'ASC', 'meta_key' => 'pv_locale', 'meta_value' => 'es'));
+    $policy = pvc_lt_policy();
+    $publish = pvc_lt_publishes($policy);
+    $sources = get_posts(array('post_type' => array_keys(pvc_types()), 'post_status' => 'publish', 'has_password' => false, 'posts_per_page' => -1, 'orderby' => 'ID', 'order' => 'ASC', 'meta_key' => 'pv_locale', 'meta_value' => 'es'));
     foreach ($sources as $source) {
-        if (!pvc_lt_eligible($source)) { continue; }
+        if (!pvc_lt_eligible($source, $policy)) { continue; }
         foreach (pvc_lt_languages() as $lang) {
             $targets = pvc_lt_targets($source, $lang);
             if ($targets) {
@@ -126,10 +184,10 @@ function pvc_lt_pending(): array {
                 else { ++$protected; }
                 continue;
             }
-            $jobs[] = array('id' => (int) $source->ID, 'title' => $source->post_title, 'lang' => $lang, 'fingerprint' => pvc_lt_hash($source), 'segments' => pvc_lt_segments($source));
+            $jobs[] = array('id' => (int) $source->ID, 'type' => $source->post_type, 'title' => $source->post_title, 'lang' => $lang, 'publish' => $publish, 'fingerprint' => pvc_lt_hash($source), 'segments' => pvc_lt_segments($source));
         }
     }
-    return array('jobs' => $jobs, 'complete' => $complete, 'protected' => $protected, 'legacy' => count(pvc_lt_policy()['legacy'] ?? array()));
+    return array('jobs' => $jobs, 'complete' => $complete, 'protected' => $protected, 'publish' => $publish, 'legacy' => count($policy['legacy'] ?? array()), 'labels' => pvc_lt_type_labels());
 }
 add_action('wp_ajax_pvc_lt_pending', function() { pvc_lt_guard(); wp_send_json_success(pvc_lt_pending()); });
 function pvc_lt_remember($source, string $lang, array $segments, array $translated): void {
@@ -148,6 +206,8 @@ add_action('wp_ajax_pvc_lt_store', function() {
     pvc_lt_guard();
     $id = absint($_POST['id'] ?? 0); $lang = sanitize_key($_POST['lang'] ?? '');
     if (!in_array($lang, pvc_lt_languages(), true)) { wp_send_json_error(array('message' => 'Idioma no permitido.'), 400); }
+    // Publication never comes from the request: it is read from the stored policy.
+    $publish = pvc_lt_publishes();
     $source = get_post($id);
     if (!pvc_lt_eligible($source) || !current_user_can('edit_post', $id)) { wp_send_json_error(array('message' => 'Contenido excluido o no publicado.'), 409); }
     $fingerprint = sanitize_text_field(wp_unslash($_POST['fingerprint'] ?? ''));
@@ -166,8 +226,8 @@ add_action('wp_ajax_pvc_lt_store', function() {
     try {
         $targets = pvc_lt_targets($source, $lang);
         if ($targets) { throw new RuntimeException('Ya existe una versión en este idioma; se conserva sin cambios.'); }
-        $payload = pvc_lt_payload($source, $translated, $lang);
-        $valid = pvc_validate($source->post_type, $lang, $payload['meta_input']['pv_key'], pvc_sanitize_data($payload['meta_input']['pv_data'], $source->post_type), 0);
+        $payload = pvc_lt_payload($source, $translated, $lang, $publish);
+        $valid = pvc_validate($source->post_type, $lang, $payload['meta_input']['pv_key'], pvc_sanitize_data($payload['meta_input']['pv_data'], $source->post_type), 0, $publish);
         if (is_wp_error($valid)) { throw new RuntimeException($valid->get_error_message()); }
         $payload['meta_input']['_pvc_lt_source'] = $id;
         $payload['meta_input']['_pvc_lt_source_hash'] = $fingerprint;
@@ -178,25 +238,64 @@ add_action('wp_ajax_pvc_lt_store', function() {
         clean_post_cache($id); $fresh = get_post($id);
         if (!pvc_lt_eligible($fresh) || !hash_equals(pvc_lt_hash($fresh), $fingerprint)) { throw new RuntimeException('La fuente cambió durante el guardado. La traducción quedó en borrador.'); }
         pvc_lt_remember($source, $lang, $segments, $translated);
-        $result = array('id' => $target, 'url' => admin_url('post.php?post=' . $target . '&action=edit'), 'lang' => $lang, 'status' => 'draft');
+        // The insertion guard can still demote a failed publication: report what exists.
+        $stored = get_post_status($target) === 'publish' ? 'publish' : 'draft';
+        $result = array('id' => $target, 'url' => admin_url('post.php?post=' . $target . '&action=edit'), 'lang' => $lang, 'status' => $stored, 'type' => $source->post_type);
     } catch (Throwable $e) { $error = $e->getMessage(); }
     finally { delete_option($lock); }
     if ($error !== null) { wp_send_json_error(array('message' => $error), 409); }
     wp_send_json_success($result);
 });
-add_action('admin_menu', function() { add_submenu_page('pecadosvip-content', 'Borradores de traducción', 'Borradores de traducción', 'manage_options', 'pvc-local-translation', 'pvc_lt_page'); });
+/**
+ * Publishes only translation drafts created by this tool for a source that is still
+ * eligible and unchanged. Anything else keeps its current status.
+ */
+function pvc_lt_publish_drafts(): array {
+    $published = 0; $skipped = 0;
+    $drafts = get_posts(array('post_type' => array_keys(pvc_types()), 'post_status' => 'draft', 'posts_per_page' => -1, 'orderby' => 'ID', 'order' => 'ASC',
+        'meta_query' => array(array('key' => '_pvc_lt_source', 'compare' => 'EXISTS'))));
+    foreach ($drafts as $draft) {
+        $source = get_post((int) get_post_meta($draft->ID, '_pvc_lt_source', true));
+        $locale = (string) get_post_meta($draft->ID, 'pv_locale', true);
+        if (!$source || !in_array($locale, pvc_lt_languages(), true) || !pvc_lt_eligible($source)
+            || !hash_equals(pvc_lt_hash($source), (string) get_post_meta($draft->ID, '_pvc_lt_source_hash', true))) { ++$skipped; continue; }
+        $data = pvc_sanitize_data(get_post_meta($draft->ID, 'pv_data', true), $draft->post_type);
+        $valid = pvc_validate($draft->post_type, $locale, (string) get_post_meta($draft->ID, 'pv_key', true), $data, (int) $draft->ID, true);
+        if (is_wp_error($valid)) { ++$skipped; continue; }
+        if (is_wp_error(wp_update_post(array('ID' => $draft->ID, 'post_status' => 'publish'), true))) { ++$skipped; continue; }
+        if (get_post_status($draft->ID) === 'publish') { ++$published; } else { ++$skipped; }
+    }
+    if ($published) { pvc_bump(); }
+    return array('published' => $published, 'skipped' => $skipped);
+}
+add_action('wp_ajax_pvc_lt_publish', function() {
+    pvc_lt_guard();
+    if (!pvc_lt_publishes()) { wp_send_json_error(array('message' => 'Activa la publicación automática antes de publicar los borradores existentes.'), 409); }
+    wp_send_json_success(pvc_lt_publish_drafts());
+});
+add_action('admin_menu', function() { add_submenu_page('pecadosvip-content', 'Traducción automática', 'Traducción automática', 'manage_options', 'pvc-local-translation', 'pvc_lt_page'); });
 function pvc_lt_page(): void {
     if (!current_user_can('manage_options')) { return; }
     wp_enqueue_script('pvc-local-translation', plugins_url('../assets/local-translation.js', __FILE__), array(), PVC_VERSION, true);
     wp_localize_script('pvc-local-translation', 'PvcLocalTranslation', array('ajax' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('pvc_local_translation')));
-    $policy = pvc_lt_policy();
-    echo '<div class="wrap"><h1>Borradores de traducción</h1><p>Español → inglés, francés e italiano. Solo páginas informativas nuevas, seleccionadas individualmente. El contenido Legacy y las versiones existentes se conservan. Perfiles, servicios y ciudades quedan fuera del proceso.</p>';
-    echo '<p>El navegador traduce localmente y guarda borradores para revisión en WordPress y en la memoria de TranslateRocket. No usa una API de pago. La herramienta no publica, no sobrescribe versiones existentes ni procesa altas en segundo plano.</p>';
-    echo '<p>Las páginas elegibles deben ser de tipo information, about, contact o legal. El corte histórico del proyecto sigue siendo anterior a la introducción de Maria; Maria no se incluye porque es un perfil.</p>';
+    $policy = pvc_lt_policy(); $enabled = pvc_lt_enabled($policy); $publish = $enabled && !empty($policy['publish']);
+    $stale = $policy && !$enabled;
+    echo '<div class="wrap"><h1>Traducción automática</h1>';
+    echo '<p>Español → inglés, francés e italiano. Alcance: <strong>páginas informativas y perfiles de modelos</strong> que no forman parte del inventario Legacy. Los servicios y las ciudades quedan fuera del proceso. Las versiones existentes se conservan siempre.</p>';
+    echo '<p>El navegador traduce localmente y el servidor guarda el resultado. No usa una API de pago y no traduce en segundo plano: el proceso se ejecuta cuando pulsas el botón.</p>';
     if (!pvc_lt_ready()) { echo '<div class="notice notice-error"><p>Se requiere TranslateRocket con origen español, sin destinos globales ni proveedor API. No cambies las rutas del sitio.</p></div>'; }
-    echo '<p id="pvc-lt-policy">' . ($policy ? 'Política guardada. Identidades Legacy protegidas: ' . count($policy['legacy']) : 'Herramienta desactivada. Habilitarla conserva el inventario Legacy; no traduce ni publica por sí solo.') . '</p>';
-    if (empty($policy['enabled'])) { echo '<button class="button" id="pvc-lt-enable">Habilitar herramienta de borradores</button> '; }
-    else { echo '<button class="button" id="pvc-lt-disable">Deshabilitar herramienta</button> '; }
-    echo '<button class="button" id="pvc-lt-refresh">Consultar páginas elegibles</button><p><label for="pvc-lt-source">Página informativa </label><select id="pvc-lt-source"><option value="">Selecciona una página</option></select></p>';
-    echo '<button class="button button-primary" id="pvc-lt-run">Preparar borradores de la página seleccionada</button> <button class="button" id="pvc-lt-stop" disabled>Detener</button><pre id="pvc-lt-status" role="status" aria-live="polite" style="white-space:pre-wrap">Sin iniciar.</pre></div>';
+    if ($stale) { echo '<div class="notice notice-warning"><p>Existe una política de un alcance anterior. Al habilitar se conserva el inventario Legacy y se amplía el alcance a los perfiles de modelos.</p></div>'; }
+    echo '<p id="pvc-lt-policy">' . ($policy ? 'Política guardada. Identidades Legacy protegidas: ' . count($policy['legacy'] ?? array()) . '. Publicación automática: ' . ($publish ? 'activada' : 'desactivada') . '.' : 'Herramienta desactivada. Habilitarla conserva el inventario Legacy; no traduce ni publica por sí solo.') . '</p>';
+    if (!$enabled) {
+        echo '<p><label><input type="checkbox" id="pvc-lt-publish-enable" value="1"' . ($stale && !empty($policy['publish']) ? ' checked' : '') . '> Publicar automáticamente las traducciones creadas</label></p>';
+        echo '<p class="description">Si lo activas, el perfil traducido queda publicado y se muestra en los cuatro idiomas. Si lo dejas vacío, se guardan borradores para revisión. Puedes cambiarlo después sin perder nada.</p>';
+        echo '<button class="button button-primary" id="pvc-lt-enable">' . ($stale ? 'Ampliar el alcance y habilitar' : 'Habilitar traducción automática') . '</button> ';
+    } else {
+        echo '<p><label><input type="checkbox" id="pvc-lt-publish-toggle" value="1"' . ($publish ? ' checked' : '') . '> Publicar automáticamente las traducciones creadas</label> <button class="button" id="pvc-lt-publish-save">Guardar esta opción</button></p>';
+        echo '<button class="button" id="pvc-lt-disable">Deshabilitar herramienta</button> ';
+        echo '<button class="button" id="pvc-lt-publish-now">Publicar borradores de traducción existentes</button> ';
+    }
+    echo '<button class="button" id="pvc-lt-refresh">Consultar contenido pendiente</button>';
+    echo '<p><label for="pvc-lt-source">Traducir solo un elemento </label><select id="pvc-lt-source"><option value="">Toda la cola pendiente (automático)</option></select></p>';
+    echo '<button class="button button-primary" id="pvc-lt-run">Traducir automáticamente lo pendiente</button> <button class="button" id="pvc-lt-stop" disabled>Detener</button><pre id="pvc-lt-status" role="status" aria-live="polite" style="white-space:pre-wrap">Sin iniciar.</pre></div>';
 }

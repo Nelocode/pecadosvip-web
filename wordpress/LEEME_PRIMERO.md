@@ -22,6 +22,10 @@ Hazlo primero en una instalación de pruebas, con una copia de seguridad de su b
 4. En **Ajustes → Enlaces permanentes**, selecciona **Nombre de la entrada** y guarda.
 5. Abre el menú **PecadosVip**. Pulsa **Importar contenido inicial** y espera al mensaje final. Si se interrumpe, repite: no sobreescribe lo que ya editaste ni restaura elementos enviados a la papelera.
 6. Abre tu web terminando la dirección en `/es`. Prueba también `/en`, `/fr` y `/it`.
+7. Revisa **PecadosVip → Botones de contacto** y **PecadosVip → Legal y privacidad**: hasta completar la identificación del prestador y marcar las aprobaciones, la web no muestra la identificación, los canales de contacto siguen desactivados y los documentos legales aparecen como plantilla pendiente.
+8. Para que un perfil nuevo aparezca en los cuatro idiomas, entra en **PecadosVip → Traducción automática**, habilita la herramienta, decide si quieres publicar automáticamente y pulsa **Traducir automáticamente lo pendiente**.
+
+El detalle de estas tres funciones, sus garantías y sus límites está en `TRADUCCION_CONTACTO_LEGAL.md`.
 
 Requisitos declarados: WordPress 6.6 o posterior, PHP 8.0 o posterior. Las versiones concretas usadas para comprobar compatibilidad aparecen en `qa/README.md` y los resultados realmente ejecutados en `VALIDACION.md`.
 
@@ -35,6 +39,9 @@ Si el hosting rechaza el tamaño del tema, descomprime su ZIP y sube la carpeta 
 | Nombre, explicación, imagen, grupo u orden de un servicio | **PecadosVip → Servicios** |
 | Nombre, imagen, descripción o pertenencia a Madrid/Barcelona de una zona | **PecadosVip → Ciudades** |
 | Textos de páginas, legales y bloques añadidos a inicio/catálogos | **PecadosVip → Páginas de la web** |
+| Botones de WhatsApp, Telegram, teléfono, correo, formulario y reporte | **PecadosVip → Botones de contacto** |
+| Identificación del prestador, cookies, analítica y control de acceso de adultos | **PecadosVip → Legal y privacidad** |
+| Traducción al inglés, francés e italiano de páginas informativas y perfiles | **PecadosVip → Traducción automática** |
 | Logotipo, imagen de portada, mosaico, marca, botones, navegación o pie | **PecadosVip → Textos y diseño** |
 | Orden y destinos de enlaces del menú | **Apariencia → Menús**, con ubicación independiente para cada idioma |
 | Archivo, título o texto alternativo de una imagen | **Medios → Biblioteca** |

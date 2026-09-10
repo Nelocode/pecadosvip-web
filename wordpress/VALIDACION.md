@@ -43,3 +43,60 @@ Para continuar: reparar el inicio de Docker Desktop hasta que `docker info` resp
 ## Límites
 
 Subir esta conversión a una rama de GitHub no implica despliegue ni modificación del sitio EasyPanel. No se activaron reservas, pagos, contacto comercial ni indexación de la beta. No existe sincronización bidireccional con el CMS original. El ZIP de código contiene el catálogo inicial, no una base de datos WordPress de producción ni ediciones posteriores del usuario.
+
+---
+
+# Traducción automática no Legacy, botones de contacto y mecánica legal — 10 de septiembre de 2026
+
+Base: `62d4ee4fcf00232d4ea916b4420abb855dff7edd` (main local). Entregable aislado; no
+integrado en el checkout compartido, sin commit ni push. Detalle funcional en
+`TRADUCCION_CONTACTO_LEGAL.md`.
+
+## Alcance implementado
+
+- Traducción automática de páginas informativas **y perfiles de modelos** no Legacy, en
+  lote y sin selección página a página; publicación opcional y revocable.
+- Botones de contacto multicanal con destinos vacíos y validados por esquema, más canal
+  de reporte accesible antes de cualquier barrera de edad.
+- Identificación del prestador (LSSI art. 10), documentos legales por capas, política y
+  aviso de cookies con revocación permanente y puerta de acceso de adultos en servidor
+  con adaptador verificado.
+
+## Evidencia ejecutada
+
+- `npm run build`: PASS. 224 registros, 72 recursos, `seedSha256`
+  `3a1010b0b4030bf24a0f0b9fee0ee41085f31bfda3bb48ef4b228539a8a06637`.
+- `npm run verify`: **PASS_STATIC**. 166 rutas de texto editables con valor en es/en/fr/it
+  (antes 103), paridad de origen y distribución, sintaxis JS, contratos del plugin y del
+  tema, contratos de contacto/legal/acceso adulto y equilibrio de delimitadores PHP.
+- Comprobación de producción del hueco que cierra la traducción: `/es/perfiles/maria`
+  200, `/en/perfiles` 200 con «No profiles match this selection.», `/en/perfiles/maria`
+  404. Observado el 10/09/2026 por lectura pública de `pecadosvip.com`.
+- Revisión estática del código: el módulo de traducción conserva el inventario Legacy
+  congelado, nunca reemplaza versiones existentes y no acepta publicación desde el
+  navegador; el módulo de contacto no contiene ningún destino real; el gate de adultos no
+  lee cookie, parámetro ni autodeclaración; el intake legal aprueba en falso por defecto.
+
+## NO EJECUTADO
+
+- **PHP no está disponible en este entorno** (ni intérprete local ni Docker con motor
+  Linux), y **no hay red saliente** desde el shell. Por tanto no se ejecutaron
+  `php -l`, ni `tests/selective-translation-test.php`, `tests/contact-legal-test.php`,
+  `tests/age-access-test.php`, ni `node qa/docker.mjs test`. Las tres pruebas están
+  escritas y añadidas a la QA Docker; su sintaxis no está acreditada por un intérprete,
+  solo por la comprobación de delimitadores del verificador.
+- No se ejecutó la QA de WordPress real: guardar y refrescar, nonces, permisos, la
+  importación, ni la navegación HTTP en los cuatro idiomas.
+- No se ejecutó ninguna traducción real, ninguna publicación y ningún despliegue.
+- No se verificó `origin/main` en remoto (sin red). El registro compartido informa de un
+  cambio externo posterior en `main` que desactiva los hooks de cierre público y Apache;
+  **no está comprobado desde aquí** y debe revisarse antes de integrar.
+
+## Límites
+
+- No identifica al prestador ni sustituye asesoría jurídica; los datos siguen pendientes.
+- No integra un verificador de edad ni protege los archivos originales servidos por el
+  servidor web (capa de contención y proxy/CDN).
+- No cubre información precontractual, calificación publicitaria, derechos de imagen ni
+  consentimiento de las personas de los perfiles.
+- Activar la puerta de adultos sin adaptador cierra todo el contenido a visitantes.

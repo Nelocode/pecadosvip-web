@@ -177,6 +177,15 @@ function pvc_frontend_admin_route() {
                                 <li style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--pvn-line);">
                                     <a href="<?php echo esc_url(admin_url('admin.php?page=pecadosvip-copy')); ?>" target="_blank">Textos y diseño ↗</a>
                                 </li>
+                                <li>
+                                    <a href="<?php echo esc_url(admin_url('admin.php?page=pecadosvip-contact')); ?>" target="_blank">Botones de contacto ↗</a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo esc_url(admin_url('admin.php?page=pecadosvip-legal')); ?>" target="_blank">Legal y privacidad ↗</a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo esc_url(admin_url('admin.php?page=pvc-local-translation')); ?>" target="_blank">Traducción automática ↗</a>
+                                </li>
                             </ul>
                         </div>
                     </aside>

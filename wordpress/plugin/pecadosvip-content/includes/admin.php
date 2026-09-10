@@ -5,6 +5,8 @@ add_action('admin_menu', function() {
     add_menu_page('PecadosVip', 'PecadosVip', 'edit_posts', 'pecadosvip-content', 'pvc_dashboard', 'dashicons-palmtree', 25);
     add_submenu_page('pecadosvip-content', 'Dashboard / Importar', 'Dashboard / Importar', 'edit_posts', 'pecadosvip-content', 'pvc_dashboard');
     add_submenu_page('pecadosvip-content', 'Textos, cabecera y pie', 'Textos y diseño', 'manage_options', 'pecadosvip-copy', 'pvc_copy_admin');
+    add_submenu_page('pecadosvip-content', 'Botones de contacto', 'Botones de contacto', 'manage_options', 'pecadosvip-contact', 'pvc_contact_admin');
+    add_submenu_page('pecadosvip-content', 'Legal y privacidad', 'Legal y privacidad', 'manage_options', 'pecadosvip-legal', 'pvc_legal_admin');
 });
 add_action('admin_notices', function() {
     $message = get_transient('pvc_notice_' . get_current_user_id());
@@ -129,7 +131,7 @@ function pvc_set_nested(array &$array, string $path, $value): void {
     $keys = explode('.', $path); $cursor =& $array; foreach ($keys as $key) { if (!isset($cursor[$key]) || !is_array($cursor[$key])) { $cursor[$key] = array(); } $cursor =& $cursor[$key]; } $cursor = $value;
 }
 function pvc_label(string $path): string {
-    $names = array('site' => 'Identidad e imágenes', 'hero' => 'Portada', 'nav' => 'Navegación', 'footer' => 'Pie de página', 'home' => 'Inicio', 'services' => 'Servicios', 'profiles' => 'Perfiles', 'cities' => 'Ciudades', 'catalog' => 'Textos generales', 'brandPrimary' => 'Nombre principal de la marca', 'brandSuffix' => 'Segunda parte de la marca', 'logo' => 'Logotipo', 'mosaic' => 'Mosaico de fondo', 'icon' => 'Icono del sitio');
+    $names = array('site' => 'Identidad e imágenes', 'hero' => 'Portada', 'nav' => 'Navegación', 'footer' => 'Pie de página', 'home' => 'Inicio', 'services' => 'Servicios', 'profiles' => 'Perfiles', 'cities' => 'Ciudades', 'catalog' => 'Textos generales', 'contact' => 'Botones de contacto', 'legal' => 'Legal y cookies', 'brandPrimary' => 'Nombre principal de la marca', 'brandSuffix' => 'Segunda parte de la marca', 'logo' => 'Logotipo', 'mosaic' => 'Mosaico de fondo', 'icon' => 'Icono del sitio');
     return implode(' · ', array_map(function($part) use ($names) { return $names[$part] ?? ucfirst(trim((string) preg_replace('/([a-z])([A-Z])/', '$1 $2', $part))); }, explode('.', $path)));
 }
 function pvc_copy_admin(): void {

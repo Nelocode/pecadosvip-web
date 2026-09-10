@@ -7,6 +7,7 @@ $pvwp_locale = $pvwp_page['locale'] ?? 'es'; $pvwp_error = pvwp_error_copy($pvwp
 <head><meta charset="<?php bloginfo('charset'); ?>"><meta name="viewport" content="width=device-width, initial-scale=1"><?php wp_head(); ?></head>
 <body <?php body_class($pvwp_ready ? 'pvwp-frontend' : 'pvwp-native'); ?>>
 <?php wp_body_open(); ?><a class="skip-link" href="#main-content"><?php echo esc_html($pvwp_ready ? pvwp_text('navigation.skipLink') : $pvwp_error['skip']); ?></a>
+<?php if ($pvwp_ready) { pvwp_legal_gate(); } ?>
 <?php if ($pvwp_ready) : ?>
 <div class="public-page synthetic-preview-page pvn-site"><?php pvwp_filigree(); pvwp_header(); ?><main id="main-content">
 <?php if (!empty($pvwp_page['preview'])) : ?><p class="pvn-preview-notice"><?php echo esc_html__('Preview', 'pecadosvip'); ?></p><?php endif; ?>

@@ -6,7 +6,10 @@ Plugin independiente del tema. Guarda perfiles, servicios, ciudades y páginas c
 2. Activa el tema PecadosVip.
 3. Abre **PecadosVip → Importar contenido inicial**. El proceso trabaja por lotes y se puede repetir: no reemplaza contenidos o ajustes existentes, ni recupera elementos que ya moviste a la papelera.
 4. Edita las fichas desde el menú PecadosVip; usa **Textos y diseño** para cambiar idioma, cabecera, navegación, botones, pie e imágenes generales.
-5. Pulsa **Actualizar**: la web lee WordPress en cada petición, sin volver a compilar. La caché de WordPress se invalida al editar; si instalas una caché externa, configura su purga para estos tipos de contenido.
+5. **Botones de contacto**: un canal solo se convierte en un botón activo cuando tiene un destino válido, la aprobación está marcada y la identificación del prestador está completa y aprobada. El canal de reporte solo necesita la aprobación, porque debe seguir accesible antes de cualquier barrera de edad.
+6. **Legal y privacidad**: identificación del prestador (LSSI art. 10), inventario de cookies, analítica prevista y la puerta de acceso de personas adultas. Mientras falten datos obligatorios, la web no muestra la identificación, no activa los canales de contacto y los documentos legales quedan como plantilla pendiente.
+7. **Traducción automática**: traduce al inglés, francés e italiano las páginas informativas y los perfiles de modelos que no forman parte del inventario Legacy. El inventario Legacy se conserva. Los borradores se revisan antes de publicar, salvo que actives la publicación automática.
+8. Pulsa **Actualizar**: la web lee WordPress en cada petición, sin volver a compilar. La caché de WordPress se invalida al editar; si instalas una caché externa, configura su purga para estos tipos de contenido.
 
 Los datos sobreviven al cambiar/desactivar el tema. El plugin no elimina contenido al desactivarlo. Este plugin gestiona la presentación de la web; no conecta, escribe ni altera el backend de negocio original.
 
@@ -22,6 +25,10 @@ Los datos sobreviven al cambiar/desactivar el tema. El plugin no elimina conteni
 - `pvc_revision()`: generación de contenido; cambia al editar fichas, metadatos, imágenes o textos.
 - `pvc_preview_record($locale, $type, $key)`: solo para un usuario con permiso de edición y enlace de vista previa con nonce.
 - `pvc_import_seed($path, $offset = 0, $limit = 0)`: importa el `content/seed.json` del tema activo; requiere administrador y devuelve contadores o `WP_Error`.
+- `pvc_contact_active()`: solo los canales con destino válido y aprobados; los canales ordinarios exigen además una identificación de prestador completa y aprobada.
+- `pvc_legal_ready()` / `pvc_legal_missing()`: si la identificación obligatoria está completa y aprobada, y qué falta.
+- `pvc_legal_cookie_consent_required()`: verdadero solo si hay una cookie no esencial inventariada, el aviso está activo y el intake está aprobado. No se carga ninguna cookie no esencial antes del consentimiento.
+- `pvwp_age_verified_session` (filtro del tema): único mecanismo aceptado como prueba de mayoría de edad. El tema no lee cookies, parámetros ni autodeclaraciones.
 
 Lectura pública: `GET /wp-json/pecadosvip/v1/catalog?lang=es`. Escrituras: REST nativa WordPress `/wp-json/wp/v2/pecadosvip-profile`, `pecadosvip-service`, `pecadosvip-city` y `pecadosvip-page`, con autenticación y permisos. Las peticiones desde el navegador requieren el nonce REST de WordPress. No hay endpoint público de escritura.
 

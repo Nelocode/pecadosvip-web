@@ -42,10 +42,14 @@ function pvc_seo_informational(array $record): bool {
 }
 function pvc_seo_record_allowed(array $record): bool {
     $id = (int) ($record['id'] ?? 0); $post = get_post($id);
+    // A legal document stays non-indexable while its approval is pending, so a
+    // "pending approval" template can never be crawled as the definitive text.
+    $legal_pending = ($record['data']['kind'] ?? '') === 'legal' && !(function_exists('pvc_legal_ready') && pvc_legal_ready());
     return $post && $post->post_status === 'publish' && $post->post_password === ''
         && pvc_seo_informational($record) && !empty($record['title'])
         && isset(pvc_locales()[$record['locale'] ?? ''])
-        && empty($record['data']['synthetic']) && !get_post_meta($id, 'pv_seo_noindex', true);
+        && empty($record['data']['synthetic']) && !get_post_meta($id, 'pv_seo_noindex', true)
+        && !$legal_pending;
 }
 function pvc_seo_indexable(array $context): bool {
     return !empty($context['owned']) && ($context['status'] ?? 0) === 200

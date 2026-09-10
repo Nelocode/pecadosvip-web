@@ -190,7 +190,7 @@ function pvc_copy(string $locale): array {
     $copy = array_replace_recursive((array) ($seed[$locale] ?? array()), (array) get_option('pvc_copy_' . $locale, array()));
     // Only labels used by the native theme belong in its UI/public API. Older seeds
     // also held profile/page text snapshots; those must not bypass CPT publication.
-    $public_groups = array('brand', 'coverage', 'filters', 'footer', 'hero', 'nativeUi', 'navigation', 'profile', 'profilesSection', 'security', 'services', 'servicesSection', 'site', 'trustSignals', 'languageName');
+    $public_groups = array('brand', 'contact', 'coverage', 'filters', 'footer', 'hero', 'legal', 'nativeUi', 'navigation', 'profile', 'profilesSection', 'security', 'services', 'servicesSection', 'site', 'trustSignals', 'languageName');
     return array_intersect_key($copy, array_flip($public_groups));
 }
 function pvc_site(string $locale): array {
@@ -226,4 +226,6 @@ require_once PVC_DIR . '/includes/admin.php';
 require_once PVC_DIR . '/includes/seo.php';
 require_once PVC_DIR . '/includes/import.php';
 require_once PVC_DIR . '/includes/frontend-admin.php';
+require_once PVC_DIR . '/includes/legal.php';
+require_once PVC_DIR . '/includes/contact.php';
 require_once PVC_DIR . '/includes/selective-translation.php';

@@ -162,3 +162,69 @@
     update(false); updateSelection();
   });
 })();
+
+/**
+ * Cookie consent.
+ *
+ * Nothing here loads a non-essential resource: this module only records the visitor's
+ * decision and announces it. Any future integration must wait for the
+ * "pvn:cookie-consent" event or call window.PecadosVipConsent.granted(category)
+ * before loading a cookie or SDK. Fail-closed: without storage or without a decision,
+ * nothing optional is granted and the banner is shown again.
+ *
+ * Adult access is NOT handled here. It is a server-side gate with a verified adapter
+ * (inc/age-access.php); a self-declaration in the browser is never proof of age.
+ */
+(() => {
+  'use strict';
+  const read = (key) => { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; } };
+  const write = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* no storage: no optional consent */ } };
+  const clear = (key) => { try { localStorage.removeItem(key); } catch { /* ignore */ } };
+  const statusNodes = () => [...document.querySelectorAll('[data-pvn-cookie-status]')];
+  const say = (message) => statusNodes().forEach(node => { node.textContent = message || ''; });
+  const banner = document.querySelector('[data-pvn-cookie-banner]');
+  const consentKey = banner?.dataset.storageKey || 'pvn-cookie-consent';
+  const policyVersion = banner?.dataset.policyVersion || '1';
+  const messageFor = (name) => statusNodes().map(node => node.dataset[name] || '').find(Boolean) || '';
+  let grantedCategories = ['essential'];
+  window.PecadosVipConsent = { granted: (category) => grantedCategories.includes(category) };
+
+  if (banner) {
+    const categories = banner.querySelector('[data-pvn-cookie-categories]');
+    const save = banner.querySelector('[data-pvn-cookie-save]');
+    const configure = banner.querySelector('[data-pvn-cookie-configure]');
+    const boxes = () => [...banner.querySelectorAll('[data-pvn-cookie-category]')];
+    const record = read(consentKey);
+    const grant = (list) => {
+      grantedCategories = ['essential', ...list];
+      write(consentKey, { version: policyVersion, categories: grantedCategories, at: new Date().toISOString() });
+      document.dispatchEvent(new CustomEvent('pvn:cookie-consent', { detail: { version: policyVersion, categories: grantedCategories } }));
+      banner.querySelector('[data-pvn-cookie-categories]')?.setAttribute('hidden', '');
+      if (save) save.hidden = true;
+      banner.hidden = true;
+      say('');
+    };
+    if (record && record.version === policyVersion) {
+      grantedCategories = ['essential', ...(Array.isArray(record.categories) ? record.categories.filter(category => category !== 'essential') : [])];
+      banner.remove();
+    } else {
+      banner.hidden = false;
+      if (record) say(messageFor('messageReview'));
+      banner.querySelector('[data-pvn-cookie-accept]')?.addEventListener('click', () => grant(boxes().map(box => box.value)));
+      banner.querySelector('[data-pvn-cookie-reject]')?.addEventListener('click', () => grant([]));
+      configure?.addEventListener('click', () => {
+        if (categories) categories.hidden = false;
+        if (save) save.hidden = false;
+        configure.hidden = true;
+      });
+      save?.addEventListener('click', () => grant(boxes().filter(box => box.checked).map(box => box.value)));
+    }
+  }
+
+  document.querySelectorAll('[data-pvn-cookie-revoke]').forEach(button => button.addEventListener('click', () => {
+    clear(consentKey);
+    grantedCategories = ['essential'];
+    say(messageFor('messageRevoked'));
+    if (banner && document.body.contains(banner)) { banner.hidden = false; }
+  }));
+})();
