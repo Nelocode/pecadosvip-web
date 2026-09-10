@@ -58,9 +58,21 @@ function enable($publish=false){$GLOBALS['options']['pvc_local_translation_polic
 // 1. The glossary is built in: no API, no key, no browser, and it always reports itself.
 check(pvc_lt_auto_available(),'The offline glossary is always available');
 check(pvc_lt_auto_mode()==='glossary','The default mode is the bundled glossary');
-check(pvc_lt_offline_dictionary_size()>40,'The bundled glossary carries real vocabulary');
+check(pvc_lt_offline_dictionary_size()>400,'The bundled glossary carries a wide editorial vocabulary');
+check(pvc_lt_offline_translate('Carismática, romántica.','en')['text']==='Charismatic, romantic.','A known phrase is translated and its punctuation preserved');
+// Every phrase the catalogue actually contains must reach full coverage, or the engine
+// would leave its translation as a review draft instead of publishing it.
+foreach (array('Carismática, romántica.', 'Extrovertida, sensual, espontánea.', 'Amable, apasionado, extrovertida') as $real) {
+    foreach (array('en', 'fr', 'it') as $locale) {
+        $result = pvc_lt_offline_translate($real, $locale);
+        check($result['complete'] === true, 'A real catalogue phrase must be fully covered: ' . $locale . ' / ' . $real);
+    }
+}
+// Multi-word entries must win over their single words and consume exactly what they use.
+$phrase = pvc_lt_offline_translate('Reserva por horas, sin prisa', 'en');
+check($phrase['text'] === 'Booking by the hour, without rushing', 'A multi-word phrase is translated as a whole');
+check(pvc_lt_offline_translate('Masaje tántrico y cena romántica','en')['text']==='Tantric massage and romantic dinner','Phrases and connectors combine correctly');
 $t=pvc_lt_offline_translate('Carismática, romántica.','en');
-check($t['text']==='Charismatic, romantic.','A known phrase is translated and its punctuation preserved');
 check($t['complete']===true&&$t['coverage']===1.0,'A fully known phrase reports full coverage');
 $t=pvc_lt_offline_translate('Carismática y violinista.','it');
 check($t['complete']===false&&$t['coverage']<1.0,'An unknown word lowers the coverage instead of being invented');

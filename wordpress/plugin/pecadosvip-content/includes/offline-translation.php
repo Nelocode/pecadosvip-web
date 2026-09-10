@@ -2,152 +2,24 @@
 /**
  * Offline translation engine: no external API, no key, no network, no browser.
  *
- * It is a glossary-based translator. The vocabulary lives in the plugin, is reviewable
- * and can be extended from WordPress without touching code (`pvc_lt_glossary` option), so
- * a site can grow it as its editorial voice grows.
+ * It is a glossary-based translator. The vocabulary lives in `offline-glossary.php`,
+ * which is meant to be read and edited by a person, and a site can extend it from
+ * WordPress through the `pvc_lt_glossary` option without touching code.
  *
  * Honest limits, by design:
  * - It translates vocabulary, not prose. Word order follows the source and agreement
- *   between gender and number is not solved.
+ *   between gender and number is not solved; that is why every gender variant is written
+ *   out explicitly in the glossary instead of being guessed.
  * - Every segment reports its coverage. `pvc_lt_auto_translate()` publishes only a fully
- *   covered translation; an incomplete one stays a draft for a human and the untranslated
+ *   covered translation; an incomplete one stays a draft for a human, and the untranslated
  *   profile still shows through the locale fallback, disclosed as untranslated.
  */
 if (!defined('ABSPATH')) { exit; }
+require_once __DIR__ . '/offline-glossary.php';
 
-/** Closed vocabulary that must always be exact: spoken languages, availability and genre words. */
+/** The glossary plus whatever the site has added, with every key normalised. */
 function pvc_lt_offline_dictionary(): array {
-    $dictionary = array(
-        // Spoken languages. Stored lowercase on purpose: the source capitalisation is
-        // copied onto the translation, so a list label stays capitalised in every language.
-        'inglés' => array('en' => 'english', 'fr' => 'anglais', 'it' => 'inglese'),
-        'español' => array('en' => 'spanish', 'fr' => 'espagnol', 'it' => 'spagnolo'),
-        'italiano' => array('en' => 'italian', 'fr' => 'italien', 'it' => 'italiano'),
-        'francés' => array('en' => 'french', 'fr' => 'français', 'it' => 'francese'),
-        'alemán' => array('en' => 'german', 'fr' => 'allemand', 'it' => 'tedesco'),
-        'portugués' => array('en' => 'portuguese', 'fr' => 'portugais', 'it' => 'portoghese'),
-        'catalán' => array('en' => 'catalan', 'fr' => 'catalan', 'it' => 'catalano'),
-        'ruso' => array('en' => 'russian', 'fr' => 'russe', 'it' => 'russo'),
-        'árabe' => array('en' => 'arabic', 'fr' => 'arabe', 'it' => 'arabo'),
-        // Editorial adjectives and nouns seen in the catalogue.
-        'carismática' => array('en' => 'charismatic', 'fr' => 'charismatique', 'it' => 'carismatica'),
-        'carismático' => array('en' => 'charismatic', 'fr' => 'charismatique', 'it' => 'carismatico'),
-        'romántica' => array('en' => 'romantic', 'fr' => 'romantique', 'it' => 'romantica'),
-        'romántico' => array('en' => 'romantic', 'fr' => 'romantique', 'it' => 'romantico'),
-        'elegante' => array('en' => 'elegant', 'fr' => 'élégante', 'it' => 'elegante'),
-        'sofisticada' => array('en' => 'sophisticated', 'fr' => 'sophistiquée', 'it' => 'sofisticata'),
-        'natural' => array('en' => 'natural', 'fr' => 'naturelle', 'it' => 'naturale'),
-        'divertida' => array('en' => 'fun', 'fr' => 'amusante', 'it' => 'divertente'),
-        'simpática' => array('en' => 'friendly', 'fr' => 'sympathique', 'it' => 'simpatica'),
-        'cariñosa' => array('en' => 'affectionate', 'fr' => 'affectueuse', 'it' => 'affettuosa'),
-        'discreta' => array('en' => 'discreet', 'fr' => 'discrète', 'it' => 'discreta'),
-        'discreto' => array('en' => 'discreet', 'fr' => 'discret', 'it' => 'discreto'),
-        'sensual' => array('en' => 'sensual', 'fr' => 'sensuelle', 'it' => 'sensuale'),
-        'dulce' => array('en' => 'sweet', 'fr' => 'douce', 'it' => 'dolce'),
-        'atractiva' => array('en' => 'attractive', 'fr' => 'attrayante', 'it' => 'attraente'),
-        'guapa' => array('en' => 'beautiful', 'fr' => 'belle', 'it' => 'bella'),
-        'inteligente' => array('en' => 'intelligent', 'fr' => 'intelligente', 'it' => 'intelligente'),
-        'culta' => array('en' => 'cultured', 'fr' => 'cultivée', 'it' => 'colta'),
-        'deportista' => array('en' => 'sporty', 'fr' => 'sportive', 'it' => 'sportiva'),
-        'joven' => array('en' => 'young', 'fr' => 'jeune', 'it' => 'giovane'),
-        'madura' => array('en' => 'mature', 'fr' => 'mûre', 'it' => 'matura'),
-        'alta' => array('en' => 'tall', 'fr' => 'grande', 'it' => 'alta'),
-        'morena' => array('en' => 'brunette', 'fr' => 'brune', 'it' => 'bruna'),
-        'rubia' => array('en' => 'blonde', 'fr' => 'blonde', 'it' => 'bionda'),
-        'delgada' => array('en' => 'slim', 'fr' => 'mince', 'it' => 'snella'),
-        'refinada' => array('en' => 'refined', 'fr' => 'raffinée', 'it' => 'raffinata'),
-        'tranquila' => array('en' => 'calm', 'fr' => 'tranquille', 'it' => 'tranquilla'),
-        'independiente' => array('en' => 'independent', 'fr' => 'indépendante', 'it' => 'indipendente'),
-        // Vocabulary taken from the catalogue as it is actually written.
-        'extrovertida' => array('en' => 'extroverted', 'fr' => 'extravertie', 'it' => 'estroversa'),
-        'extrovertido' => array('en' => 'extroverted', 'fr' => 'extraverti', 'it' => 'estroverso'),
-        'espontánea' => array('en' => 'spontaneous', 'fr' => 'spontanée', 'it' => 'spontanea'),
-        'espontáneo' => array('en' => 'spontaneous', 'fr' => 'spontané', 'it' => 'spontaneo'),
-        'coqueta' => array('en' => 'flirtatious', 'fr' => 'coquette', 'it' => 'civettuola'),
-        'apasionada' => array('en' => 'passionate', 'fr' => 'passionnée', 'it' => 'appassionata'),
-        'tierna' => array('en' => 'tender', 'fr' => 'tendre', 'it' => 'dolce'),
-        'alegre' => array('en' => 'cheerful', 'fr' => 'joyeuse', 'it' => 'allegra'),
-        'activa' => array('en' => 'active', 'fr' => 'active', 'it' => 'attiva'),
-        'atrevida' => array('en' => 'daring', 'fr' => 'audacieuse', 'it' => 'audace'),
-        'juguetona' => array('en' => 'playful', 'fr' => 'joueuse', 'it' => 'giocosa'),
-        'educada' => array('en' => 'polite', 'fr' => 'polie', 'it' => 'educata'),
-        'risueña' => array('en' => 'smiling', 'fr' => 'souriante', 'it' => 'sorridente'),
-        'femenina' => array('en' => 'feminine', 'fr' => 'féminine', 'it' => 'femminile'),
-        'pelirroja' => array('en' => 'red-haired', 'fr' => 'rousse', 'it' => 'rossa'),
-        'voluptuosa' => array('en' => 'voluptuous', 'fr' => 'voluptueuse', 'it' => 'voluttuosa'),
-        'esbelta' => array('en' => 'slender', 'fr' => 'svelte', 'it' => 'slanciata'),
-        'estilosa' => array('en' => 'stylish', 'fr' => 'stylée', 'it' => 'stilosa'),
-        'divertido' => array('en' => 'fun', 'fr' => 'amusant', 'it' => 'divertente'),
-        'tímida' => array('en' => 'shy', 'fr' => 'timide', 'it' => 'timida'),
-        'reservada' => array('en' => 'reserved', 'fr' => 'réservée', 'it' => 'riservata'),
-        'seductora' => array('en' => 'seductive', 'fr' => 'séductrice', 'it' => 'seduttrice'),
-        'enigmática' => array('en' => 'enigmatic', 'fr' => 'énigmatique', 'it' => 'enigmatica'),
-        'sonrisa' => array('en' => 'smile', 'fr' => 'sourire', 'it' => 'sorriso'),
-        'mirada' => array('en' => 'gaze', 'fr' => 'regard', 'it' => 'sguardo'),
-        'voz' => array('en' => 'voice', 'fr' => 'voix', 'it' => 'voce'),
-        'cuerpo' => array('en' => 'body', 'fr' => 'corps', 'it' => 'corpo'),
-        'piel' => array('en' => 'skin', 'fr' => 'peau', 'it' => 'pelle'),
-        'ojos' => array('en' => 'eyes', 'fr' => 'yeux', 'it' => 'occhi'),
-        'cabello' => array('en' => 'hair', 'fr' => 'cheveux', 'it' => 'capelli'),
-        'griega' => array('en' => 'greek', 'fr' => 'grecque', 'it' => 'greca'),
-        'latina' => array('en' => 'latin', 'fr' => 'latine', 'it' => 'latina'),
-        'brasileña' => array('en' => 'brazilian', 'fr' => 'brésilienne', 'it' => 'brasiliana'),
-        'colombiana' => array('en' => 'colombian', 'fr' => 'colombienne', 'it' => 'colombiana'),
-        'venezolana' => array('en' => 'venezuelan', 'fr' => 'vénézuélienne', 'it' => 'venezuelana'),
-        // Masculine and neutral forms of every adjective above, plus the vocabulary the
-        // catalogue keeps adding. A gender variant missing from the glossary would turn a
-        // complete phrase into a partial one and leave the translation as a review draft.
-        'amable' => array('en' => 'kind', 'fr' => 'aimable', 'it' => 'gentile'),
-        'apasionado' => array('en' => 'passionate', 'fr' => 'passionné', 'it' => 'appassionato'),
-        'cariñoso' => array('en' => 'affectionate', 'fr' => 'affectueux', 'it' => 'affettuoso'),
-        'simpático' => array('en' => 'friendly', 'fr' => 'sympathique', 'it' => 'simpatico'),
-        'tranquilo' => array('en' => 'calm', 'fr' => 'tranquille', 'it' => 'tranquillo'),
-        'atrevido' => array('en' => 'daring', 'fr' => 'audacieux', 'it' => 'audace'),
-        'juguetón' => array('en' => 'playful', 'fr' => 'joueuse', 'it' => 'giocoso'),
-        'coqueto' => array('en' => 'flirtatious', 'fr' => 'coquet', 'it' => 'civettuolo'),
-        'tierno' => array('en' => 'tender', 'fr' => 'tendre', 'it' => 'dolce'),
-        'educado' => array('en' => 'polite', 'fr' => 'poli', 'it' => 'educato'),
-        'risueño' => array('en' => 'smiling', 'fr' => 'souriant', 'it' => 'sorridente'),
-        'femenino' => array('en' => 'feminine', 'fr' => 'féminin', 'it' => 'femminile'),
-        'tímido' => array('en' => 'shy', 'fr' => 'timide', 'it' => 'timido'),
-        'reservado' => array('en' => 'reserved', 'fr' => 'réservé', 'it' => 'riservato'),
-        'seductor' => array('en' => 'seductive', 'fr' => 'séducteur', 'it' => 'seduttore'),
-        'enigmático' => array('en' => 'enigmatic', 'fr' => 'énigmatique', 'it' => 'enigmatico'),
-        'refinado' => array('en' => 'refined', 'fr' => 'raffiné', 'it' => 'raffinato'),
-        'esbelto' => array('en' => 'slender', 'fr' => 'svelte', 'it' => 'slanciato'),
-        'estiloso' => array('en' => 'stylish', 'fr' => 'stylé', 'it' => 'stiloso'),
-        'voluptuoso' => array('en' => 'voluptuous', 'fr' => 'voluptueux', 'it' => 'voluttuoso'),
-        'delgado' => array('en' => 'slim', 'fr' => 'mince', 'it' => 'snello'),
-        'alto' => array('en' => 'tall', 'fr' => 'grand', 'it' => 'alto'),
-        'moreno' => array('en' => 'brunette', 'fr' => 'brun', 'it' => 'bruno'),
-        'rubio' => array('en' => 'blonde', 'fr' => 'blond', 'it' => 'biondo'),
-        'pelirrojo' => array('en' => 'red-haired', 'fr' => 'roux', 'it' => 'rosso'),
-        'culto' => array('en' => 'cultured', 'fr' => 'cultivé', 'it' => 'colto'),
-        'maduro' => array('en' => 'mature', 'fr' => 'mûr', 'it' => 'maturo'),
-        'guapo' => array('en' => 'handsome', 'fr' => 'beau', 'it' => 'bello'),
-        'atractivo' => array('en' => 'attractive', 'fr' => 'attrayant', 'it' => 'attraente'),
-        'sofisticado' => array('en' => 'sophisticated', 'fr' => 'sophistiqué', 'it' => 'sofisticato'),
-        'activo' => array('en' => 'active', 'fr' => 'actif', 'it' => 'attivo'),
-        'presencia' => array('en' => 'presence', 'fr' => 'présence', 'it' => 'presenza'),
-        'estilo' => array('en' => 'style', 'fr' => 'style', 'it' => 'stile'),
-        'elegancia' => array('en' => 'elegance', 'fr' => 'élégance', 'it' => 'eleganza'),
-        'belleza' => array('en' => 'beauty', 'fr' => 'beauté', 'it' => 'bellezza'),
-        'simpatía' => array('en' => 'friendliness', 'fr' => 'sympathie', 'it' => 'simpatia'),
-        'compañía' => array('en' => 'company', 'fr' => 'compagnie', 'it' => 'compagnia'),
-        'experiencia' => array('en' => 'experience', 'fr' => 'expérience', 'it' => 'esperienza'),
-        'discreción' => array('en' => 'discretion', 'fr' => 'discrétion', 'it' => 'discrezione'),
-        'exclusividad' => array('en' => 'exclusivity', 'fr' => 'exclusivité', 'it' => 'esclusività'),
-        'placer' => array('en' => 'pleasure', 'fr' => 'plaisir', 'it' => 'piacere'),
-        'lujo' => array('en' => 'luxury', 'fr' => 'luxe', 'it' => 'lusso'),
-        // Connectives that keep a sentence readable.
-        'y' => array('en' => 'and', 'fr' => 'et', 'it' => 'e'),
-        'con' => array('en' => 'with', 'fr' => 'avec', 'it' => 'con'),
-        'para' => array('en' => 'for', 'fr' => 'pour', 'it' => 'per'),
-        'muy' => array('en' => 'very', 'fr' => 'très', 'it' => 'molto'),
-        'más' => array('en' => 'more', 'fr' => 'plus', 'it' => 'più'),
-        'sin' => array('en' => 'without', 'fr' => 'sans', 'it' => 'senza'),
-        'en' => array('en' => 'in', 'fr' => 'à', 'it' => 'a'),
-    );
+    $dictionary = pvc_lt_offline_base_dictionary();
     $custom = (array) get_option('pvc_lt_glossary', array());
     foreach ($custom as $source => $targets) {
         if (!is_string($source) || !is_array($targets)) { continue; }
@@ -198,17 +70,46 @@ function pvc_lt_offline_plural(string $translated, string $target): string {
     }
     return $translated . 's';
 }
+/** Longest phrase first, so a multi-word entry wins over its single words. */
+function pvc_lt_offline_phrases(): array {
+    $phrases = array();
+    foreach (array_keys(pvc_lt_offline_dictionary()) as $key) {
+        if (strpos($key, ' ') !== false) { $phrases[$key] = true; }
+    }
+    return $phrases;
+}
 /**
  * Translates one segment. Returns the text, the share of content words it could resolve
  * and whether every one of them was resolved.
  */
 function pvc_lt_offline_translate(string $text, string $target): array {
     $dictionary = pvc_lt_offline_dictionary();
+    $phrases = pvc_lt_offline_phrases();
     $tokens = preg_split('/(\s+|[^\p{L}\p{N}]+)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-    if (!is_array($tokens)) { return array('text' => $text, 'coverage' => 0.0, 'complete' => false); }
-    $out = ''; $words = 0; $known = 0; $changed = false;
-    foreach ($tokens as $token) {
-        if (!preg_match('/^\p{L}+$/u', $token)) { $out .= $token; continue; }
+    if (!is_array($tokens)) { return array('text' => $text, 'coverage' => 0.0, 'complete' => false, 'changed' => false); }
+    $out = ''; $words = 0; $known = 0; $changed = false; $index = 0; $total = count($tokens);
+    while ($index < $total) {
+        $token = $tokens[$index];
+        if (!preg_match('/^\p{L}+$/u', $token)) { $out .= $token; ++$index; continue; }
+        // Greedy multi-word match: the longest phrase starting here wins. Only the tokens
+        // actually read are consumed, so a truncated candidate can never skip text.
+        $matched = false;
+        for ($span = 4; $span >= 2 && !$matched; $span--) {
+            $candidate = ''; $used = 0;
+            for ($offset = 0; $offset < $span * 2 - 1 && $index + $offset < $total; $offset++) { $candidate .= $tokens[$index + $offset]; ++$used; }
+            if ($used < 3) { continue; }
+            $key = pvc_lt_offline_key(trim($candidate));
+            if (isset($phrases[$key]) && isset($dictionary[$key][$target])) {
+                ++$words;
+                ++$known;
+                $rendered = pvc_lt_offline_case(trim($candidate), $dictionary[$key][$target]);
+                if ($rendered !== trim($candidate)) { $changed = true; }
+                $out .= $rendered;
+                $index += $used;
+                $matched = true;
+            }
+        }
+        if ($matched) { continue; }
         ++$words;
         $key = pvc_lt_offline_key($token);
         $hit = $dictionary[$key][$target] ?? null;
@@ -217,11 +118,12 @@ function pvc_lt_offline_translate(string $text, string $target): array {
             $base = $singular !== null ? ($dictionary[$singular][$target] ?? null) : null;
             if ($base !== null) { $hit = pvc_lt_offline_plural($base, $target); }
         }
-        if ($hit === null) { $out .= $token; continue; }
+        if ($hit === null) { $out .= $token; ++$index; continue; }
         ++$known;
         $rendered = pvc_lt_offline_case($token, $hit);
         if ($rendered !== $token) { $changed = true; }
         $out .= $rendered;
+        ++$index;
     }
     // Cast explicitly: PHP returns an int for an exact integer division, and the caller
     // compares coverage strictly.
