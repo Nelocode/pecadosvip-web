@@ -42,6 +42,7 @@ jobs:
         run: docker build --target production --tag pecadosvip-watermark-qa:${{ github.sha }} .
       - name: Contract and real GD/FFmpeg regression suites
         run: |
+          docker run --rm --entrypoint php --volume "$PWD/wordpress:/qa-src:ro" pecadosvip-watermark-qa:${{ github.sha }} /qa-src/tests/selective-translation-test.php
           docker run --rm --entrypoint php --volume "$PWD/wordpress:/qa-src:ro" pecadosvip-watermark-qa:${{ github.sha }} /qa-src/tests/profile-media-contract-test.php
           docker run --rm --entrypoint php --volume "$PWD/wordpress:/qa-src:ro" pecadosvip-watermark-qa:${{ github.sha }} /qa-src/tests/media-watermark-test.php
       - name: Verify production image tools and packaged watermark
