@@ -217,8 +217,40 @@ texto distinto del mapa en vez de adivinar. Cubierto por
 ## Traducción automática al publicar una modelo nueva
 
 `plugin/pecadosvip-content/includes/auto-translation.php`. Al publicar por primera vez un
-perfil en español que no sea Legacy, se crean solas las versiones que falten. Dos caminos,
-ambos opcionales:
+perfil en español que no sea Legacy, se crean solas las versiones que falten. **No hace
+falta abrir nada, ni claves, ni pestañas**: el traductor vive en el servidor.
+
+### Traductor propio, sin APIs ni servicios externos
+
+`plugin/pecadosvip-content/includes/offline-translation.php`. Es un traductor de glosario:
+el vocabulario editorial está empaquetado en el plugin y se amplía sin tocar código con la
+opción `pvc_lt_glossary` (español → en/fr/it).
+
+```
+ES: Carismática, romántica y elegante.
+   en: Charismatic, romantic and elegant.        [cobertura 100 %]
+   fr: Charismatique, romantique et élégante.    [cobertura 100 %]
+   it: Carismatica, romantica e elegante.        [cobertura 100 %]
+
+ES: Inglés, Español, Italiano, Francés
+   en: English, Spanish, Italian, French
+   fr: Anglais, Espagnol, Italien, Français
+   it: Inglese, Spagnolo, Italiano, Francese
+```
+
+**Límite honesto:** traduce vocabulario, no prosa. No reordena la frase ni resuelve la
+concordancia de género y número; `Presencia sofisticada y natural` sale como
+`Presence sophisticated and natural`. Por eso cada segmento informa de su **cobertura**:
+
+- cobertura completa → la traducción se publica (si la política lo permite);
+- cobertura incompleta → **nunca se publica**: queda en borrador marcada
+  `_pvc_lt_review = incomplete`, con su cobertura real en `_pvc_lt_coverage`;
+- si no se reconoce nada, no se escribe ningún registro: el perfil sigue visible con el
+  respaldo de idioma y declarado como no traducido.
+
+Nunca hace red: no hay `wp_remote_*`, ni `curl`, ni URLs. El verificador lo comprueba.
+
+### Caminos alternativos
 
 1. **Motor en servidor** (sin intervención ninguna). Configura un endpoint compatible con
    OpenAI en la opción `pvc_lt_engine` (`provider`, `endpoint`, `model`, `api_key`), o
