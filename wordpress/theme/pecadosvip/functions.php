@@ -54,7 +54,10 @@ function pvwp_context(): array {
                 $routes['/' . $locale . $suffix] = array('kind' => $kind, 'record' => $page, 'title' => $page['title'], 'description' => wp_strip_all_tags($page['excerpt'] ?? ''), 'allowed' => $kind === 'services' ? array('category' => array_values(array_unique(array_filter(array_map(static fn($s) => $s['data']['group'] ?? '', $services))))) : $allowed);
             }
             foreach (array('profile', 'service', 'city', 'page') as $type) {
-                foreach (pvc_records($type, $locale) as $record) {
+                // A profile that only exists in Spanish must still resolve in the other
+                // languages, so its route is built from the fallback-aware list.
+                $type_records = $type === 'profile' ? pvc_records_localized($type, $locale) : pvc_records($type, $locale);
+                foreach ($type_records as $record) {
                     if ($type === 'page' && in_array($record['key'], array('home', 'perfiles', 'servicios'), true)) { continue; }
                     $path = pvwp_record_path($type, $record);
                     if (!preg_match('#^[a-z0-9][a-z0-9_/-]*$#D', $path) || strpos($path, '..') !== false || in_array($path, array('perfiles', 'servicios'), true)) { continue; }

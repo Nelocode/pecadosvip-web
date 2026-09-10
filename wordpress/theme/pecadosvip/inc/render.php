@@ -14,6 +14,20 @@ function pvwp_text(string $path, array $vars = array()): string {
     return $text;
 }
 function pvwp_label(string $path, array $vars = array()): void { echo esc_html(pvwp_text($path, $vars)); }
+/**
+ * Disclosure for a record shown through the source locale because the requested locale
+ * has no version of it yet. Theme chrome in the four locales, like pvwp_error_copy().
+ */
+function pvwp_fallback_copy(): array {
+    $locale = pvwp_context()['locale'] ?? 'es';
+    $copy = array(
+        'es' => array('card' => 'Sin traducir', 'detail' => 'Este perfil todavía no está traducido a este idioma. Se muestra en español.'),
+        'en' => array('card' => 'Not translated', 'detail' => 'This profile has not been translated into this language yet. It is shown in Spanish.'),
+        'fr' => array('card' => 'Non traduit', 'detail' => 'Ce profil n’a pas encore été traduit dans cette langue. Il est affiché en espagnol.'),
+        'it' => array('card' => 'Non tradotto', 'detail' => 'Questo profilo non è ancora stato tradotto in questa lingua. Viene mostrato in spagnolo.'),
+    );
+    return $copy[$locale] ?? $copy['es'];
+}
 function pvwp_group_label(string $group): string { return pvwp_text('services.groups.' . $group . '.label') ?: $group; }
 function pvwp_tags(array $data): void {
     if (empty($data['tags'])) { return; }
@@ -55,7 +69,11 @@ function pvwp_language_url(string $locale): ?string {
         if (!pvc_record('page', $locale, $key)) { return null; }
         $suffix = $key === 'home' ? '' : $key;
     } else {
-        $record = pvc_record($kind, $locale, $route['record']['key'] ?? '');
+        // The language selector follows the same fallback as the profile listing, so a
+        // language that shows a profile through the source text is still offered.
+        $record = $kind === 'profile'
+            ? pvc_record_localized($kind, $locale, $route['record']['key'] ?? '')
+            : pvc_record($kind, $locale, $route['record']['key'] ?? '');
         if (!$record) { return null; }
         $suffix = pvwp_record_path($kind, $record);
     }
@@ -167,11 +185,11 @@ function pvwp_profile_card(array $profile): void {
     $data = $profile['data']; $href = pvwp_url('perfiles/' . $profile['key']); $names = array();
     foreach (($data['cities'] ?? array()) as $key) { $names[] = pvwp_city_label((string) $key); }
     ?><article class="pvn-profile-card" data-record-id="<?php echo (int) $profile['id']; ?>"><a class="pvn-profile-photo" href="<?php echo esc_url($href); ?>" tabindex="-1" aria-hidden="true"><?php pvwp_media($profile['image'] ?? null, '', false, '(max-width:700px) 45vw, 22vw'); ?></a>
-    <div class="pvn-profile-summary"><h3><a href="<?php echo esc_url($href); ?>"><?php echo esc_html($profile['title']); ?></a></h3><p><?php echo esc_html(implode(' · ', $names)); ?></p><small><?php pvwp_label('profilesSection.ageYears', array('age' => $data['age'] ?? '')); ?></small><p class="pvn-availability" data-status="<?php echo esc_attr($data['availability'] ?? 'on-request'); ?>"><?php pvwp_label('filters.availability.' . ($data['availability'] ?? 'on-request')); ?></p><?php if ($data['synthetic'] ?? true) { ?><span class="pvn-disclosure"><?php pvwp_label('profilesSection.cardDisclosureShort'); ?></span><?php } ?><a class="pvn-card-link" href="<?php echo esc_url($href); ?>"><?php pvwp_label('profilesSection.viewProfile'); ?> <span aria-hidden="true">→</span></a></div></article><?php
+    <div class="pvn-profile-summary"><h3><a href="<?php echo esc_url($href); ?>"><?php echo esc_html($profile['title']); ?></a></h3><p><?php echo esc_html(implode(' · ', $names)); ?></p><small><?php pvwp_label('profilesSection.ageYears', array('age' => $data['age'] ?? '')); ?></small><p class="pvn-availability" data-status="<?php echo esc_attr($data['availability'] ?? 'on-request'); ?>"><?php pvwp_label('filters.availability.' . ($data['availability'] ?? 'on-request')); ?></p><?php if ($data['synthetic'] ?? true) { ?><span class="pvn-disclosure"><?php pvwp_label('profilesSection.cardDisclosureShort'); ?></span><?php } ?><?php if (!empty($profile['fallback'])) { ?><span class="pvn-disclosure pvn-fallback-badge"><?php echo esc_html(pvwp_fallback_copy()['card']); ?></span><?php } ?><a class="pvn-card-link" href="<?php echo esc_url($href); ?>"><?php pvwp_label('profilesSection.viewProfile'); ?> <span aria-hidden="true">→</span></a></div></article><?php
 }
 function pvwp_profiles(?string $city_override = null): void {
     $context = pvwp_context(); $locale = $context['locale']; $city = $city_override ?? ($context['query']['city'] ?? ''); $availability = $context['query']['availability'] ?? '';
-    $profiles = array_values(array_filter(pvc_records('profile', $locale), static fn($p) => pvwp_profile_matches($p, $city) && ($availability === '' || ($p['data']['availability'] ?? '') === $availability)));
+    $profiles = array_values(array_filter(pvc_records_localized('profile', $locale), static fn($p) => pvwp_profile_matches($p, $city) && ($availability === '' || ($p['data']['availability'] ?? '') === $availability)));
     ?><section id="perfiles" class="pvn-section">
     <?php pvwp_section_heading(pvwp_text('profilesSection.eyebrow'), pvwp_text('profilesSection.title'), pvwp_text('profilesSection.note')); ?>
     <form class="pvn-filters" action="<?php echo esc_url(pvwp_url('perfiles')); ?>#perfiles" method="get"><fieldset><legend><?php pvwp_label('filters.legend'); ?></legend>
@@ -221,7 +239,7 @@ function pvwp_profile_videos(array $profile): void {
 function pvwp_profile(array $profile): void {
     $data = $profile['data']; $gallery = $profile['gallery'] ?? array(); if (!$gallery && !empty($profile['image'])) { $gallery = array($profile['image']); }
     $photo = pvwp_context()['query']['foto'] ?? '0'; $index = $photo === 'cover' ? 0 : (strpos($photo, 'gallery-') === 0 ? (int) substr($photo, 8) : (int) $photo); $selected = $gallery[$index] ?? ($gallery[0] ?? null);
-    ?><section class="pvn-section"><?php pvwp_breadcrumb('perfiles', pvwp_text('navigation.profiles'), $profile['title']); ?><div class="pvn-profile-detail"><div class="pvn-gallery"><figure class="pvn-gallery-main"><?php pvwp_media($selected, '', true, '(max-width:700px) 100vw, 48vw'); ?><figcaption class="pvn-disclosure"><?php pvwp_label('profile.imageGenerated'); ?></figcaption></figure><nav class="pvn-gallery-thumbs" aria-label="<?php echo esc_attr(pvwp_text('profile.galleryAria')); ?>"><?php foreach ($gallery as $i => $image) { ?><a href="<?php echo esc_url(pvwp_url('perfiles/' . $profile['key'], null, array('foto' => (string) $i))); ?>" <?php if ($i === $index) { echo 'aria-current="true"'; } ?> aria-label="<?php echo esc_attr(pvwp_text('profile.selectPhotoAria') . ' ' . ($i + 1) . ': ' . $profile['title']); ?>"><?php pvwp_media($image, '', false, '100px'); ?></a><?php } ?></nav><?php pvwp_profile_videos($profile); ?></div>
+    ?><section class="pvn-section"><?php pvwp_breadcrumb('perfiles', pvwp_text('navigation.profiles'), $profile['title']); ?><?php if (!empty($profile['fallback'])) { ?><p class="pvn-notice pvn-fallback-notice" role="status"><?php echo esc_html(pvwp_fallback_copy()['detail']); ?></p><?php } ?><div class="pvn-profile-detail"><div class="pvn-gallery"><figure class="pvn-gallery-main"><?php pvwp_media($selected, '', true, '(max-width:700px) 100vw, 48vw'); ?><figcaption class="pvn-disclosure"><?php pvwp_label('profile.imageGenerated'); ?></figcaption></figure><nav class="pvn-gallery-thumbs" aria-label="<?php echo esc_attr(pvwp_text('profile.galleryAria')); ?>"><?php foreach ($gallery as $i => $image) { ?><a href="<?php echo esc_url(pvwp_url('perfiles/' . $profile['key'], null, array('foto' => (string) $i))); ?>" <?php if ($i === $index) { echo 'aria-current="true"'; } ?> aria-label="<?php echo esc_attr(pvwp_text('profile.selectPhotoAria') . ' ' . ($i + 1) . ': ' . $profile['title']); ?>"><?php pvwp_media($image, '', false, '100px'); ?></a><?php } ?></nav><?php pvwp_profile_videos($profile); ?></div>
     <div class="pvn-profile-info"><p class="pvn-eyebrow"><?php pvwp_label('profile.statusBanner'); ?></p><h1><?php echo esc_html($profile['title']); ?></h1><p class="pvn-profile-age"><?php pvwp_label('profile.ageYears', array('age' => $data['age'] ?? '')); ?></p><div class="pvn-tags"><?php foreach (($data['cities'] ?? array()) as $key) { $href = pvwp_city_href((string) $key); if ($href !== null) { ?><a href="<?php echo esc_url($href); ?>"><?php echo esc_html(pvwp_city_label((string) $key)); ?></a><?php } else { ?><span><?php echo esc_html(pvwp_city_label((string) $key)); ?></span><?php } } ?></div><p class="pvn-availability" data-status="<?php echo esc_attr($data['availability'] ?? 'on-request'); ?>"><?php pvwp_label('profile.availability.' . ($data['availability'] ?? 'on-request')); ?></p>
     <?php if (!empty($data['height'])) { ?><p><?php echo esc_html($data['height']); ?></p><?php } pvwp_rich($profile); ?><div class="pvn-tags"><?php foreach (array_merge($data['tags'] ?? array(), $data['conceptTags'] ?? array(), $data['languages'] ?? array()) as $tag) { ?><span><?php echo esc_html($tag); ?></span><?php } ?></div>
     <aside class="pvn-notice"><p><?php pvwp_label('profile.syntheticNotice'); ?></p></aside><?php pvwp_contact_buttons(); ?></div></div>

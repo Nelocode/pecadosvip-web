@@ -63,6 +63,7 @@ try {
   if (command === 'test') {
     await run([...compose, 'run', '--rm', '-e', 'PVWP_THEME_DIR=/var/www/html/wp-content/themes/pecadosvip', '--entrypoint', 'php', 'cli', '/theme-tests/router-test.php']);
     // Pure-PHP contracts that need no WordPress bootstrap.
+    await run([...compose, 'run', '--rm', '--entrypoint', 'php', 'cli', '/theme-tests/localized-records-test.php']);
     await run([...compose, 'run', '--rm', '--entrypoint', 'php', 'cli', '/theme-tests/selective-translation-test.php']);
     await run([...compose, 'run', '--rm', '--entrypoint', 'php', 'cli', '/theme-tests/contact-legal-test.php']);
     await run([...compose, 'run', '--rm', '--entrypoint', 'php', 'cli', '/theme-tests/age-access-test.php']);

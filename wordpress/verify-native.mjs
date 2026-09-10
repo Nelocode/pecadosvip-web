@@ -151,6 +151,19 @@ assert.ok(!/age_gate/.test(await readFile(resolve(theme, 'assets/frontend.js'), 
 const themeCompliance = await readFile(resolve(theme, 'inc/contact-legal.php'), 'utf8');
 assert.ok(themeCompliance.includes("if ($missing && current_user_can('edit_posts'))"), 'The pending provider checklist must stay editor-only');
 assert.ok(themeCompliance.includes('if ($onlyWhenActive && !$report) { return; }'), 'The public footer must not announce a pending reporting channel');
+// A profile published only in Spanish must stay visible and reachable in the other
+// languages, disclosed as untranslated, while the public catalog keeps strict semantics.
+const localizedRecords = await readFile(resolve(root, 'dist/pecadosvip-content/includes/localized-records.php'), 'utf8');
+for (const contract of ['const PVC_SOURCE_LOCALE', 'function pvc_records_localized(', 'function pvc_record_localized(', 'function pvc_records_fallback_count(']) assert.ok(localizedRecords.includes(contract), `Missing locale completion contract: ${contract}`);
+assert.ok(localizedRecords.includes("$record['fallback'] = true;"), 'A completed record must be flagged as untranslated');
+const themeFunctions = await readFile(resolve(theme, 'functions.php'), 'utf8');
+assert.ok(themeFunctions.includes('pvc_records_localized($type, $locale)'), 'Profile routes must use the fallback-aware list');
+const themeRender = await readFile(resolve(theme, 'inc/render.php'), 'utf8');
+assert.ok(themeRender.includes("pvc_records_localized('profile', $locale)"), 'The profile listing must use the fallback-aware list');
+assert.ok(themeRender.includes('pvc_record_localized($kind, $locale'), 'The language selector must follow the same fallback');
+assert.ok(themeRender.includes('function pvwp_fallback_copy()'), 'The untranslated disclosure must exist');
+for (const locale of ['es', 'en', 'fr', 'it']) assert.ok(themeRender.includes(`'${locale}' => array('card' =>`), `Missing untranslated disclosure copy: ${locale}`);
+assert.ok(plugin.includes("pvc_records('profile', $locale)"), 'The public catalog must stay strictly per-locale');
 assert.ok(themeCompliance.includes("pvwp_legal_report('contact')"), 'The reporting channel must stay on the contact page');
 /**
  * Structural check for the PHP sources. This is NOT a PHP parser or a substitute for

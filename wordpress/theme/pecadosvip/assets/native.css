@@ -20,6 +20,9 @@
 @media (max-width: 700px) { .pvn-legal-identification dl { grid-template-columns: 1fr; } }
 /* Adult access is enforced on the server (inc/age-access.php) with its own neutral shell. */
 .pvn-legal-report { border: 1px dashed var(--pvn-line); padding: 1rem; margin: 1.2rem 0; }
+/* A profile shown through the source text because this locale has no version yet. */
+.pvn-fallback-badge { border-color: #b98a3a; color: #e8c474; }
+.pvn-fallback-notice { border-style: dashed; margin: 0 0 1.2rem; }
 .pvn-cookie-banner { --pvn-gold: #e8c474; --pvn-line: #ad884e45; --pvn-muted: #beb4a3; color: #eee8dc; font-family: Arial, Helvetica, sans-serif; }
 .pvn-cookie-banner .pvn-gold { background: #e8c474; color: #14100a; }
 .pvn-cookie-banner { display: none; }

@@ -221,6 +221,7 @@ add_action('rest_api_init', function() {
         $response->header('Cache-Control', 'no-store'); $response->header('X-Robots-Tag', 'noindex, nofollow'); return $response;
     }));
 });
+require_once PVC_DIR . '/includes/localized-records.php';
 require_once PVC_DIR . '/includes/media-watermark.php';
 require_once PVC_DIR . '/includes/admin.php';
 require_once PVC_DIR . '/includes/seo.php';
