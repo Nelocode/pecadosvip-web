@@ -294,3 +294,81 @@
     });
   }
 })();
+(() => {
+    'use strict';
+    const reserveBtn = document.querySelector('.pvn-reserve-btn');
+    if (!reserveBtn) return;
+
+    let userCity = null;
+
+    // Pre-fetch location
+    fetch('https://get.geojs.io/v1/ip/geo.json')
+        .then(res => res.json())
+        .then(data => {
+            const lat = parseFloat(data.latitude);
+            const lon = parseFloat(data.longitude);
+            if (!isNaN(lat) && !isNaN(lon)) {
+                const distMadrid = Math.pow(lat - 40.4168, 2) + Math.pow(lon - -3.7038, 2);
+                const distBcn = Math.pow(lat - 41.3851, 2) + Math.pow(lon - 2.1734, 2);
+                userCity = distMadrid < distBcn ? 'madrid' : 'bcn';
+            } else {
+                userCity = 'madrid'; // default
+            }
+        })
+        .catch(() => {
+            userCity = 'madrid'; // default fallback
+        });
+
+    reserveBtn.addEventListener('click', () => {
+        const city = userCity || 'madrid';
+        
+        let phone = reserveBtn.getAttribute(`data-phone-${city}`);
+        let wa = reserveBtn.getAttribute(`data-wa-${city}`);
+        let tg = reserveBtn.getAttribute(`data-tg-${city}`);
+        
+        // Fallback to the other city if this one is completely empty
+        if (!phone && !wa && !tg) {
+            const otherCity = city === 'madrid' ? 'bcn' : 'madrid';
+            phone = reserveBtn.getAttribute(`data-phone-${otherCity}`);
+            wa = reserveBtn.getAttribute(`data-wa-${otherCity}`);
+            tg = reserveBtn.getAttribute(`data-tg-${otherCity}`);
+        }
+
+        // If still empty, use defaults
+        phone = phone || '+34 000 000 000';
+        wa = wa || 'https://wa.me/34000000000';
+        tg = tg || 'https://t.me/pecadosvip';
+
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+        
+        const modal = document.createElement('div');
+        modal.style.cssText = 'background:#fff;color:#000;padding:25px;border-radius:12px;width:90%;max-width:400px;text-align:center;box-shadow:0 15px 30px rgba(0,0,0,0.5);position:relative;font-family:sans-serif;';
+        
+        modal.innerHTML = `
+            <button class="pvn-reserve-close" style="position:absolute;top:15px;right:15px;background:#fff;border:1px solid #333;color:#333;padding:5px 10px;font-weight:bold;cursor:pointer;border-radius:4px;font-size:0.9rem;">Cerrar ✖</button>
+            <h2 style="font-size:2rem;margin:35px 0 10px;color:#000;font-weight:bold;">${phone}</h2>
+            <p style="color:#666;margin-bottom:20px;font-size:1.1rem;">Contacta con nosotros</p>
+            <hr style="border:none;border-top:3px solid #ccc;margin-bottom:20px;">
+            <a href="tel:${phone}" style="display:flex;align-items:center;justify-content:center;background:#b92831;color:#fff;padding:15px;border-radius:8px;text-decoration:none;font-weight:bold;margin-bottom:12px;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">📞 Toca aquí para llamar</a>
+            <a href="${tg}" target="_blank" style="display:flex;align-items:center;justify-content:center;background:#2ca4d8;color:#fff;padding:15px;border-radius:8px;text-decoration:none;font-weight:bold;margin-bottom:12px;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">✈️ Mensaje Telegram</a>
+            <a href="${wa}" target="_blank" style="display:flex;align-items:center;justify-content:center;background:#44c152;color:#fff;padding:15px;border-radius:8px;text-decoration:none;font-weight:bold;margin-bottom:12px;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">💬 Mensaje Whatsapp</a>
+        `;
+        
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden'; // prevent background scrolling
+        
+        const closeBtn = modal.querySelector('.pvn-reserve-close');
+        closeBtn.addEventListener('click', () => {
+            overlay.remove();
+            document.body.style.overflow = '';
+        });
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+                document.body.style.overflow = '';
+            }
+        });
+    });
+})();

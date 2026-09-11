@@ -283,7 +283,20 @@ function pvwp_profile(array $profile): void {
       <div style="margin-top: 2rem;">
           <?php pvwp_rich($profile); ?>
       </div>
-      <aside class="pvn-notice"><p><?php pvwp_label('profile.syntheticNotice'); ?></p></aside><?php pvwp_contact_buttons(); ?></div></div>
+      <aside class="pvn-notice"><p><?php pvwp_label('profile.syntheticNotice'); ?></p></aside><?php pvwp_contact_buttons(); ?>
+      <!-- Sticky Reservar Button -->
+      <button type="button" class="pvn-reserve-btn" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(135, 172, 140, 0.95); color: white; border: 2px solid rgba(255,255,255,0.2); padding: 10px 24px; border-radius: 8px; font-weight: bold; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px; cursor: pointer; backdrop-filter: blur(5px);"
+          data-phone-madrid="<?php echo esc_attr($data['phoneMadrid'] ?? ''); ?>"
+          data-wa-madrid="<?php echo esc_attr($data['whatsappMadrid'] ?? ''); ?>"
+          data-tg-madrid="<?php echo esc_attr($data['telegramMadrid'] ?? ''); ?>"
+          data-phone-bcn="<?php echo esc_attr($data['phoneBarcelona'] ?? ''); ?>"
+          data-wa-bcn="<?php echo esc_attr($data['whatsappBarcelona'] ?? ''); ?>"
+          data-tg-bcn="<?php echo esc_attr($data['telegramBarcelona'] ?? ''); ?>"
+      >
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:24px; height:24px; filter: brightness(0) invert(1);" alt="WA">
+          Reservar
+      </button>
+</div></div>
       <?php pvwp_tariffs_notice(); ?>
     <?php $related = array(); foreach (($data['services'] ?? array()) as $key) { $service = pvc_record('service', pvwp_context()['locale'], $key); if ($service) { $related[] = $service; } } if ($related) { ?><section class="pvn-related"><h2><?php pvwp_label('navigation.services'); ?></h2><div class="pvn-service-grid"><?php foreach ($related as $service) { pvwp_service_card($service); } ?></div></section><?php } ?>
     <a class="pvn-button" href="<?php echo esc_url(pvwp_url('perfiles')); ?>"><?php pvwp_label('profile.backToProfiles'); ?></a></section><?php
