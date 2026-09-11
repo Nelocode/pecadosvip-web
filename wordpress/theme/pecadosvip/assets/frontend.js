@@ -228,3 +228,69 @@
     if (banner && document.body.contains(banner)) { banner.hidden = false; }
   }));
 })();
+/**
+ * 18+ Age Gate and GeoIP Block.
+ */
+(() => {
+  'use strict';
+  
+  // GeoIP Restriction logic
+  const profileContainer = document.querySelector('[data-blocked-country]');
+  if (profileContainer) {
+    const blockedCountry = profileContainer.getAttribute('data-blocked-country').toUpperCase();
+    if (blockedCountry) {
+      fetch('https://get.geojs.io/v1/ip/country.json')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.country && data.country.toUpperCase() === blockedCountry) {
+            document.body.innerHTML = `
+              <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#1a1a1a;color:#c2a77a;font-family:sans-serif;text-align:center;padding:2rem;">
+                <div>
+                  <h1 style="font-size:2rem;margin-bottom:1rem;">Perfil no disponible</h1>
+                  <p style="color:#f2f2f2;">Lo sentimos, este perfil no está disponible en tu ubicación actual por privacidad.</p>
+                </div>
+              </div>
+            `;
+          }
+        })
+        .catch(err => console.error('GeoIP lookup failed', err));
+    }
+  }
+
+  // 18+ Age Verification Modal
+  const ageKey = 'pv_age_verified';
+  const ageVerified = sessionStorage.getItem(ageKey);
+  
+  if (!ageVerified) {
+    const overlay = document.createElement('div');
+    overlay.className = 'pvn-modal-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;backdrop-filter:blur(10px);';
+    
+    const modal = document.createElement('div');
+    modal.className = 'pvn-modal';
+    modal.style.cssText = 'background:#1a1a1a;border:1px solid #c2a77a;padding:3rem;max-width:500px;border-radius:8px;color:#f2f2f2;';
+    
+    modal.innerHTML = `
+      <h2 style="color:#c2a77a;margin-bottom:1rem;font-size:1.5rem;">Confirmación de Edad</h2>
+      <p style="margin-bottom:2rem;line-height:1.5;">Debes ser mayor de 18 años para ingresar a este sitio. Al entrar confirmas tu mayoría de edad y aceptas nuestros términos y condiciones legales.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <button id="pvn-age-accept" style="background:#c2a77a;color:#000;border:none;padding:0.8rem 2rem;cursor:pointer;font-weight:bold;border-radius:4px;font-size:1rem;">Soy mayor de 18 años</button>
+        <button id="pvn-age-reject" style="background:transparent;color:#c2a77a;border:1px solid #c2a77a;padding:0.8rem 2rem;cursor:pointer;font-weight:bold;border-radius:4px;font-size:1rem;">Salir</button>
+      </div>
+    `;
+    
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+    
+    document.getElementById('pvn-age-accept').addEventListener('click', () => {
+      sessionStorage.setItem(ageKey, 'true');
+      overlay.remove();
+      document.body.style.overflow = '';
+    });
+    
+    document.getElementById('pvn-age-reject').addEventListener('click', () => {
+      window.location.href = 'https://google.com';
+    });
+  }
+})();
