@@ -241,9 +241,49 @@ function pvwp_profile(array $profile): void {
     $photo = pvwp_context()['query']['foto'] ?? '0'; $index = $photo === 'cover' ? 0 : (strpos($photo, 'gallery-') === 0 ? (int) substr($photo, 8) : (int) $photo); $selected = $gallery[$index] ?? ($gallery[0] ?? null);
     $blocked = $data['blockedCountry'] ?? '';
     ?><section class="pvn-section"><?php pvwp_breadcrumb('perfiles', pvwp_text('navigation.profiles'), $profile['title']); ?><?php if (!empty($profile['fallback'])) { ?><p class="pvn-notice pvn-fallback-notice" role="status"><?php echo esc_html(pvwp_fallback_copy()['detail']); ?></p><?php } ?><div class="pvn-profile-detail" data-blocked-country="<?php echo esc_attr($blocked); ?>"><div class="pvn-gallery"><figure class="pvn-gallery-main"><?php pvwp_media($selected, '', true, '(max-width:700px) 100vw, 48vw'); ?><figcaption class="pvn-disclosure"><?php pvwp_label('profile.imageGenerated'); ?></figcaption></figure><nav class="pvn-gallery-thumbs" aria-label="<?php echo esc_attr(pvwp_text('profile.galleryAria')); ?>"><?php foreach ($gallery as $i => $image) { ?><a href="<?php echo esc_url(pvwp_url('perfiles/' . $profile['key'], null, array('foto' => (string) $i))); ?>" <?php if ($i === $index) { echo 'aria-current="true"'; } ?> aria-label="<?php echo esc_attr(pvwp_text('profile.selectPhotoAria') . ' ' . ($i + 1) . ': ' . $profile['title']); ?>"><?php pvwp_media($image, '', false, '100px'); ?></a><?php } ?></nav><?php pvwp_profile_videos($profile); ?></div>
-    <div class="pvn-profile-info"><p class="pvn-eyebrow"><?php pvwp_label('profile.statusBanner'); ?></p><h1><?php echo esc_html($profile['title']); ?></h1><p class="pvn-profile-age"><?php pvwp_label('profile.ageYears', array('age' => $data['age'] ?? '')); ?></p><div class="pvn-tags"><?php foreach (($data['cities'] ?? array()) as $key) { $href = pvwp_city_href((string) $key); if ($href !== null) { ?><a href="<?php echo esc_url($href); ?>"><?php echo esc_html(pvwp_city_label((string) $key)); ?></a><?php } else { ?><span><?php echo esc_html(pvwp_city_label((string) $key)); ?></span><?php } } ?></div><p class="pvn-availability" data-status="<?php echo esc_attr($data['availability'] ?? 'on-request'); ?>"><?php pvwp_label('profile.availability.' . ($data['availability'] ?? 'on-request')); ?></p>
-    <?php if (!empty($data['height'])) { ?><p><?php echo esc_html($data['height']); ?></p><?php } pvwp_rich($profile); ?><div class="pvn-tags"><?php foreach (array_merge($data['tags'] ?? array(), $data['conceptTags'] ?? array(), $data['languages'] ?? array()) as $tag) { ?><span><?php echo esc_html($tag); ?></span><?php } ?></div>
-    <aside class="pvn-notice"><p><?php pvwp_label('profile.syntheticNotice'); ?></p></aside><?php pvwp_contact_buttons(); ?></div></div>
+    <div class="pvn-profile-info"><p class="pvn-eyebrow"><?php pvwp_label('profile.statusBanner'); ?></p><h1><?php echo esc_html($profile['title']); ?></h1>
+      
+      <!-- Characteristics Grid -->
+      <div class="pvn-characteristics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1.5rem 0; padding: 1.5rem; background: #1a1a1a; border: 1px solid #c2a77a; border-radius: 8px;">
+          <div style="margin-bottom: 0.5rem;">
+              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php echo pvwp_context()['locale'] === 'en' ? 'Age' : (pvwp_context()['locale'] === 'fr' ? 'Âge' : (pvwp_context()['locale'] === 'it' ? 'Età' : 'Edad')); ?></p>
+              <p style="font-weight: bold; font-size: 1.1rem; color: #c2a77a; margin: 0;"><?php pvwp_label('profile.ageYears', array('age' => $data['age'] ?? '')); ?></p>
+          </div>
+          <?php if (!empty($data['height'])) { ?>
+          <div style="margin-bottom: 0.5rem;">
+              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php echo pvwp_context()['locale'] === 'en' ? 'Height' : (pvwp_context()['locale'] === 'fr' ? 'Taille' : (pvwp_context()['locale'] === 'it' ? 'Altezza' : 'Estatura')); ?></p>
+              <p style="font-weight: bold; font-size: 1.1rem; color: #c2a77a; margin: 0;"><?php echo esc_html($data['height']); ?></p>
+          </div>
+          <?php } ?>
+          <div style="margin-bottom: 0.5rem;">
+              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php echo pvwp_context()['locale'] === 'en' ? 'City' : (pvwp_context()['locale'] === 'fr' ? 'Ville' : (pvwp_context()['locale'] === 'it' ? 'Città' : 'Ciudad')); ?></p>
+              <div style="font-weight: bold; font-size: 1.1rem; color: #c2a77a; margin: 0;">
+                  <?php 
+                  $cities_out = array();
+                  foreach (($data['cities'] ?? array()) as $key) {
+                      $cities_out[] = esc_html(pvwp_city_label((string) $key));
+                  }
+                  echo $cities_out ? implode(', ', $cities_out) : '-';
+                  ?>
+              </div>
+          </div>
+          <div style="margin-bottom: 0.5rem;">
+              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php echo pvwp_context()['locale'] === 'en' ? 'Availability' : (pvwp_context()['locale'] === 'fr' ? 'Disponibilité' : (pvwp_context()['locale'] === 'it' ? 'Disponibilità' : 'Disponibilidad')); ?></p>
+              <p style="font-weight: bold; font-size: 1.1rem; color: #c2a77a; margin: 0; text-transform: capitalize;" data-status="<?php echo esc_attr($data['availability'] ?? 'on-request'); ?>"><?php pvwp_label('profile.availability.' . ($data['availability'] ?? 'on-request')); ?></p>
+          </div>
+          <?php $all_tags = array_merge($data['tags'] ?? array(), $data['conceptTags'] ?? array(), $data['languages'] ?? array()); if (!empty($all_tags)) { ?>
+          <div style="grid-column: 1 / -1; margin-top: 0.5rem; border-top: 1px solid #333; padding-top: 1rem;">
+              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.5rem;"><?php echo pvwp_context()['locale'] === 'en' ? 'Details & Languages' : (pvwp_context()['locale'] === 'fr' ? 'Détails & Langues' : (pvwp_context()['locale'] === 'it' ? 'Dettagli & Lingue' : 'Detalles e Idiomas')); ?></p>
+              <div class="pvn-tags" style="margin: 0;">
+                  <?php foreach ($all_tags as $tag) { ?><span><?php echo esc_html($tag); ?></span><?php } ?>
+              </div>
+          </div>
+          <?php } ?>
+      </div>
+      <div style="margin-top: 2rem;">
+          <?php pvwp_rich($profile); ?>
+      </div>
+      <aside class="pvn-notice"><p><?php pvwp_label('profile.syntheticNotice'); ?></p></aside><?php pvwp_contact_buttons(); ?></div></div>
       <?php pvwp_tariffs_notice(); ?>
     <?php $related = array(); foreach (($data['services'] ?? array()) as $key) { $service = pvc_record('service', pvwp_context()['locale'], $key); if ($service) { $related[] = $service; } } if ($related) { ?><section class="pvn-related"><h2><?php pvwp_label('navigation.services'); ?></h2><div class="pvn-service-grid"><?php foreach ($related as $service) { pvwp_service_card($service); } ?></div></section><?php } ?>
     <a class="pvn-button" href="<?php echo esc_url(pvwp_url('perfiles')); ?>"><?php pvwp_label('profile.backToProfiles'); ?></a></section><?php
