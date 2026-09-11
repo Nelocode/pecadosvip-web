@@ -7,6 +7,7 @@ import { getSyntheticHeroMedia } from '../../lib/preview/synthetic-hero-media';
 import { getSyntheticServiceMedia } from '../../lib/preview/synthetic-service-media';
 import { getCatalog } from '../../lib/i18n/catalog';
 import { getContactCopy, getLegalCopy } from './compliance-copy';
+import { getWordPressServiceCopy } from './service-copy';
 import { SUPPORTED_LOCALES } from '../../lib/i18n/locales';
 import { legalDocumentKeys } from '../../lib/content/public-legal';
 import { getBetaCityMedia, getBetaDecorMedia, getBetaHeroMedia, getBetaProfileMedia, getBetaServiceMedia } from '../../lib/beta/beta-media-catalog';
@@ -61,12 +62,18 @@ export function makeSeed(media: Record<string, string>, sourceCommit: string) {
           homeZone: ['valeria','lucia','alicia'].includes(profile.slug) ? 'madrid' : 'barcelona',
           gallery: profile.media.map((asset) => image(asset.desktopUrl, asset.alt)), conceptTags: editorial.conceptTags } });
     });
+    // The WordPress site owns its service copy: the delivery must not depend on the legacy
+    // application's editorial text. Anything this module does not override keeps the shared one.
+    const ownServices = getWordPressServiceCopy(locale);
     getSyntheticServiceCatalog(locale).forEach((service, order) => {
-      const group = services.groups[service.group];
+      const sharedGroup = services.groups[service.group];
+      const ownGroup = ownServices.groups[service.group];
+      const ownService = ownServices.services[service.slug] ?? {};
       const visual = getSyntheticServiceMedia(service.mediaKey, locale, 'public-beta');
-      records.push({ type: 'service', key: service.slug, locale, title: service.name, excerpt: service.teaser,
-        content: heading(services.detail.overviewTitle) + paragraph(group.overview) + heading(services.detail.processTitle)
-          + list(services.detail.processSteps) + heading(services.detail.safeguardsTitle) + list(group.safeguards),
+      records.push({ type: 'service', key: service.slug, locale, title: ownService.name ?? service.name,
+        excerpt: ownService.teaser ?? ownGroup?.teaser ?? service.teaser,
+        content: heading(services.detail.overviewTitle) + paragraph(ownService.overview ?? ownGroup?.overview ?? sharedGroup.overview) + heading(services.detail.processTitle)
+          + list(services.detail.processSteps) + heading(services.detail.safeguardsTitle) + list(ownService.safeguards ?? ownGroup?.safeguards ?? sharedGroup.safeguards),
         image: image(visual.desktopUrl, visual.alt), order, data: { group: service.group, synthetic: true } });
     });
     syntheticCityMediaSlugs.forEach((key, order) => {
