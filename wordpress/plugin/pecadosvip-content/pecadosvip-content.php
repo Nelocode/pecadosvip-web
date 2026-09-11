@@ -36,7 +36,7 @@ function pvc_fields(string $type): array {
               'telegramMadrid' => array('label' => 'Telegram (Madrid, URL completa)', 'type' => 'string'),
               'phoneBarcelona' => array('label' => 'Teléfono (Barcelona)', 'type' => 'string'),
               'whatsappBarcelona' => array('label' => 'WhatsApp (Barcelona, URL completa)', 'type' => 'string'),
-              'telegramBarcelona' => array('label' => 'Telegram (Barcelona, URL completa)', 'type' => 'string'),,
+              'telegramBarcelona' => array('label' => 'Telegram (Barcelona, URL completa)', 'type' => 'string'),
               'videos' => array('label' => 'Vídeos del perfil', 'type' => 'array', 'items' => array('type' => 'integer'), 'control' => 'videos'),
         ),
         'pv_service' => array('group' => array('label' => 'Grupo del servicio', 'type' => 'string', 'control' => 'service-group'), 'relatedProfiles' => array('label' => 'Perfiles relacionados', 'type' => 'array', 'items' => array('type' => 'string'), 'control' => 'profiles'), 'gallery' => array('label' => 'Galería de imágenes', 'type' => 'array', 'items' => array('type' => 'integer'), 'control' => 'gallery')),
