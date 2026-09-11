@@ -244,6 +244,7 @@ function pvwp_profile(array $profile): void {
     <div class="pvn-profile-info"><p class="pvn-eyebrow"><?php pvwp_label('profile.statusBanner'); ?></p><h1><?php echo esc_html($profile['title']); ?></h1><p class="pvn-profile-age"><?php pvwp_label('profile.ageYears', array('age' => $data['age'] ?? '')); ?></p><div class="pvn-tags"><?php foreach (($data['cities'] ?? array()) as $key) { $href = pvwp_city_href((string) $key); if ($href !== null) { ?><a href="<?php echo esc_url($href); ?>"><?php echo esc_html(pvwp_city_label((string) $key)); ?></a><?php } else { ?><span><?php echo esc_html(pvwp_city_label((string) $key)); ?></span><?php } } ?></div><p class="pvn-availability" data-status="<?php echo esc_attr($data['availability'] ?? 'on-request'); ?>"><?php pvwp_label('profile.availability.' . ($data['availability'] ?? 'on-request')); ?></p>
     <?php if (!empty($data['height'])) { ?><p><?php echo esc_html($data['height']); ?></p><?php } pvwp_rich($profile); ?><div class="pvn-tags"><?php foreach (array_merge($data['tags'] ?? array(), $data['conceptTags'] ?? array(), $data['languages'] ?? array()) as $tag) { ?><span><?php echo esc_html($tag); ?></span><?php } ?></div>
     <aside class="pvn-notice"><p><?php pvwp_label('profile.syntheticNotice'); ?></p></aside><?php pvwp_contact_buttons(); ?></div></div>
+      <?php pvwp_tariffs_notice(); ?>
     <?php $related = array(); foreach (($data['services'] ?? array()) as $key) { $service = pvc_record('service', pvwp_context()['locale'], $key); if ($service) { $related[] = $service; } } if ($related) { ?><section class="pvn-related"><h2><?php pvwp_label('navigation.services'); ?></h2><div class="pvn-service-grid"><?php foreach ($related as $service) { pvwp_service_card($service); } ?></div></section><?php } ?>
     <a class="pvn-button" href="<?php echo esc_url(pvwp_url('perfiles')); ?>"><?php pvwp_label('profile.backToProfiles'); ?></a></section><?php
 }
@@ -252,7 +253,24 @@ function pvwp_service(array $service): void {
     <?php $related_profiles = array(); foreach (($service['data']['relatedProfiles'] ?? array()) as $key) { $p = pvc_record('profile', pvwp_context()['locale'], $key); if ($p) { $related_profiles[] = $p; } } if ($related_profiles) { ?><section class="pvn-related"><h2><?php pvwp_label('services.detail.profilesTitle'); ?></h2><div class="pvn-profile-track"><?php foreach ($related_profiles as $profile) { pvwp_profile_card($profile); } ?></div></section><?php } ?>
     <a class="pvn-button" href="<?php echo esc_url(pvwp_url('servicios')); ?>"><?php pvwp_label('services.detail.backToServices'); ?></a></section><?php
 }
-function pvwp_render_route(array $context): void {
+
+  function pvwp_tariffs_notice(): void {
+      $locale = pvwp_context()['locale'];
+      $texts = array(
+          'es' => array('title' => 'TARIFA DE LOS SERVICIOS', 'body' => 'Todas las acompañantes que colaboran con nosotros determinan libremente las tarifas que ofrecen por sus servicios. Le recomendamos que contacte con nosotros, la encargada le informará sobre los precios que maneja cada señorita de su interés.', 'button' => 'SOBRE LAS TARIFAS'),
+          'en' => array('title' => 'SERVICE TARIFFS', 'body' => 'All the companions who collaborate with us freely determine the rates they offer for their services. We recommend that you contact us; the manager will inform you about the prices of each lady of your interest.', 'button' => 'ABOUT TARIFFS'),
+          'fr' => array('title' => 'TARIF DES SERVICES', 'body' => 'Toutes les compagnes qui collaborent avec nous déterminent librement les tarifs qu\'elles proposent pour leurs services. Nous vous recommandons de nous contacter ; la responsable vous informera des prix de chaque demoiselle qui vous intéresse.', 'button' => 'SUR LES TARIFS'),
+          'it' => array('title' => 'TARIFFE DEI SERVIZI', 'body' => 'Tutte le accompagnatrici che collaborano con noi determinano liberamente le tariffe che offrono per i loro servizi. Ti consigliamo di contattarci; la responsabile ti informerà sui prezzi di ciascuna ragazza di tuo interesse.', 'button' => 'SULLE TARIFFE')
+      );
+      $t = $texts[$locale] ?? $texts['es'];
+      echo '<section class="pvn-section pvn-tariffs-notice" style="text-align: center; padding: 3rem 1rem; margin-top: 2rem; border-top: 1px solid #c2a77a; border-bottom: 1px solid #c2a77a; max-width: 800px; margin-left: auto; margin-right: auto; margin-bottom: 2rem;">';
+      echo '<h2 style="font-family: serif; font-style: italic; font-size: 2rem; letter-spacing: 2px; margin-bottom: 1.5rem; text-transform: uppercase; color: inherit;">' . esc_html($t['title']) . '</h2>';
+      echo '<p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; color: inherit;">' . esc_html($t['body']) . '</p>';
+      echo '<a class="pvn-button pvn-secondary" href="' . esc_url(pvwp_url('contacto')) . '" style="border: 1px solid #c2a77a; padding: 0.8rem 2rem; border-radius: 30px; text-decoration: none; color: inherit; font-size: 0.9rem; letter-spacing: 1px; display: inline-block;">' . esc_html($t['button']) . '</a>';
+      echo '</section>';
+  }
+
+  function pvwp_render_route(array $context): void {
     $kind = $context['route']['kind']; $record = $context['route']['record'] ?? array();
     if ($kind === 'home') { pvwp_hero(); if (!empty($record['content'])) { echo '<section class="pvn-section">'; pvwp_rich($record); echo '</section>'; } pvwp_coverage(); pvwp_profiles();
         echo '<section id="servicios" class="pvn-section">'; pvwp_section_heading(pvwp_text('servicesSection.eyebrow'), pvwp_text('servicesSection.title'), pvwp_text('servicesSection.body')); echo '<div class="pvn-service-grid">'; foreach (array_slice(pvc_records('service', $context['locale']), 0, 4) as $service) { pvwp_service_card($service); } echo '</div><a class="pvn-button" href="' . esc_url(pvwp_url('servicios')) . '">' . esc_html(pvwp_text('servicesSection.exploreRoutes')) . ' →</a></section>';
