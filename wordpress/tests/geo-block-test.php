@@ -125,5 +125,11 @@ check(pvc_geo_visible($blocked, 'pv_city') === $blocked, 'Cities are never restr
 check(in_array(array('pvc_records', 'pvc_geo_visible', 10, 2), $GLOBALS['pvqa_filters'], true), 'The filter is registered on pvc_records with the type argument');
 check(in_array(array('admin_menu', 10), $GLOBALS['pvqa_hooks'], true), 'The screen is registered in the administration');
 
+/* 11. The field the resolver reads must exist in the editor, or the whole feature is
+       unreachable: the resolver would read a key that nothing can ever write. */
+$plugin = (string) file_get_contents(__DIR__ . '/../plugin/pecadosvip-content/pecadosvip-content.php');
+check(str_contains($plugin, "'blockedRegions'"), 'The editor declares the field the resolver reads');
+check(preg_match("/'blockedRegions' => array\([^;]*'type' => 'array'/", $plugin) === 1, 'The declared field is a list, not a single value');
+
 geo_set(null, null, null);
 echo json_encode(array('ok' => true, 'assertions' => $checks), JSON_PRETTY_PRINT) . PHP_EOL;
