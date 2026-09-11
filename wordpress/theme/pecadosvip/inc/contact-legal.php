@@ -17,6 +17,9 @@ function pvwp_contact_label(string $channel): string {
         case 'phone': return pvwp_text('contact.channels.phone');
         case 'email': return pvwp_text('contact.channels.email');
         case 'form': return pvwp_text('contact.channels.form');
+        // The reporting channel is not an ordinary contact channel, but it is published as a
+        // button too, so it carries the same editable label as the rest instead of its slug.
+        case 'report': return pvwp_text('contact.channels.report');
     }
     return $channel;
 }
