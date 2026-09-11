@@ -267,17 +267,25 @@
     overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;backdrop-filter:blur(10px);';
     
     const modal = document.createElement('div');
-    modal.className = 'pvn-modal';
-    modal.style.cssText = 'background:#1a1a1a;border:1px solid #c2a77a;padding:3rem;max-width:500px;border-radius:8px;color:#f2f2f2;';
-    
-    modal.innerHTML = `
-      <h2 style="color:#c2a77a;margin-bottom:1rem;font-size:1.5rem;">Confirmación de Edad</h2>
-      <p style="margin-bottom:2rem;line-height:1.5;">Debes ser mayor de 18 años para ingresar a este sitio. Al entrar confirmas tu mayoría de edad y aceptas nuestros términos y condiciones legales.</p>
-      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-        <button id="pvn-age-accept" style="background:#c2a77a;color:#000;border:none;padding:0.8rem 2rem;cursor:pointer;font-weight:bold;border-radius:4px;font-size:1rem;">Soy mayor de 18 años</button>
-        <button id="pvn-age-reject" style="background:transparent;color:#c2a77a;border:1px solid #c2a77a;padding:0.8rem 2rem;cursor:pointer;font-weight:bold;border-radius:4px;font-size:1rem;">Salir</button>
-      </div>
-    `;
+        modal.style.cssText = 'background:#1a1a1a;color:#f2f2f2;padding:35px 25px;border:1px solid #c2a77a;border-radius:8px;width:90%;max-width:400px;text-align:center;box-shadow:0 15px 40px rgba(0,0,0,0.9);position:relative;font-family:sans-serif;';
+        
+        modal.innerHTML = `
+            <button class="pvn-reserve-close" style="position:absolute;top:15px;right:15px;background:transparent;border:none;color:#c2a77a;font-size:1.5rem;cursor:pointer;line-height:1;padding:5px;">✖</button>
+            <h2 style="font-size:2.2rem;margin:10px 0 5px;color:#c2a77a;font-weight:normal;font-family:serif;letter-spacing:2px;">${phone}</h2>
+            <p style="color:#888;margin-bottom:30px;font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;">Contacta con nosotros</p>
+            
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                <a href="tel:${phone}" style="display:flex;align-items:center;justify-content:center;background:#111;color:#f2f2f2;padding:15px;border:1px solid #c2a77a;border-radius:4px;text-decoration:none;text-transform:uppercase;letter-spacing:1px;font-size:0.9rem;">
+                    <span style="margin-right:10px;font-size:1.2rem;">📞</span> Toca aquí para llamar
+                </a>
+                <a href="${tg}" target="_blank" style="display:flex;align-items:center;justify-content:center;background:#111;color:#f2f2f2;padding:15px;border:1px solid #c2a77a;border-radius:4px;text-decoration:none;text-transform:uppercase;letter-spacing:1px;font-size:0.9rem;">
+                    <span style="margin-right:10px;font-size:1.2rem;">✈️</span> Mensaje Telegram
+                </a>
+                <a href="${wa}" target="_blank" style="display:flex;align-items:center;justify-content:center;background:#111;color:#f2f2f2;padding:15px;border:1px solid #c2a77a;border-radius:4px;text-decoration:none;text-transform:uppercase;letter-spacing:1px;font-size:0.9rem;">
+                    <span style="margin-right:10px;font-size:1.2rem;">💬</span> Mensaje Whatsapp
+                </a>
+            </div>
+        `;
     
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
@@ -343,16 +351,24 @@
         overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
         
         const modal = document.createElement('div');
-        modal.style.cssText = 'background:#fff;color:#000;padding:25px;border-radius:12px;width:90%;max-width:400px;text-align:center;box-shadow:0 15px 30px rgba(0,0,0,0.5);position:relative;font-family:sans-serif;';
+        modal.style.cssText = 'background:#1a1a1a;color:#f2f2f2;padding:35px 25px;border:1px solid #c2a77a;border-radius:8px;width:90%;max-width:400px;text-align:center;box-shadow:0 15px 40px rgba(0,0,0,0.9);position:relative;font-family:sans-serif;';
         
         modal.innerHTML = `
-            <button class="pvn-reserve-close" style="position:absolute;top:15px;right:15px;background:#fff;border:1px solid #333;color:#333;padding:5px 10px;font-weight:bold;cursor:pointer;border-radius:4px;font-size:0.9rem;">Cerrar ✖</button>
-            <h2 style="font-size:2rem;margin:35px 0 10px;color:#000;font-weight:bold;">${phone}</h2>
-            <p style="color:#666;margin-bottom:20px;font-size:1.1rem;">Contacta con nosotros</p>
-            <hr style="border:none;border-top:3px solid #ccc;margin-bottom:20px;">
-            <a href="tel:${phone}" style="display:flex;align-items:center;justify-content:center;background:#b92831;color:#fff;padding:15px;border-radius:8px;text-decoration:none;font-weight:bold;margin-bottom:12px;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">📞 Toca aquí para llamar</a>
-            <a href="${tg}" target="_blank" style="display:flex;align-items:center;justify-content:center;background:#2ca4d8;color:#fff;padding:15px;border-radius:8px;text-decoration:none;font-weight:bold;margin-bottom:12px;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">✈️ Mensaje Telegram</a>
-            <a href="${wa}" target="_blank" style="display:flex;align-items:center;justify-content:center;background:#44c152;color:#fff;padding:15px;border-radius:8px;text-decoration:none;font-weight:bold;margin-bottom:12px;font-size:1.1rem;box-shadow:0 3px 6px rgba(0,0,0,0.2);">💬 Mensaje Whatsapp</a>
+            <button class="pvn-reserve-close" style="position:absolute;top:15px;right:15px;background:transparent;border:none;color:#c2a77a;font-size:1.5rem;cursor:pointer;line-height:1;padding:5px;transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">✖</button>
+            <h2 style="font-size:2.2rem;margin:10px 0 5px;color:#c2a77a;font-weight:normal;font-family:serif;letter-spacing:1px;">${phone}</h2>
+            <p style="color:#888;margin-bottom:30px;font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;">Contacta con nosotros</p>
+            
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                <a href="tel:${phone}" style="display:flex;align-items:center;justify-content:center;background:#111;color:#f2f2f2;padding:15px;border:1px solid #c2a77a;border-radius:4px;text-decoration:none;text-transform:uppercase;letter-spacing:1px;font-size:0.9rem;transition: background 0.3s;" onmouseover="this.style.background='#c2a77a'; this.style.color='#000';" onmouseout="this.style.background='#111'; this.style.color='#f2f2f2';">
+                    <span style="margin-right:10px;font-size:1.2rem;">📞</span> Toca aquí para llamar
+                </a>
+                <a href="${tg}" target="_blank" style="display:flex;align-items:center;justify-content:center;background:#111;color:#f2f2f2;padding:15px;border:1px solid #c2a77a;border-radius:4px;text-decoration:none;text-transform:uppercase;letter-spacing:1px;font-size:0.9rem;transition: background 0.3s;" onmouseover="this.style.background='#c2a77a'; this.style.color='#000';" onmouseout="this.style.background='#111'; this.style.color='#f2f2f2';">
+                    <span style="margin-right:10px;font-size:1.2rem;">✈️</span> Mensaje Telegram
+                </a>
+                <a href="${wa}" target="_blank" style="display:flex;align-items:center;justify-content:center;background:#111;color:#f2f2f2;padding:15px;border:1px solid #c2a77a;border-radius:4px;text-decoration:none;text-transform:uppercase;letter-spacing:1px;font-size:0.9rem;transition: background 0.3s;" onmouseover="this.style.background='#c2a77a'; this.style.color='#000';" onmouseout="this.style.background='#111'; this.style.color='#f2f2f2';">
+                    <span style="margin-right:10px;font-size:1.2rem;">💬</span> Mensaje Whatsapp
+                </a>
+            </div>
         `;
         
         overlay.appendChild(modal);
