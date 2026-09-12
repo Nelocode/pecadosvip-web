@@ -139,5 +139,11 @@ check(!str_contains($render, "pvwp_context()['locale'] ==="), 'No public label i
 foreach (array('age', 'height', 'city', 'availability', 'tags', 'reserve') as $key) {
     check(str_contains($render, 'profileFields.' . $key), 'The template reads profileFields.' . $key . ' from the copy');
 }
+/* 9. The profile card prints what the profile has. This is a source guard, not a rendering test:
+      it pins the shape of the card so the empty paragraph cannot come back unnoticed. */
+check(str_contains($render, 'pvn-card-facts'), 'The profile card renders a facts list');
+check(str_contains($render, "pvwp_label('profileFields.languages')"), 'The card shows the languages as editable copy');
+check(str_contains($render, "pvwp_label('profileFields.features')"), 'The card shows the features as editable copy');
+check(!str_contains($render, "implode(' · ', \$names)"), 'The card no longer prints an unguarded cities paragraph');
 
 echo json_encode(array('ok' => true, 'assertions' => $checks), JSON_PRETTY_PRINT) . PHP_EOL;
