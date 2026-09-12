@@ -4,6 +4,7 @@ if (!defined('ABSPATH')) { exit; }
 require_once __DIR__ . '/inc/router.php';
 require_once __DIR__ . '/inc/render.php';
 require_once __DIR__ . '/inc/contact-legal.php';
+require_once __DIR__ . '/inc/profile-information.php';
 require_once __DIR__ . '/inc/age-access.php';
 require_once __DIR__ . '/inc/seo.php';
 

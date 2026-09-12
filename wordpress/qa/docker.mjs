@@ -73,6 +73,7 @@ try {
     await run([...compose, 'run', '--rm', '--entrypoint', 'php', 'cli', '/theme-tests/containment-policy-test.php']);
     await run([...compose, 'run', '--rm', '--entrypoint', 'php', 'cli', '/theme-tests/geo-block-test.php']);
     await run([...compose, 'run', '--rm', '--entrypoint', 'php', 'cli', '/theme-tests/contact-render-test.php']);
+    await run([...compose, 'run', '--rm', '--entrypoint', 'php', 'cli', '/theme-tests/profile-information-test.php']);
     await run([...compose, 'run', '--rm', 'cli', 'wp', 'eval-file', '/qa/cleanup.php']);
     try {
       await run([...compose, 'run', '--rm', 'cli', 'php', '/theme-tests/seo-growth-test.php']);

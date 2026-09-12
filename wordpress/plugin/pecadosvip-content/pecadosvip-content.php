@@ -2,13 +2,13 @@
 /**
  * Plugin Name: PecadosVip — Contenido editable
  * Description: Perfiles, servicios, ciudades, páginas y textos multilingües de presentación, editables en WordPress.
- * Version: 1.3.1
+ * Version: 1.3.2
  * Requires at least: 6.4
  * Requires PHP: 8.0
  * Text Domain: pecadosvip-content
  */
 if (!defined('ABSPATH')) { exit; }
-define('PVC_VERSION', '1.3.1');
+define('PVC_VERSION', '1.3.2');
 define('PVC_DIR', __DIR__);
 
 function pvc_types(): array {
@@ -234,6 +234,7 @@ add_action('rest_api_init', function() {
 require_once PVC_DIR . '/includes/localized-records.php';
 require_once PVC_DIR . '/includes/media-watermark.php';
 require_once PVC_DIR . '/includes/admin.php';
+require_once PVC_DIR . '/includes/profile-information.php';
 require_once PVC_DIR . '/includes/seo.php';
 require_once PVC_DIR . '/includes/import.php';
 require_once PVC_DIR . '/includes/copy-upgrade.php';
