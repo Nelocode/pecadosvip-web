@@ -47,6 +47,18 @@ function pvwp_context(): array { return array('locale' => 'es'); }
 function pvc_record(string $type, string $locale, string $key): ?array { return $key === 'guia-primera-vez' ? $GLOBALS['pvqa_guide'] : null; }
 function pvwp_record_path(string $type, array $record): string { return (string) ($record['path'] ?? 'guia/primera-vez'); }
 function home_url(string $path = '/'): string { return 'https://pecadosvip.com' . $path; }
+/** The booking destinations ask the same gate as the contact buttons. */
+$GLOBALS['pvqa_gate'] = array('approved' => false, 'legal' => false, 'ok' => false);
+function pvc_contact_gate(): array { return $GLOBALS['pvqa_gate']; }
+/** Mirrors the branded-host rule; the real normaliser is covered by the contact and legal suite. */
+function pvc_contact_normalize(string $channel, $value): string {
+    $value = trim((string) $value);
+    if ($value === '') { return ''; }
+    $parts = parse_url($value);
+    if (!is_array($parts) || ($parts['scheme'] ?? '') !== 'https') { return ''; }
+    $branded = array('whatsapp' => array('wa.me', 'api.whatsapp.com'), 'telegram' => array('t.me', 'telegram.me'));
+    return in_array(strtolower((string) ($parts['host'] ?? '')), $branded[$channel] ?? array(), true) ? $value : '';
+}
 
 require __DIR__ . '/../theme/pecadosvip/inc/contact-legal.php';
 
@@ -109,5 +121,16 @@ check(str_contains($html, '>Lee nuestra guía</a>'), 'The button carries its edi
 /* 6. Copy that is not loaded renders nothing, instead of a block with empty headings. */
 $GLOBALS['pvqa_copy'] = array();
 check(render_discretion() === '', 'Missing copy renders no empty block');
+
+/* 7. The booking button publishes no unapproved and no invented destination. */
+$booking = array('phoneMadrid' => '+34 600 111 222', 'whatsappMadrid' => 'https://wa.me/34600111222', 'telegramMadrid' => 'https://example.org/usuario', 'phoneBarcelona' => 'no es un telefono');
+check(pvwp_reserve_destinations($booking) === array(), 'A closed gate publishes no destination at all');
+$GLOBALS['pvqa_gate'] = array('approved' => true, 'legal' => true, 'ok' => true);
+$destinations = pvwp_reserve_destinations($booking);
+check($destinations === array('phone-madrid' => '+34 600 111 222', 'wa-madrid' => 'https://wa.me/34600111222'), 'Only valid destinations survive, keyed the way the button reads them');
+check(!isset($destinations['tg-madrid']), 'A messaging link outside the branded hosts is refused');
+check(!isset($destinations['phone-bcn']), 'A malformed phone number is refused');
+check(pvwp_reserve_destinations(array()) === array(), 'A profile with no destinations publishes none');
+check(pvwp_reserve_destinations(array('phoneMadrid' => 'https://wa.me/34000000000')) === array(), 'A URL in the phone field is not a phone number');
 
 echo json_encode(array('ok' => true, 'assertions' => $checks), JSON_PRETTY_PRINT) . PHP_EOL;

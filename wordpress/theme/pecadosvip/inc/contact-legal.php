@@ -48,6 +48,35 @@ function pvwp_discretion(): void {
     }
     echo '</section>';
 }
+/**
+ * Destinations for the per-profile booking button, or an empty list while the gate is closed.
+ *
+ * That button publishes a phone number and messaging links, so it goes through the same
+ * fail-closed gate as the contact buttons: without the explicit approval and a complete,
+ * accepted provider identification nothing is published at all. Every destination is checked
+ * with the same schema as an approved channel, so a WhatsApp or Telegram link cannot point at
+ * an unrelated domain, and an empty value stays empty instead of becoming a placeholder number.
+ */
+function pvwp_reserve_destinations(array $data): array {
+    if (!function_exists('pvc_contact_gate') || !function_exists('pvc_contact_normalize')) { return array(); }
+    $gate = pvc_contact_gate();
+    if (empty($gate['ok'])) { return array(); }
+    $destinations = array();
+    foreach (array('phone' => 'phone', 'whatsapp' => 'wa', 'telegram' => 'tg') as $channel => $prefix) {
+        foreach (array('Madrid' => 'madrid', 'Barcelona' => 'bcn') as $suffix => $city) {
+            $value = trim((string) ($data[$channel . $suffix] ?? ''));
+            if ($value === '') { continue; }
+            if ($channel === 'phone') {
+                // Stored as a plain number, because the template builds the tel: link itself.
+                if (preg_match('/^\+?[0-9][0-9 ().-]{5,24}$/u', $value) === 1) { $destinations[$prefix . '-' . $city] = $value; }
+                continue;
+            }
+            $url = pvc_contact_normalize($channel, $value);
+            if ($url !== '') { $destinations[$prefix . '-' . $city] = $url; }
+        }
+    }
+    return $destinations;
+}
 /** Renders the approved channels, or the disabled control while a gate is closed. */
 function pvwp_contact_buttons(): void {
     $channels = pvwp_contact_active();

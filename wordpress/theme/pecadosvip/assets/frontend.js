@@ -342,10 +342,9 @@
             tg = reserveBtn.getAttribute(`data-tg-${otherCity}`);
         }
 
-        // If still empty, use defaults
-        phone = phone || '+34 000 000 000';
-        wa = wa || 'https://wa.me/34000000000';
-        tg = tg || 'https://t.me/pecadosvip';
+        // Nothing is invented: the button is only rendered with an approved destination, so an
+        // empty value must stay empty instead of turning into a placeholder number.
+        if (!phone && !wa && !tg) return;
 
         const overlay = document.createElement('div');
         overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';

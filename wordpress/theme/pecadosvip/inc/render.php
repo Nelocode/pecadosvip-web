@@ -284,18 +284,16 @@ function pvwp_profile(array $profile): void {
           <?php pvwp_rich($profile); ?>
       </div>
       <aside class="pvn-notice"><p><?php pvwp_label('profile.syntheticNotice'); ?></p></aside><?php pvwp_contact_buttons(); ?>
-      <!-- Sticky Reservar Button -->
+      <?php $reserve = pvwp_reserve_destinations($data); if ($reserve) { ?>
+      <!-- Sticky booking button. It publishes a phone number and messaging links, so it appears
+           only with approved destinations and never carries a placeholder. -->
       <button type="button" class="pvn-reserve-btn" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(135, 172, 140, 0.95); color: white; border: 2px solid rgba(255,255,255,0.2); padding: 10px 24px; border-radius: 8px; font-weight: bold; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px; cursor: pointer; backdrop-filter: blur(5px);"
-          data-phone-madrid="<?php echo esc_attr($data['phoneMadrid'] ?? ''); ?>"
-          data-wa-madrid="<?php echo esc_attr($data['whatsappMadrid'] ?? ''); ?>"
-          data-tg-madrid="<?php echo esc_attr($data['telegramMadrid'] ?? ''); ?>"
-          data-phone-bcn="<?php echo esc_attr($data['phoneBarcelona'] ?? ''); ?>"
-          data-wa-bcn="<?php echo esc_attr($data['whatsappBarcelona'] ?? ''); ?>"
-          data-tg-bcn="<?php echo esc_attr($data['telegramBarcelona'] ?? ''); ?>"
+<?php foreach ($reserve as $reserve_key => $reserve_url) { echo '          data-' . esc_attr($reserve_key) . '="' . esc_attr($reserve_url) . '"' . "\n"; } ?>
       >
-          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:24px; height:24px; filter: brightness(0) invert(1);" alt="WA">
+          <svg style="width:24px;height:24px" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.62 10.79a15.149 15.149 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
           Reservar
       </button>
+      <?php } ?>
 </div></div>
       <?php pvwp_tariffs_notice(); ?>
     <?php pvwp_discretion(); ?>
