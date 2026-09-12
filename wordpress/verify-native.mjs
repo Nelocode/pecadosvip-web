@@ -24,7 +24,7 @@ assert.equal(seed.version, 1);
 assert.equal(sha(seedBytes), manifest.seedSha256);
 assert.equal(seed.sourceCommit, manifest.sourceCommit);
 assert.equal(seed.records.length, manifest.records);
-assert.equal(seed.records.length, 224, 'Unexpected initial editorial inventory');
+assert.equal(seed.records.length, 228, 'Unexpected initial editorial inventory');
 assert.deepEqual(Object.keys(seed.copy).sort(), ['en', 'es', 'fr', 'it']);
 const assets = await json(resolve(theme, 'content/media-inventory.json'));
 assert.equal(assets.length, manifest.mediaCount);
@@ -64,7 +64,7 @@ for (const record of seed.records) {
 }
 for (const locale of Object.keys(seed.copy)) {
   for (const legacy of ['profiles', 'catalog', 'metadata', 'cities', 'homeServices', 'locale']) assert.ok(!(legacy in seed.copy[locale]), `Duplicate legacy content: ${locale}:${legacy}`);
-  for (const [type, count] of Object.entries({ profile: 6, service: 34, city: 8, page: 8 })) assert.equal(counts[`${locale}:${type}`], count);
+  for (const [type, count] of Object.entries({ profile: 6, service: 34, city: 8, page: 9 })) assert.equal(counts[`${locale}:${type}`], count);
   for (const key of ['logo', 'icon', 'hero', 'mosaic']) media(seed.copy[locale].site[key]);
   assert.ok(seed.copy[locale].nativeUi.previous && seed.copy[locale].nativeUi.close);
 }
