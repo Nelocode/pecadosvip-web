@@ -9,6 +9,7 @@ import { getCatalog } from '../../lib/i18n/catalog';
 import { getContactCopy, getDiscretionCopy, getLegalCopy, getProfileFieldsCopy } from './compliance-copy';
 import { getWordPressServiceCopy } from './service-copy';
 import { getGuideCopy } from './guide';
+import { getFaqCopy } from './faq';
 import { SUPPORTED_LOCALES } from '../../lib/i18n/locales';
 import { legalDocumentKeys } from '../../lib/content/public-legal';
 import { getBetaCityMedia, getBetaDecorMedia, getBetaHeroMedia, getBetaProfileMedia, getBetaServiceMedia } from '../../lib/beta/beta-media-catalog';
@@ -98,6 +99,11 @@ export function makeSeed(media: Record<string, string>, sourceCommit: string) {
       content: paragraph(guide.lead) + guide.sections.map((section) => heading(section.heading) + paragraph(section.body)).join('')
         + heading(guide.limitsHeading) + list(guide.limits) + paragraph(guide.closing),
       excerpt: guide.lead, order: 0, data: { kind: 'information', route: 'guia/primera-vez' } });
+    // The frequently asked questions, also an ordinary page so an editor can rewrite them.
+    const faq = getFaqCopy(locale);
+    records.push({ type: 'page', key: 'faq', locale, title: faq.title,
+      content: paragraph(faq.lead) + faq.entries.map((entry) => heading(entry.question) + paragraph(entry.answer)).join(''),
+      excerpt: faq.lead, order: 0, data: { kind: 'information', route: 'faq' } });
   }
   return { version:1,sourceCommit,mode:'native-editable-wordpress',productionActivation:false,copy,records };
 }

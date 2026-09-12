@@ -44,9 +44,9 @@ foreach ($qa_seed_document['records'] as $qa_seed_record) {
     $qa_seed_identities[$qa_identity] = (int) $qa_ids[0];
     $qa_expected_counts[$qa_seed_record['locale']][$qa_seed_record['type']] = ($qa_expected_counts[$qa_seed_record['locale']][$qa_seed_record['type']] ?? 0) + 1;
 }
-$qa_assert(count($qa_seed_identities) === 228, 'The complete initial seed must contain 228 identities.');
+$qa_assert(count($qa_seed_identities) === 232, 'The complete initial seed must contain 232 identities.');
 foreach (array_keys(pvc_locales()) as $qa_locale) {
-    foreach (array('profile' => 6, 'service' => 34, 'city' => 8, 'page' => 9) as $qa_type => $qa_expected) {
+    foreach (array('profile' => 6, 'service' => 34, 'city' => 8, 'page' => 10) as $qa_type => $qa_expected) {
         $qa_assert(($qa_expected_counts[$qa_locale][$qa_type] ?? 0) === $qa_expected, 'Initial seed identity count mismatch: ' . $qa_locale . '/' . $qa_type);
     }
 }
@@ -67,7 +67,7 @@ try {
     $qa_reimport = pvc_import_seed($qa_seed_path);
     $qa_assert(!is_wp_error($qa_reimport), 'Repeat seed import returned WP_Error.');
     $qa_assert(is_array($qa_reimport) && empty($qa_reimport['errors']) && ($qa_reimport['complete'] ?? false) === true, 'Repeat import was incomplete or contained errors.');
-    $qa_assert(($qa_reimport['created'] ?? -1) === 0 && ($qa_reimport['skipped'] ?? -1) === 228 && ($qa_reimport['total'] ?? -1) === 228, 'Repeat import must skip all 228 existing identities and create none.');
+    $qa_assert(($qa_reimport['created'] ?? -1) === 0 && ($qa_reimport['skipped'] ?? -1) === 232 && ($qa_reimport['total'] ?? -1) === 232, 'Repeat import must skip all 232 existing identities and create none.');
     $qa_assert(get_post_field('post_title', $qa_existing_id, 'raw') === $qa_reimport_title, 'Repeat import overwrote a title edited in WordPress.');
     $qa_assert(pvc_copy('es')['hero']['titlePrimary'] === $qa_reimport_copy, 'Repeat import overwrote a WordPress text override.');
 } finally {
@@ -75,7 +75,7 @@ try {
     if ($qa_existing_override === null) { delete_option('pvc_copy_es'); }
     else { update_option('pvc_copy_es', $qa_existing_override, false); }
 }
-WP_CLI::success('All 228 seed identities exist; repeat import skips them and preserves edited content and copy.');
+WP_CLI::success('All 232 seed identities exist; repeat import skips them and preserves edited content and copy.');
 $qa_fixture = array('posts' => array(), 'attachments' => array(), 'originalCopy' => array(), 'seedRoutes' => array(), 'seedMedia' => array(), 'published' => array(), 'hidden' => array());
 $qa_seed_counts = array();
 foreach (array_keys(pvc_locales()) as $qa_locale) {
