@@ -104,7 +104,7 @@ export function makeSeed(media: Record<string, string>, sourceCommit: string) {
     // The frequently asked questions, also an ordinary page so an editor can rewrite them.
     const faq = getFaqCopy(locale);
     records.push({ type: 'page', key: 'faq', locale, title: faq.title,
-      content: paragraph(faq.lead) + faq.entries.map((entry) => heading(entry.question) + paragraph(entry.answer)).join(''),
+      content: paragraph(faq.lead) + faq.entries.map((entry) => heading(entry.question) + paragraph(entry.answer)).join('') + heading(faq.notesHeading) + list(faq.notes),
       excerpt: faq.lead, order: 0, data: { kind: 'information', route: 'faq' } });
   }
   return { version:1,sourceCommit,mode:'native-editable-wordpress',productionActivation:false,copy,records };
