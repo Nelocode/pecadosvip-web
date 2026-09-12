@@ -79,6 +79,20 @@ export const contactCopy = {
 } as const satisfies Readonly<Record<Locale, unknown>>;
 
 /**
+ * Labels for the profile attributes grid and the booking button.
+ *
+ * They used to be written into the template as per-locale ternaries, which meant the panel could
+ * not edit them and a language could not be corrected without a release. They are copy now, like
+ * every other public string.
+ */
+export const profileFieldsCopy = {
+  es: { age: 'Edad', height: 'Estatura', city: 'Ciudad', availability: 'Disponibilidad', tags: 'Detalles e idiomas', reserve: 'Reservar' },
+  en: { age: 'Age', height: 'Height', city: 'City', availability: 'Availability', tags: 'Details and languages', reserve: 'Book' },
+  fr: { age: 'Âge', height: 'Taille', city: 'Ville', availability: 'Disponibilité', tags: 'Détails et langues', reserve: 'Réserver' },
+  it: { age: 'Età', height: 'Altezza', city: 'Città', availability: 'Disponibilità', tags: 'Dettagli e lingue', reserve: 'Prenota' },
+};
+
+/**
  * Discretion block published on every profile.
  *
  * It is written for this business specifically: the site has no premises, so everything happens
@@ -369,4 +383,5 @@ export const legalCopy = {
 
 export function getContactCopy(locale: Locale) { return contactCopy[locale]; }
 export function getDiscretionCopy(locale: Locale) { return discretionCopy[locale]; }
+export function getProfileFieldsCopy(locale: Locale) { return profileFieldsCopy[locale]; }
 export function getLegalCopy(locale: Locale) { return legalCopy[locale]; }

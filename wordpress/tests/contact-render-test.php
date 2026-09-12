@@ -133,4 +133,11 @@ check(!isset($destinations['phone-bcn']), 'A malformed phone number is refused')
 check(pvwp_reserve_destinations(array()) === array(), 'A profile with no destinations publishes none');
 check(pvwp_reserve_destinations(array('phoneMadrid' => 'https://wa.me/34000000000')) === array(), 'A URL in the phone field is not a phone number');
 
+/* 8. Public labels live in the editable copy, never in per-locale ternaries in the template. */
+$render = (string) file_get_contents(__DIR__ . '/../theme/pecadosvip/inc/render.php');
+check(!str_contains($render, "pvwp_context()['locale'] ==="), 'No public label is written as a per-locale ternary');
+foreach (array('age', 'height', 'city', 'availability', 'tags', 'reserve') as $key) {
+    check(str_contains($render, 'profileFields.' . $key), 'The template reads profileFields.' . $key . ' from the copy');
+}
+
 echo json_encode(array('ok' => true, 'assertions' => $checks), JSON_PRETTY_PRINT) . PHP_EOL;

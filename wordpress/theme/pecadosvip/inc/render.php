@@ -246,17 +246,17 @@ function pvwp_profile(array $profile): void {
       <!-- Characteristics Grid -->
       <div class="pvn-characteristics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1.5rem 0; padding: 1.5rem; background: #1a1a1a; border: 1px solid #c2a77a; border-radius: 8px;">
           <div style="margin-bottom: 0.5rem;">
-              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php echo pvwp_context()['locale'] === 'en' ? 'Age' : (pvwp_context()['locale'] === 'fr' ? 'Âge' : (pvwp_context()['locale'] === 'it' ? 'Età' : 'Edad')); ?></p>
+              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php pvwp_label('profileFields.age'); ?></p>
               <p style="font-weight: bold; font-size: 1.1rem; color: #c2a77a; margin: 0;"><?php pvwp_label('profile.ageYears', array('age' => $data['age'] ?? '')); ?></p>
           </div>
           <?php if (!empty($data['height'])) { ?>
           <div style="margin-bottom: 0.5rem;">
-              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php echo pvwp_context()['locale'] === 'en' ? 'Height' : (pvwp_context()['locale'] === 'fr' ? 'Taille' : (pvwp_context()['locale'] === 'it' ? 'Altezza' : 'Estatura')); ?></p>
+              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php pvwp_label('profileFields.height'); ?></p>
               <p style="font-weight: bold; font-size: 1.1rem; color: #c2a77a; margin: 0;"><?php echo esc_html($data['height']); ?></p>
           </div>
           <?php } ?>
           <div style="margin-bottom: 0.5rem;">
-              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php echo pvwp_context()['locale'] === 'en' ? 'City' : (pvwp_context()['locale'] === 'fr' ? 'Ville' : (pvwp_context()['locale'] === 'it' ? 'Città' : 'Ciudad')); ?></p>
+              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php pvwp_label('profileFields.city'); ?></p>
               <div style="font-weight: bold; font-size: 1.1rem; color: #c2a77a; margin: 0;">
                   <?php 
                   $cities_out = array();
@@ -268,12 +268,12 @@ function pvwp_profile(array $profile): void {
               </div>
           </div>
           <div style="margin-bottom: 0.5rem;">
-              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php echo pvwp_context()['locale'] === 'en' ? 'Availability' : (pvwp_context()['locale'] === 'fr' ? 'Disponibilité' : (pvwp_context()['locale'] === 'it' ? 'Disponibilità' : 'Disponibilidad')); ?></p>
+              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.2rem;"><?php pvwp_label('profileFields.availability'); ?></p>
               <p style="font-weight: bold; font-size: 1.1rem; color: #c2a77a; margin: 0; text-transform: capitalize;" data-status="<?php echo esc_attr($data['availability'] ?? 'on-request'); ?>"><?php pvwp_label('profile.availability.' . ($data['availability'] ?? 'on-request')); ?></p>
           </div>
           <?php $all_tags = array_merge($data['tags'] ?? array(), $data['conceptTags'] ?? array(), $data['languages'] ?? array()); if (!empty($all_tags)) { ?>
           <div style="grid-column: 1 / -1; margin-top: 0.5rem; border-top: 1px solid #333; padding-top: 1rem;">
-              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.5rem;"><?php echo pvwp_context()['locale'] === 'en' ? 'Details & Languages' : (pvwp_context()['locale'] === 'fr' ? 'Détails & Langues' : (pvwp_context()['locale'] === 'it' ? 'Dettagli & Lingue' : 'Detalles e Idiomas')); ?></p>
+              <p style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.5rem;"><?php pvwp_label('profileFields.tags'); ?></p>
               <div class="pvn-tags" style="margin: 0;">
                   <?php foreach ($all_tags as $tag) { ?><span><?php echo esc_html($tag); ?></span><?php } ?>
               </div>
@@ -291,7 +291,7 @@ function pvwp_profile(array $profile): void {
 <?php foreach ($reserve as $reserve_key => $reserve_url) { echo '          data-' . esc_attr($reserve_key) . '="' . esc_attr($reserve_url) . '"' . "\n"; } ?>
       >
           <svg style="width:24px;height:24px" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.62 10.79a15.149 15.149 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-          Reservar
+          <?php pvwp_label('profileFields.reserve'); ?>
       </button>
       <?php } ?>
 </div></div>
