@@ -164,6 +164,12 @@
 .pvn-service-copy .pvn-card-link { margin-top: auto; }
 .pvn-page-intro { padding-bottom: 1rem; }
 .pvn-page-intro > p { max-width: 900px; color: #c8bba5; }
+/* Profile card facts: what each model actually declares, never an empty line. */
+.pvn-card-where { color: #d1b779; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; margin: .2rem 0 .45rem; }
+.pvn-card-facts { list-style: none; padding: 0; margin: .4rem 0; display: flex; flex-wrap: wrap; gap: .3rem 1rem; }
+.pvn-card-facts li { font-size: .78rem; color: #c0b69f; }
+.pvn-card-label { color: #8d8474; text-transform: uppercase; font-size: .62rem; letter-spacing: .07em; margin-right: .25rem; }
+.pvn-card-features { font-size: .75rem; color: #bfb7a7; margin: .3rem 0 .55rem; }
 /* Discretion block and its guide button, published under every profile. */
 .pvn-discretion { border-top: 1px solid var(--pvn-line); }
 .pvn-discretion > p { max-width: 70ch; color: #c0b69f; font-size: .9rem; }

@@ -86,10 +86,10 @@ export const contactCopy = {
  * every other public string.
  */
 export const profileFieldsCopy = {
-  es: { age: 'Edad', height: 'Estatura', city: 'Ciudad', availability: 'Disponibilidad', tags: 'Detalles e idiomas', reserve: 'Reservar' },
-  en: { age: 'Age', height: 'Height', city: 'City', availability: 'Availability', tags: 'Details and languages', reserve: 'Book' },
-  fr: { age: 'Âge', height: 'Taille', city: 'Ville', availability: 'Disponibilité', tags: 'Détails et langues', reserve: 'Réserver' },
-  it: { age: 'Età', height: 'Altezza', city: 'Città', availability: 'Disponibilità', tags: 'Dettagli e lingue', reserve: 'Prenota' },
+  es: { age: 'Edad', height: 'Estatura', city: 'Ciudad', languages: 'Idiomas', features: 'Características', availability: 'Disponibilidad', tags: 'Detalles e idiomas', reserve: 'Reservar' },
+  en: { age: 'Age', height: 'Height', city: 'City', languages: 'Languages', features: 'Features', availability: 'Availability', tags: 'Details and languages', reserve: 'Book' },
+  fr: { age: 'Âge', height: 'Taille', city: 'Ville', languages: 'Langues', features: 'Caractéristiques', availability: 'Disponibilité', tags: 'Détails et langues', reserve: 'Réserver' },
+  it: { age: 'Età', height: 'Altezza', city: 'Città', languages: 'Lingue', features: 'Caratteristiche', availability: 'Disponibilità', tags: 'Dettagli e lingue', reserve: 'Prenota' },
 };
 
 /**
