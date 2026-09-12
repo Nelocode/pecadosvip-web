@@ -11,6 +11,7 @@ import { getWordPressServiceCopy } from './service-copy';
 import { getGuideCopy } from './guide';
 import { getFaqCopy } from './faq';
 import { getRulesCopy } from './rules';
+import { getHygieneCopy } from './hygiene';
 import { SUPPORTED_LOCALES } from '../../lib/i18n/locales';
 import { legalDocumentKeys } from '../../lib/content/public-legal';
 import { getBetaCityMedia, getBetaDecorMedia, getBetaHeroMedia, getBetaProfileMedia, getBetaServiceMedia } from '../../lib/beta/beta-media-catalog';
@@ -97,9 +98,10 @@ export function makeSeed(media: Record<string, string>, sourceCommit: string) {
     // The first-time guide, published as an ordinary page so an editor can rewrite it later.
     const guide = getGuideCopy(locale);
     const rules = getRulesCopy(locale);
+    const hygiene = getHygieneCopy(locale);
     records.push({ type: 'page', key: 'guia-primera-vez', locale, title: guide.title,
       content: paragraph(guide.lead) + guide.sections.map((section) => heading(section.heading) + paragraph(section.body)).join('')
-        + heading(guide.limitsHeading) + list(guide.limits) + heading(rules.heading) + list(rules.items) + paragraph(guide.closing),
+        + heading(guide.limitsHeading) + list(guide.limits) + heading(rules.heading) + list(rules.items) + heading(hygiene.heading) + list(hygiene.items) + paragraph(guide.closing),
       excerpt: guide.lead, order: 0, data: { kind: 'information', route: 'guia/primera-vez' } });
     // The frequently asked questions, also an ordinary page so an editor can rewrite them.
     const faq = getFaqCopy(locale);
