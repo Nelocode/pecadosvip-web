@@ -15,7 +15,7 @@ function pvc_profile_information_sanitize($raw): array {
         $block['enabled'] = in_array($input['enabled'] ?? false, array(true, 1, '1'), true);
         foreach (array('title', 'body', 'buttonLabel', 'pageKey') as $field) {
             if (!is_string($input[$field] ?? null)) { continue; }
-            $block[$field] = $field === 'body' ? sanitize_textarea_field($input[$field]) : ($field === 'pageKey' ? sanitize_key($input[$field]) : sanitize_text_field($input[$field]));
+            $block[$field] = $field === 'body' ? sanitize_textarea_field($input[$field]) : ($field === 'pageKey' ? (preg_match('/^wp:[1-9][0-9]*$/D', $input[$field]) ? $input[$field] : sanitize_key($input[$field])) : sanitize_text_field($input[$field]));
         }
     }
     unset($block);
@@ -25,15 +25,50 @@ function pvc_profile_information(string $locale): array {
     if (!isset(pvc_locales()[$locale])) { return array(); }
     return pvc_profile_information_sanitize(get_option('pvc_profile_information_' . $locale, array()));
 }
+/** Standard pages keep WordPress permalinks; their IDs cannot collide with legacy pv_key values. */
+function pvc_profile_information_wp_page(int $id): ?array {
+    if ($id < 1) { return null; }
+    $post = get_post($id);
+    if (!$post || $post->post_type !== 'page' || $post->post_status !== 'publish' || $post->post_password !== '') { return null; }
+    $url = get_permalink($post);
+    if (!is_string($url) || !preg_match('#^https?://#i', $url)) { return null; }
+    return array('key' => 'wp:' . $id, 'title' => get_the_title($post), 'url' => $url, 'source' => 'wordpress');
+}
+function pvc_profile_information_native_page(array $page, string $locale): ?array {
+    $path = pvc_suffix('pv_page', $page['key'], $page['data']);
+    if (($path === '' && ($page['data']['kind'] ?? '') !== 'home') || ($path !== '' && (!preg_match('#^[a-z0-9]+(?:[-/][a-z0-9]+)*$#D', $path) || preg_match('#^(wp-|api(?:/|$)|es(?:/|$)|en(?:/|$)|fr(?:/|$)|it(?:/|$))#', $path)))) { return null; }
+    return array('key' => $page['key'], 'title' => $page['title'], 'url' => home_url('/' . $locale . ($path !== '' ? '/' . $path : '')), 'source' => 'pecadosvip');
+}
+/** Resolve at render time too, so an unpublished destination never leaves a public button. */
+function pvc_profile_information_destination(string $key, string $locale): ?array {
+    if (!isset(pvc_locales()[$locale])) { return null; }
+    if (preg_match('/^wp:([1-9][0-9]*)$/D', $key, $match)) {
+        $id = (int) $match[1];
+        return (string) $id === $match[1] ? pvc_profile_information_wp_page($id) : null;
+    }
+    $page = pvc_record('page', $locale, $key);
+    return $page ? pvc_profile_information_native_page($page, $locale) : null;
+}
+function pvc_profile_information_pages(string $locale): array {
+    if (!isset(pvc_locales()[$locale])) { return array(); }
+    $pages = array();
+    // Standard WordPress pages have no pv_locale. The editor chooses their language manually.
+    foreach (get_posts(array('post_type' => 'page', 'post_status' => 'publish', 'has_password' => false, 'posts_per_page' => -1, 'orderby' => array('title' => 'ASC', 'ID' => 'ASC'), 'suppress_filters' => false)) as $post) {
+        $destination = pvc_profile_information_wp_page((int) $post->ID);
+        if ($destination) { $pages[$destination['key']] = $destination; }
+    }
+    foreach (pvc_records('page', $locale) as $page) {
+        $destination = pvc_profile_information_native_page($page, $locale);
+        if ($destination) { $pages[$destination['key']] = $destination; }
+    }
+    return $pages;
+}
 function pvc_profile_information_admin(): void {
     if (!current_user_can('manage_options')) { return; }
     $locale = sanitize_key(wp_unslash($_GET['lang'] ?? 'es'));
     if (!isset(pvc_locales()[$locale])) { $locale = 'es'; }
     $blocks = pvc_profile_information($locale);
-    $pages = array();
-    foreach (pvc_records('page', $locale) as $page) {
-        if (in_array($page['data']['kind'] ?? '', array('information', 'about', 'legal'), true)) { $pages[$page['key']] = $page['title']; }
-    }
+    $pages = pvc_profile_information_pages($locale);
     echo '<div class="wrap pvc-admin"><h1>Bloques informativos del perfil</h1><p>Estos tres espacios se comparten entre todas las páginas individuales de perfiles, también las que crees después. Cada idioma tiene sus propios textos.</p><p>Escribe tu contenido, elige una página si quieres un botón y marca «Mostrar este bloque». Los espacios vacíos o desactivados no aparecen en la web. Los bloques existentes de otras secciones se conservan.</p><nav class="nav-tab-wrapper">';
     foreach (pvc_locales() as $code => $label) {
         echo '<a class="nav-tab ' . ($code === $locale ? 'nav-tab-active' : '') . '" href="' . esc_url(add_query_arg(array('page' => 'pvc-profile-information', 'lang' => $code), admin_url('admin.php'))) . '">' . esc_html($label) . '</a>';
@@ -49,12 +84,20 @@ function pvc_profile_information_admin(): void {
         echo '<p><label for="' . esc_attr($id . '-title') . '"><strong>Título</strong></label><br><input class="large-text" id="' . esc_attr($id . '-title') . '" name="' . esc_attr($prefix . '[title]') . '" value="' . esc_attr($block['title']) . '"></p>';
         echo '<p><label for="' . esc_attr($id . '-body') . '"><strong>Texto</strong></label><br><textarea class="large-text" rows="6" id="' . esc_attr($id . '-body') . '" name="' . esc_attr($prefix . '[body]') . '">' . esc_textarea($block['body']) . '</textarea><span class="description">Texto plano. Se conservan los saltos de línea.</span></p>';
         echo '<p><label for="' . esc_attr($id . '-button') . '"><strong>Texto del botón (opcional)</strong></label><br><input class="regular-text" id="' . esc_attr($id . '-button') . '" name="' . esc_attr($prefix . '[buttonLabel]') . '" value="' . esc_attr($block['buttonLabel']) . '" placeholder="LEE NUESTRA GUÍA"></p>';
-        echo '<p><label for="' . esc_attr($id . '-page') . '"><strong>Página de destino (opcional)</strong></label><br><select id="' . esc_attr($id . '-page') . '" name="' . esc_attr($prefix . '[pageKey]') . '"><option value="">Sin enlace</option>';
+        echo '<p><label for="' . esc_attr($id . '-page') . '"><strong>Página de destino (opcional)</strong></label><br><select style="width:100%;max-width:60rem" id="' . esc_attr($id . '-page') . '" name="' . esc_attr($prefix . '[pageKey]') . '"><option value="">Sin enlace</option>';
         if ($block['pageKey'] !== '' && !isset($pages[$block['pageKey']])) {
-            echo '<option value="' . esc_attr($block['pageKey']) . '" selected>Página no disponible en este idioma</option>';
+            echo '<option value="' . esc_attr($block['pageKey']) . '" selected>Página no disponible · ' . esc_html($block['pageKey']) . '</option>';
         }
-        foreach ($pages as $key => $title) { echo '<option value="' . esc_attr($key) . '" ' . selected($block['pageKey'], $key, false) . '>' . esc_html($title) . '</option>'; }
-        echo '</select><br><span class="description">Solo páginas informativas publicadas en este idioma. El botón necesita texto y una página disponible. Puedes preparar páginas desde «Páginas de la web».</span></p></fieldset><hr>';
+        foreach (array('wordpress' => 'Páginas de WordPress', 'pecadosvip' => 'Páginas de PecadosVip · ' . pvc_locales()[$locale]) as $source => $group) {
+            echo '<optgroup label="' . esc_attr($group) . '">';
+            foreach ($pages as $key => $page) {
+                if ($page['source'] !== $source) { continue; }
+                $label = (trim($page['title']) !== '' ? $page['title'] : '(Sin título)') . ' — ' . $page['url'];
+                echo '<option value="' . esc_attr($key) . '" ' . selected($block['pageKey'], $key, false) . '>' . esc_html($label) . '</option>';
+            }
+            echo '</optgroup>';
+        }
+        echo '</select><br><span class="description">Puedes elegir páginas publicadas desde «Páginas» de WordPress o «Páginas de la web» de PecadosVip. Las de PecadosVip corresponden a este idioma; para las de WordPress, elige la versión que necesites. El botón necesita texto y una página pública sin contraseña.</span></p></fieldset><hr>';
     }
     submit_button('Guardar bloques de este idioma'); echo '</form></div>';
 }

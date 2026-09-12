@@ -8,15 +8,9 @@ function pvwp_profile_information(): void {
     foreach (pvc_profile_information($locale) as $slot => $block) {
         if (empty($block['enabled'])) { continue; }
         $title = trim($block['title']); $body = trim($block['body']); $label = trim($block['buttonLabel']); $url = '';
-        if ($label !== '' && $block['pageKey'] !== '' && function_exists('pvc_record')) {
-            // pvc_record only returns published records in this exact language.
-            $page = pvc_record('page', $locale, $block['pageKey']);
-            if ($page && in_array($page['data']['kind'] ?? '', array('information', 'about', 'legal'), true)) {
-                $path = pvwp_record_path('page', $page);
-                if (preg_match('#^[a-z0-9]+(?:[-/][a-z0-9]+)*$#D', $path) && !preg_match('#^(wp-|api(?:/|$)|es(?:/|$)|en(?:/|$)|fr(?:/|$)|it(?:/|$)|perfiles(?:/|$)|servicios(?:/|$))#', $path)) {
-                    $url = home_url('/' . $locale . '/' . $path);
-                }
-            }
+        if ($label !== '' && $block['pageKey'] !== '' && function_exists('pvc_profile_information_destination')) {
+            $page = pvc_profile_information_destination($block['pageKey'], $locale);
+            if ($page) { $url = $page['url']; }
         }
         if ($title === '' && $body === '' && $url === '') { continue; }
         echo '<div class="pvn-profile-information" data-information-slot="' . esc_attr($slot) . '">';

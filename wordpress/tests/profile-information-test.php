@@ -7,6 +7,9 @@ $optionReads = array();
 $optionWrites = array();
 $recordReads = array();
 $pages = array();
+$wordpressPages = array();
+$wordpressQueries = array();
+$wordpressReads = array();
 $locale = 'es';
 $hooks = array();
 $canManage = true;
@@ -55,6 +58,21 @@ function rest_sanitize_boolean($value): bool {
 function esc_html($value): string { return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 function esc_attr($value): string { return esc_html($value); }
 function esc_url($value): string { return esc_html($value); }
+function esc_textarea($value): string { return esc_html($value); }
+function admin_url(string $path = ''): string { return 'https://example.test/wp-admin/' . $path; }
+function add_query_arg(array $values, string $url): string { return $url . '?' . http_build_query($values); }
+function wp_nonce_field($action, $name): void { echo '<input name="' . esc_attr($name) . '" value="test-nonce">'; }
+function selected($selected, $current = true, $display = true): string {
+    $html = (string) $selected === (string) $current ? 'selected="selected"' : '';
+    if ($display) { echo $html; }
+    return $html;
+}
+function checked($checked, $current = true, $display = true): string {
+    $html = (string) $checked === (string) $current ? 'checked="checked"' : '';
+    if ($display) { echo $html; }
+    return $html;
+}
+function submit_button($label): void { echo '<button>' . esc_html($label) . '</button>'; }
 function pvwp_context(): array { return array('locale'=>$GLOBALS['locale']); }
 function pvwp_record_path(string $type, array $record): string {
     $custom = trim((string) ($record['data']['route'] ?? ''), '/');
@@ -70,6 +88,35 @@ function pvc_record(string $type, string $language, string $key): ?array {
     $record = $GLOBALS['pages'][$language][$key] ?? null;
     return is_array($record) && ($record['status'] ?? '') === 'publish' ? $record : null;
 }
+function pvc_records(string $type, string $language): array {
+    return array_values(array_filter($GLOBALS['pages'][$language] ?? array(), static fn($page) => ($page['status'] ?? '') === 'publish'));
+}
+function pvc_suffix(string $type, string $key, array $data): string {
+    if ($type !== 'pv_page') { throw new RuntimeException('The page selector must resolve only pv_page routes.'); }
+    $custom = trim((string) ($data['route'] ?? ''), '/');
+    return ($data['kind'] ?? '') === 'home' ? '' : ($custom !== '' ? $custom : (($data['kind'] ?? '') === 'legal' ? 'legal/' : '') . $key);
+}
+function get_post($id) {
+    $id = is_object($id) ? $id->ID : $id;
+    $GLOBALS['wordpressReads'][] = $id;
+    return $GLOBALS['wordpressPages'][$id] ?? null;
+}
+function get_posts(array $query): array {
+    $GLOBALS['wordpressQueries'][] = $query;
+    return array_values(array_filter($GLOBALS['wordpressPages'], static function($post) use ($query) {
+        return (!isset($query['post_type']) || $post->post_type === $query['post_type'])
+            && (!isset($query['post_status']) || $post->post_status === $query['post_status'])
+            && (!array_key_exists('has_password', $query) || (bool) ($post->post_password !== '') === $query['has_password']);
+    }));
+}
+function get_permalink($post) {
+    $post = is_object($post) ? $post : ($GLOBALS['wordpressPages'][$post] ?? null);
+    return $post->permalink ?? false;
+}
+function get_the_title($post): string {
+    $post = is_object($post) ? $post : ($GLOBALS['wordpressPages'][$post] ?? null);
+    return $post->post_title ?? '';
+}
 
 require __DIR__ . '/../plugin/pecadosvip-content/includes/profile-information.php';
 require __DIR__ . '/../theme/pecadosvip/inc/profile-information.php';
@@ -78,10 +125,17 @@ function reset_information(array $blocks = array(), string $language = 'es'): vo
     $GLOBALS['locale'] = $language;
     $GLOBALS['options'] = array('pvc_profile_information_' . $language=>$blocks);
     $GLOBALS['optionReads'] = array(); $GLOBALS['recordReads'] = array(); $GLOBALS['pages'] = array();
+    $GLOBALS['wordpressPages'] = array(); $GLOBALS['wordpressQueries'] = array(); $GLOBALS['wordpressReads'] = array();
 }
 function render_information(): string {
     ob_start();
     try { pvwp_profile_information(); return (string) ob_get_contents(); }
+    finally { ob_end_clean(); }
+}
+function render_information_admin(): string {
+    $_GET = array('lang'=>$GLOBALS['locale']);
+    ob_start();
+    try { pvc_profile_information_admin(); return (string) ob_get_contents(); }
     finally { ob_end_clean(); }
 }
 function information_block(array $values = array()): array {
@@ -89,6 +143,9 @@ function information_block(array $values = array()): array {
 }
 function information_page(string $kind = 'information', string $route = 'informacion/privacidad', string $status = 'publish'): array {
     return array('key'=>'privacidad-ejemplo', 'title'=>'Información general', 'locale'=>$GLOBALS['locale'], 'status'=>$status, 'data'=>array('kind'=>$kind, 'route'=>$route));
+}
+function wordpress_page(int $id, array $values = array()): object {
+    return (object) array_replace(array('ID'=>$id, 'post_type'=>'page', 'post_status'=>'publish', 'post_password'=>'', 'post_title'=>'Información general', 'permalink'=>'https://example.test/manual/accesibilidad/'), $values);
 }
 
 /* Opening the editor or rendering a profile does not initialize the database. */
@@ -123,6 +180,10 @@ check($clean['slot3'] === $defaults['slot3'], 'A malformed slot falls back indep
 foreach (array(false, 'false', '0', 0, '', array('1'), new stdClass()) as $disabled) {
     check(pvc_profile_information_sanitize(array('slot1'=>array('enabled'=>$disabled)))['slot1']['enabled'] === false, 'Invalid or false checkbox values do not enable a block');
 }
+foreach (array('wp:1', 'wp:918', 'wp:123456789') as $key) {
+    check(pvc_profile_information_sanitize(array('slot1'=>array('pageKey'=>$key)))['slot1']['pageKey'] === $key, 'A standard WordPress ID token survives sanitation unchanged: ' . $key);
+}
+check(pvc_profile_information_sanitize(array('slot1'=>$clean['slot1']))['slot1'] === $clean['slot1'], 'Existing native settings remain stable through another read or save');
 
 /* Each locale has independent storage, with no fallback to another language. */
 reset_information(array('slot1'=>information_block(array('title'=>'Solo español'))));
@@ -164,7 +225,7 @@ $html = render_information();
 check(str_contains($html, 'A &amp; B &quot;C&quot;'), 'Title characters are HTML escaped');
 check(str_contains($html, 'Texto &amp; detalle &quot;seguro&quot;.'), 'Body characters are HTML escaped');
 
-/* A destination is an existing informational page in the current language. */
+/* Native destinations retain their existing keys and use the current language. */
 $linked = information_block(array('buttonLabel'=>'Leer & revisar', 'pageKey'=>'privacidad-ejemplo'));
 reset_information(array('slot1'=>$linked));
 check(!str_contains(render_information(), '<a '), 'A missing page creates no broken button');
@@ -175,15 +236,17 @@ $html = render_information();
 check(str_contains($html, 'href="https://example.test/es/informacion/privacidad"'), 'Published page destination uses the actual localized route');
 check(str_contains($html, 'Leer &amp; revisar'), 'The optional button label is escaped');
 check(in_array(array('page', 'es', 'privacidad-ejemplo'), $recordReads, true), 'The lookup requests only a page in the current language');
-foreach (array('information', 'about', 'legal') as $kind) {
+foreach (array('information', 'about', 'legal', 'contact', 'profiles', 'services', '') as $kind) {
     $pages['es']['privacidad-ejemplo'] = information_page($kind);
-    check(str_contains(render_information(), '<a '), 'Published ' . $kind . ' pages are valid information destinations');
+    check(str_contains(render_information(), '<a '), 'Published ' . $kind . ' native pages are selectable without a kind allowlist');
 }
-foreach (array('contact', 'home', 'profiles', 'services', '') as $kind) {
-    $pages['es']['privacidad-ejemplo'] = information_page($kind);
-    check(!str_contains(render_information(), '<a '), 'Page kind ' . $kind . ' is not an information destination');
+$pages['es']['privacidad-ejemplo'] = information_page('home', '');
+check(str_contains(render_information(), 'href="https://example.test/es"'), 'Native home pages resolve to the locale root');
+foreach (array('perfiles', 'servicios', 'contacto', 'informacion/legal') as $path) {
+    $pages['es']['privacidad-ejemplo'] = information_page('information', $path);
+    check(str_contains(render_information(), 'href="https://example.test/es/' . $path . '"'), 'An actual native catalog or content route remains selectable: ' . $path);
 }
-foreach (array('../private', 'https://outside.example/path', 'informacion?redirect=elsewhere', 'informacion#fragment', 'wp-admin', 'es/otra', 'info/../private') as $path) {
+foreach (array('../private', 'https://outside.example/path', 'informacion?redirect=elsewhere', 'informacion#fragment', 'wp-admin', 'wp-json/example', 'api', 'api/otro', 'es/otra', 'en', 'fr/otra', 'it/otra', 'info/../private') as $path) {
     $pages['es']['privacidad-ejemplo'] = information_page('information', $path);
     check(!str_contains(render_information(), '<a '), 'An invalid or reserved destination route is omitted: ' . $path);
 }
@@ -196,6 +259,82 @@ check(str_contains(render_information(), 'href="https://example.test/en/informat
 reset_information(array('slot1'=>information_block(array('pageKey'=>'privacidad-ejemplo'))));
 $pages['es']['privacidad-ejemplo'] = information_page();
 check(!str_contains(render_information(), '<a '), 'An empty button label produces no unnamed link');
+
+/* WordPress pages use a separate identity and their real permalink in every locale. */
+reset_information(array('slot1'=>information_block(array('buttonLabel'=>'Leer más', 'pageKey'=>'wp:918'))));
+$wordpressPages[918] = wordpress_page(918);
+$destination = pvc_profile_information_destination('wp:918', 'es');
+check(is_array($destination) && $destination['key'] === 'wp:918' && $destination['source'] === 'wordpress', 'A WordPress page resolves with its explicit namespace and source');
+check($destination['title'] === 'Información general' && $destination['url'] === 'https://example.test/manual/accesibilidad/', 'A WordPress destination keeps its own title and hierarchical permalink');
+$html = render_information();
+check(str_contains($html, 'href="https://example.test/manual/accesibilidad/"'), 'Public rendering uses the existing WordPress permalink');
+check(!str_contains($html, '/es/manual/'), 'The selected block language does not add a path prefix to a WordPress permalink');
+check($recordReads === array(), 'WordPress tokens do not fall through into native record lookup');
+$wordpressPages[918]->permalink = 'https://example.test/?page_id=918&preview_mode=plain';
+check(pvc_profile_information_destination('wp:918', 'es')['url'] === $wordpressPages[918]->permalink, 'Plain permalinks preserve their query string exactly');
+check(str_contains(render_information(), 'href="https://example.test/?page_id=918&amp;preview_mode=plain"'), 'Permalink query separators are escaped only for HTML output');
+$options['pvc_profile_information_en'] = array('slot1'=>information_block(array('title'=>'English heading', 'buttonLabel'=>'Read more', 'pageKey'=>'wp:918')));
+$locale = 'en';
+check(str_contains(render_information(), 'English heading') && str_contains(render_information(), '?page_id=918'), 'An editor can independently select the same WordPress page in another language');
+check(pvc_profile_information('es')['slot1']['buttonLabel'] === 'Leer más', 'Rendering another language leaves the Spanish selection and text unchanged');
+check(pvc_profile_information_destination('wp:918', 'de') === null, 'Unsupported block languages do not resolve destinations');
+
+/* Stale or protected WordPress destinations lose only the link, never the authored text. */
+foreach (array('draft', 'pending', 'future', 'private', 'trash', 'auto-draft') as $status) {
+    $wordpressPages[918] = wordpress_page(918, array('post_status'=>$status));
+    check(pvc_profile_information_destination('wp:918', 'en') === null, 'A ' . $status . ' WordPress page is unavailable as a public destination');
+    $html = render_information();
+    check(!str_contains($html, '<a ') && str_contains($html, 'English heading'), 'The ' . $status . ' destination hides its button while preserving block text');
+}
+foreach (array('post', 'attachment', 'pv_page', 'pv_profile') as $type) {
+    $wordpressPages[918] = wordpress_page(918, array('post_type'=>$type));
+    check(pvc_profile_information_destination('wp:918', 'en') === null, 'A WordPress token cannot address a ' . $type . ' record');
+}
+$wordpressPages[918] = wordpress_page(918, array('post_password'=>'example-only-password'));
+check(pvc_profile_information_destination('wp:918', 'en') === null, 'A password-protected page is excluded even when its status is publish');
+$wordpressPages[918] = wordpress_page(918, array('permalink'=>false));
+check(pvc_profile_information_destination('wp:918', 'en') === null, 'A page without a permalink is not linked');
+$wordpressPages = array();
+check(pvc_profile_information_destination('wp:918', 'en') === null, 'A deleted WordPress page is not linked');
+$wordpressPages[918] = wordpress_page(918);
+foreach (array('wp:0', 'wp:-1', 'wp:0918', 'wp:+918', 'wp:918.0', 'wp:918x', 'WP:918', 'wp: 918', 'wp:918 ', "wp:918\n", 'wp:99999999999999999999999999999999999999') as $invalid) {
+    check(pvc_profile_information_destination($invalid, 'en') === null, 'A malformed or out-of-range WordPress token cannot resolve: ' . json_encode($invalid));
+}
+
+/* The editor lists native pages alongside all published, public WordPress pages. */
+reset_information(array('slot1'=>information_block(array('pageKey'=>'wp:918', 'buttonLabel'=>'Leer más'))));
+$pages['es']['privacidad-ejemplo'] = information_page();
+$pages['es']['privacidad-secundaria'] = array_replace(information_page('legal', 'legal/segunda'), array('key'=>'privacidad-secundaria'));
+$pages['es']['draft-native'] = array_replace(information_page('information', 'informacion/borrador', 'draft'), array('key'=>'draft-native'));
+$pages['es']['invalid-native'] = array_replace(information_page('information', 'wp-admin'), array('key'=>'invalid-native'));
+$pages['en']['english-only'] = array_replace(information_page(), array('key'=>'english-only', 'locale'=>'en'));
+$wordpressPages[918] = wordpress_page(918);
+$wordpressPages[919] = wordpress_page(919, array('permalink'=>'https://example.test/otra/informacion/'));
+$wordpressPages[920] = wordpress_page(920, array('post_status'=>'draft'));
+$wordpressPages[921] = wordpress_page(921, array('post_status'=>'private'));
+$wordpressPages[922] = wordpress_page(922, array('post_password'=>'example-only-password'));
+$wordpressPages[923] = wordpress_page(923, array('post_type'=>'post'));
+$available = pvc_profile_information_pages('es');
+check(isset($available['privacidad-ejemplo'], $available['privacidad-secundaria'], $available['wp:918'], $available['wp:919']), 'The selector combines published native records and ordinary WordPress pages');
+check($available['privacidad-ejemplo']['source'] === 'pecadosvip', 'Native keys preserve their identity and distinguish their source');
+check(!isset($available['draft-native'], $available['invalid-native'], $available['english-only'], $available['wp:920'], $available['wp:921'], $available['wp:922'], $available['wp:923']), 'The selector omits unavailable routes, other native languages, drafts, private pages, protected pages and non-pages');
+check(count($wordpressQueries) === 1, 'Listing the selector performs one WordPress page query');
+$query = $wordpressQueries[0];
+check(($query['post_type'] ?? null) === 'page' && ($query['post_status'] ?? null) === 'publish', 'The query explicitly requests published standard WordPress pages');
+check(array_key_exists('has_password', $query) && $query['has_password'] === false, 'The WordPress query excludes password-protected pages');
+check(($query['posts_per_page'] ?? null) === -1 && ($query['suppress_filters'] ?? null) === false, 'The editor lists all results and honors registered WordPress filters');
+check(!isset($query['meta_query'], $query['meta_key'], $query['meta_value']), 'Standard pages do not require PecadosVip language metadata');
+check(pvc_profile_information_pages('de') === array(), 'An unsupported locale yields no selectable destinations');
+$html = render_information_admin();
+check(str_contains($html, 'value="wp:918"') && str_contains($html, 'value="privacidad-ejemplo"'), 'The actual editor includes both page identities in its options');
+check(preg_match('/<option\b[^>]*value="wp:918"[^>]*selected/', $html) === 1, 'The stored WordPress destination remains selected in the form');
+check(str_contains($html, 'manual/accesibilidad') && str_contains($html, 'otra/informacion'), 'Duplicate page titles are distinguishable by destination URL in the selector');
+check(str_contains($html, 'informacion/privacidad') && str_contains($html, 'legal/segunda'), 'Duplicate native titles also expose their distinct destination URLs');
+$options['pvc_profile_information_es']['slot1']['pageKey'] = 'wp:777';
+$html = render_information_admin();
+check(preg_match('/<option\b[^>]*value="wp:777"[^>]*selected/', $html) === 1, 'An unavailable saved selection is preserved in the editor instead of being silently replaced');
+check(str_contains($html, 'Texto de ejemplo.'), 'Opening an editor with an unavailable destination preserves its authored body');
+check($optionWrites === array(), 'Destination discovery and editor rendering never modify stored content');
 
 /* Independent blocks render in editorial order without affecting hidden slots. */
 reset_information(array(

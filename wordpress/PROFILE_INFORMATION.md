@@ -9,7 +9,7 @@ Dispones de tres bloques independientes con título, texto y botón opcional. Es
 3. Marca **Mostrar este bloque** y pulsa **Guardar bloques de este idioma**.
 4. Abre una página individual para revisar el resultado. Desmarca el bloque y guarda para ocultarlo sin borrar su contenido.
 
-El selector ofrece las páginas publicadas del mismo idioma que tengan tipo `information`, `about` o `legal`. Puedes prepararlas desde **PecadosVip → Páginas de la web** y publicarlas cuando estén listas. No se crean ni publican páginas automáticamente. Si retiras la página de destino, el botón deja de mostrarse y el texto del bloque permanece.
+El selector reúne las páginas publicadas y sin contraseña de **Páginas de WordPress** y **PecadosVip → Páginas de la web**, separadas en dos grupos. Cada opción muestra su título y dirección para distinguir páginas con el mismo nombre. Las páginas de PecadosVip corresponden al idioma seleccionado y ya no están limitadas a tres tipos. Las páginas normales de WordPress conservan su dirección original, sin añadir un prefijo de idioma: elige manualmente la versión que necesites. No se crean ni publican páginas automáticamente. Si retiras la página de destino, el botón deja de mostrarse y el texto del bloque permanece.
 
 El botón tiene fondo rosa claro, borde rosa, texto negro en negrita, extremos redondeados y foco visible para navegar con teclado. Los botones sin destino válido no se muestran. Los bloques vacíos no dejan huecos en la web.
 
@@ -18,3 +18,5 @@ Los contenidos de «Textos y diseño», el bloque existente y las páginas exist
 ## Comprobación técnica
 
 La suite `php wordpress/tests/profile-information-test.php` verifica opciones y render con funciones de WordPress simuladas y textos neutros. Está incluida en el runner de QA. `npm --prefix wordpress run build` y `npm --prefix wordpress run verify` validan el empaquetado. Las pruebas locales no acreditan un guardado real en la instalación de producción.
+
+Los destinos existentes mantienen su `pv_key`. Las páginas normales se guardan como `wp:ID` dentro del mismo campo `pageKey`, sin migrar ni reescribir las opciones existentes. El selector y el botón comparten el mismo resolutor; este comprueba de nuevo que el destino siga publicado y disponible antes de renderizarlo.
