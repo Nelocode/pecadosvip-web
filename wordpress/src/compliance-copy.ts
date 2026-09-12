@@ -78,6 +78,44 @@ export const contactCopy = {
   },
 } as const satisfies Readonly<Record<Locale, unknown>>;
 
+/**
+ * Discretion block published on every profile.
+ *
+ * It is written for this business specifically: the site has no premises, so everything happens
+ * on an outcall to a hotel or a home. Nothing here promises a venue, a licence, a length of
+ * service or a price, and there is no borrowed claim about how long anybody has been trading.
+ */
+export const discretionCopy = {
+  es: {
+    eyebrow: 'Discreción y privacidad',
+    title: 'Tu privacidad no se negocia',
+    body1: 'La discreción no es un extra: es la base de todo lo que hacemos. Cada encuentro se organiza de forma privada, sin nombres, sin registros innecesarios y sin rastro en tu entorno. Acordamos contigo el lugar y el momento, y la acompañante llega sola, sin llamar la atención ni identificarse ante nadie.',
+    body2: 'Si es tu primera vez, no vas a tener que improvisar nada: hablamos antes, resolvemos tus dudas y decidimos juntos cómo, cuándo y dónde. A partir de ahí, la experiencia es tuya y de nadie más.',
+    guideCta: 'Lee nuestra guía',
+  },
+  en: {
+    eyebrow: 'Discretion and privacy',
+    title: 'Your privacy is not negotiable',
+    body1: 'Discretion is not an extra: it is the basis of everything we do. Every meeting is arranged privately, with no names, no unnecessary records and no trace in your surroundings. We agree the place and the time with you, and the companion arrives alone, drawing no attention and identifying herself to no one.',
+    body2: 'If this is your first time, you will not have to improvise anything: we talk first, answer your questions and settle together how, when and where. From there on, the experience is yours and no one else’s.',
+    guideCta: 'Read our guide',
+  },
+  fr: {
+    eyebrow: 'Discrétion et vie privée',
+    title: 'Votre vie privée ne se négocie pas',
+    body1: 'La discrétion n’est pas un supplément : c’est la base de tout ce que nous faisons. Chaque rencontre s’organise en privé, sans noms, sans registres inutiles et sans trace dans votre entourage. Nous convenons avec vous du lieu et du moment, et l’accompagnante arrive seule, sans attirer l’attention et sans se présenter à quiconque.',
+    body2: 'Si c’est votre première fois, vous n’aurez rien à improviser : on parle d’abord, on répond à vos questions et on décide ensemble comment, quand et où. Ensuite, l’expérience est la vôtre et celle de personne d’autre.',
+    guideCta: 'Lisez notre guide',
+  },
+  it: {
+    eyebrow: 'Discrezione e privacy',
+    title: 'La tua privacy non si negozia',
+    body1: 'La discrezione non è un extra: è la base di tutto ciò che facciamo. Ogni incontro si organizza in privato, senza nomi, senza registri inutili e senza tracce nel tuo ambiente. Concordiamo con te il luogo e il momento, e l’accompagnatrice arriva da sola, senza attirare l’attenzione e senza presentarsi a nessuno.',
+    body2: 'Se è la tua prima volta, non dovrai improvvisare nulla: prima si parla, si risolvono i dubbi e si decide insieme come, quando e dove. Da lì in poi l’esperienza è tua e di nessun altro.',
+    guideCta: 'Leggi la nostra guida',
+  },
+};
+
 export const legalCopy = {
   es: {
     eyebrow: 'Información legal',
@@ -330,4 +368,5 @@ export const legalCopy = {
 } as const satisfies Readonly<Record<Locale, unknown>>;
 
 export function getContactCopy(locale: Locale) { return contactCopy[locale]; }
+export function getDiscretionCopy(locale: Locale) { return discretionCopy[locale]; }
 export function getLegalCopy(locale: Locale) { return legalCopy[locale]; }

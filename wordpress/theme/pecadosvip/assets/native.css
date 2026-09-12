@@ -164,6 +164,12 @@
 .pvn-service-copy .pvn-card-link { margin-top: auto; }
 .pvn-page-intro { padding-bottom: 1rem; }
 .pvn-page-intro > p { max-width: 900px; color: #c8bba5; }
+/* Discretion block and its guide button, published under every profile. */
+.pvn-discretion { border-top: 1px solid var(--pvn-line); }
+.pvn-discretion > p { max-width: 70ch; color: #c0b69f; font-size: .9rem; }
+.pvn-guide-button { display: inline-flex; align-items: center; justify-content: center; margin-top: 1rem; padding: .8rem 2.2rem; border: 1.5px solid #d9537a; border-radius: 999px; background: #fff; color: #1b1b1b; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+.pvn-guide-button:hover, .pvn-guide-button:focus-visible { background: #d9537a; color: #fff; }
+.pvn-guide-button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 .pvn-search-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; }
 .pvn-results { font-size: .8rem; color: var(--pvn-muted); }
 .pvn-selection, .pvn-notice { border: 1px solid var(--pvn-line); background: #0d0a06de; padding: 1.5rem; margin: 2rem 0; }

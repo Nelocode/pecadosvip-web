@@ -26,6 +26,28 @@ function pvwp_contact_label(string $channel): string {
 function pvwp_contact_active(): array {
     return function_exists('pvc_contact_active') ? pvc_contact_active() : array();
 }
+/**
+ * Discretion block published on every profile, with the guide button.
+ *
+ * It renders nothing rather than empty headings when the copy is missing, and the button appears
+ * only when the guide page exists, so it can never point at a 404 while the guide is written.
+ */
+function pvwp_discretion(): void {
+    $locale = pvwp_context()['locale'] ?? 'es';
+    $eyebrow = pvwp_text('discretion.eyebrow'); $title = pvwp_text('discretion.title');
+    if ($eyebrow === '' && $title === '') { return; }
+    $guide = function_exists('pvc_record') ? pvc_record('page', $locale, 'guia-primera-vez') : null;
+    echo '<section class="pvn-section pvn-discretion">';
+    if ($eyebrow !== '') { echo '<p class="pvn-eyebrow">' . esc_html($eyebrow) . '</p>'; }
+    if ($title !== '') { echo '<h2>' . esc_html($title) . '</h2>'; }
+    $body1 = pvwp_text('discretion.body1'); $body2 = pvwp_text('discretion.body2');
+    if ($body1 !== '') { echo '<p>' . esc_html($body1) . '</p>'; }
+    if ($body2 !== '') { echo '<p>' . esc_html($body2) . '</p>'; }
+    if ($guide) {
+        echo '<a class="pvn-guide-button" href="' . esc_url(home_url('/' . $locale . '/' . pvwp_record_path('page', $guide))) . '">' . esc_html(pvwp_text('discretion.guideCta')) . '</a>';
+    }
+    echo '</section>';
+}
 /** Renders the approved channels, or the disabled control while a gate is closed. */
 function pvwp_contact_buttons(): void {
     $channels = pvwp_contact_active();

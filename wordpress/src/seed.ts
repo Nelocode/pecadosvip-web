@@ -6,7 +6,7 @@ import { getSyntheticDecorMedia } from '../../lib/preview/synthetic-decor-media'
 import { getSyntheticHeroMedia } from '../../lib/preview/synthetic-hero-media';
 import { getSyntheticServiceMedia } from '../../lib/preview/synthetic-service-media';
 import { getCatalog } from '../../lib/i18n/catalog';
-import { getContactCopy, getLegalCopy } from './compliance-copy';
+import { getContactCopy, getDiscretionCopy, getLegalCopy } from './compliance-copy';
 import { getWordPressServiceCopy } from './service-copy';
 import { SUPPORTED_LOCALES } from '../../lib/i18n/locales';
 import { legalDocumentKeys } from '../../lib/content/public-legal';
@@ -48,7 +48,7 @@ export function makeSeed(media: Record<string, string>, sourceCommit: string) {
     // Editorial biographies/pages now belong to WP posts. Do not keep a public
     // duplicate inside settings when an editor unpublishes the corresponding post.
     const { metadata, profiles, cities, homeServices, locale: sourceLocale, ...presentation } = beta;
-    copy[locale] = { ...presentation, contact: getContactCopy(locale), legal: getLegalCopy(locale), services, nativeUi: labels[locale], site: {
+    copy[locale] = { ...presentation, contact: getContactCopy(locale), legal: getLegalCopy(locale), discretion: getDiscretionCopy(locale), services, nativeUi: labels[locale], site: {
       logo: image('/icon.png', 'PecadosVip'), icon: image('/icon.png', 'PecadosVip'),
       hero: image(getSyntheticHeroMedia('home-editorial', 'public-beta').desktopUrl, beta.hero.generatedImageDisclosure),
       mosaic: image(getSyntheticDecorMedia('border-filigree', 'public-beta').desktopUrl, ''),

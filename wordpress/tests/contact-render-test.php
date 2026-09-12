@@ -28,6 +28,11 @@ $GLOBALS['pvqa_copy'] = array(
     'contact.channels.email' => 'Escribir un correo',
     'contact.channels.form' => 'Formulario de contacto',
     'contact.channels.report' => 'Reportar contenido',
+    'discretion.eyebrow' => 'Discreción y privacidad',
+    'discretion.title' => 'Tu privacidad no se negocia',
+    'discretion.body1' => 'La discreción no es un extra.',
+    'discretion.body2' => 'Si es tu primera vez, no vas a improvisar nada.',
+    'discretion.guideCta' => 'Lee nuestra guía',
 );
 function pvwp_text(string $path, array $vars = array()): string {
     $value = $GLOBALS['pvqa_copy'][$path] ?? null;
@@ -36,6 +41,12 @@ function pvwp_text(string $path, array $vars = array()): string {
 /** Stands in for the plugin gate: the template asks this for the channels it may publish. */
 $GLOBALS['pvqa_active'] = array();
 function pvc_contact_active(): array { return $GLOBALS['pvqa_active']; }
+/** The discretion block asks the theme context and the guide page; both are stubbed here. */
+$GLOBALS['pvqa_guide'] = null;
+function pvwp_context(): array { return array('locale' => 'es'); }
+function pvc_record(string $type, string $locale, string $key): ?array { return $key === 'guia-primera-vez' ? $GLOBALS['pvqa_guide'] : null; }
+function pvwp_record_path(string $type, array $record): string { return (string) ($record['path'] ?? 'guia/primera-vez'); }
+function home_url(string $path = '/'): string { return 'https://pecadosvip.com' . $path; }
 
 require __DIR__ . '/../theme/pecadosvip/inc/contact-legal.php';
 
@@ -79,5 +90,24 @@ foreach ($channels as $channel) {
 /* 4. The destination is escaped before it reaches the attribute. */
 $GLOBALS['pvqa_active'] = array('whatsapp' => array('enabled' => true, 'url' => 'https://wa.me/34"onmouseover="x', 'valid' => true));
 check(!str_contains(render_buttons(), '"onmouseover="x'), 'A quote in the destination cannot leave the attribute');
+
+/* 5. The discretion block goes under every profile, and its button waits for the guide. */
+function render_discretion(): string { ob_start(); pvwp_discretion(); return (string) ob_get_clean(); }
+$html = render_discretion();
+check(str_contains($html, 'pvn-discretion'), 'The discretion block is rendered');
+check(str_contains($html, 'Discreción y privacidad'), 'The block carries its editable eyebrow');
+check(str_contains($html, 'Tu privacidad no se negocia'), 'The block carries its editable title');
+check(str_contains($html, '<p>La discreción no es un extra.</p>'), 'Each body paragraph is rendered as a paragraph');
+check(!str_contains($html, 'pvn-guide-button'), 'No guide button is rendered while the guide does not exist');
+check(!str_contains($html, 'href'), 'A missing guide leaves no dead link behind');
+$GLOBALS['pvqa_guide'] = array('title' => 'Primera vez', 'path' => 'guia/primera-vez');
+$html = render_discretion();
+check(str_contains($html, 'class="pvn-guide-button"'), 'The guide button appears once the guide exists');
+check(str_contains($html, 'href="https://pecadosvip.com/es/guia/primera-vez"'), 'The button links to the localised guide route');
+check(str_contains($html, '>Lee nuestra guía</a>'), 'The button carries its editable label');
+
+/* 6. Copy that is not loaded renders nothing, instead of a block with empty headings. */
+$GLOBALS['pvqa_copy'] = array();
+check(render_discretion() === '', 'Missing copy renders no empty block');
 
 echo json_encode(array('ok' => true, 'assertions' => $checks), JSON_PRETTY_PRINT) . PHP_EOL;
