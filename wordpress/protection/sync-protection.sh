@@ -32,4 +32,9 @@ if [ -d "$pvsp_plugin_dir" ] && [ ! -L "$pvsp_plugin_dir" ] &&
     fi
 fi
 
+# Remove wp-super-cache if present to prevent undefined get_home_path errors
+if [ -d "/var/www/html/wp-content/plugins/wp-super-cache" ]; then
+    rm -rf "/var/www/html/wp-content/plugins/wp-super-cache"
+fi
+
 apache2ctl -t
