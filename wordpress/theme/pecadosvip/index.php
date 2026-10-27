@@ -6,7 +6,8 @@ $pvwp_locale = $pvwp_page['locale'] ?? 'es'; $pvwp_error = pvwp_error_copy($pvwp
 // Native lightweight HTML cache for anonymous visitors
 $pvwp_can_cache = !is_user_logged_in() && $pvwp_ready && empty($pvwp_page['preview']) && empty($_POST) && empty($_GET);
 if ($pvwp_can_cache) {
-    $pvwp_cache_key = 'pvwp_html_' . md5(($_SERVER['REQUEST_URI'] ?? '/') . ':' . (function_exists('pvc_revision') ? (string) pvc_revision() : '1'));
+    $pvwp_theme_ver = (string) (filemtime(__DIR__ . '/inc/render.php') ?: '2');
+    $pvwp_cache_key = 'pvwp_html_' . md5(($_SERVER['REQUEST_URI'] ?? '/') . ':' . (function_exists('pvc_revision') ? (string) pvc_revision() : '1') . ':' . $pvwp_theme_ver);
     if (function_exists('get_transient')) {
         $pvwp_cached_html = get_transient($pvwp_cache_key);
         if (is_string($pvwp_cached_html) && $pvwp_cached_html !== '') {
