@@ -8,6 +8,7 @@
  * Origin media denial is enforced separately in Apache, including for editors.
  */
 if (!defined('ABSPATH')) { exit; }
+if (!function_exists('get_home_path') && defined('ABSPATH') && file_exists(ABSPATH . 'wp-admin/includes/file.php')) { require_once ABSPATH . 'wp-admin/includes/file.php'; }
 function pvp_guard_language(string $uri): string {
     $path = parse_url($uri, PHP_URL_PATH);
     if (!is_string($path)) { return 'es'; }
