@@ -194,19 +194,36 @@ function pvwp_profile_card(array $profile): void {
     ?><article class="pvn-profile-card" data-record-id="<?php echo (int) $profile['id']; ?>"><a class="pvn-profile-photo" href="<?php echo esc_url($href); ?>" tabindex="-1" aria-hidden="true"><?php pvwp_media($profile['image'] ?? null, '', false, '(max-width:700px) 45vw, 22vw'); ?></a>
     <div class="pvn-profile-summary"><h3><a href="<?php echo esc_url($href); ?>"><?php echo esc_html($profile['title']); ?></a></h3><?php if ($where) { ?><p class="pvn-card-where"><?php echo esc_html(implode(' · ', $where)); ?></p><?php } ?><ul class="pvn-card-facts"><?php if (!empty($data['age'])) { ?><li><span class="pvn-card-label"><?php pvwp_label('profileFields.age'); ?></span> <?php echo esc_html((string) $data['age']); ?></li><?php } ?><?php if (!empty($data['height'])) { ?><li><span class="pvn-card-label"><?php pvwp_label('profileFields.height'); ?></span> <?php echo esc_html($data['height']); ?></li><?php } ?><?php if ($languages) { ?><li><span class="pvn-card-label"><?php pvwp_label('profileFields.languages'); ?></span> <?php echo esc_html(implode(', ', $languages)); ?></li><?php } ?></ul><?php if ($features) { ?><p class="pvn-card-features"><span class="pvn-card-label"><?php pvwp_label('profileFields.features'); ?></span> <?php echo esc_html(implode(' · ', $features)); ?></p><?php } ?><p class="pvn-availability" data-status="<?php echo esc_attr($data['availability'] ?? 'on-request'); ?>"><?php pvwp_label('filters.availability.' . ($data['availability'] ?? 'on-request')); ?></p><?php if ($data['synthetic'] ?? true) { ?><span class="pvn-disclosure"><?php pvwp_label('profilesSection.cardDisclosureShort'); ?></span><?php } ?><?php if (!empty($profile['fallback'])) { ?><span class="pvn-disclosure pvn-fallback-badge"><?php echo esc_html(pvwp_fallback_copy()['card']); ?></span><?php } ?><a class="pvn-card-link" href="<?php echo esc_url($href); ?>"><?php pvwp_label('profilesSection.viewProfile'); ?> <span aria-hidden="true">→</span></a></div></article><?php
 }
-function pvwp_profiles(?string $city_override = null): void {
+function pvwp_all_profiles_label(): string {
+    $locale = pvwp_context()['locale'] ?? 'es';
+    $labels = array(
+        'es' => 'Ver todas las modelos',
+        'en' => 'View all models',
+        'fr' => 'Voir tous les profils',
+        'it' => 'Vedi tutte le modelle',
+    );
+    return $labels[$locale] ?? $labels['es'];
+}
+function pvwp_profiles(?string $city_override = null, int $limit_per_zone = 0): void {
     $context = pvwp_context(); $locale = $context['locale']; $city = $city_override ?? ($context['query']['city'] ?? ''); $availability = $context['query']['availability'] ?? '';
     $profiles = array_values(array_filter(pvc_records_localized('profile', $locale), static fn($p) => pvwp_profile_matches($p, $city) && ($availability === '' || ($p['data']['availability'] ?? '') === $availability)));
     ?><section id="perfiles" class="pvn-section">
     <?php pvwp_section_heading(pvwp_text('profilesSection.eyebrow'), pvwp_text('profilesSection.title'), pvwp_text('profilesSection.note')); ?>
+    <?php if ($limit_per_zone === 0) { ?>
     <form class="pvn-filters" action="<?php echo esc_url(pvwp_url('perfiles')); ?>#perfiles" method="get"><fieldset><legend><?php pvwp_label('filters.legend'); ?></legend>
     <label><?php pvwp_label('filters.cityLabel'); ?><select name="city"><option value=""><?php pvwp_label('filters.allCities'); ?></option><?php foreach (pvc_records('city', $locale) as $c) { ?><option value="<?php echo esc_attr($c['key']); ?>" <?php selected($city, $c['key']); ?>><?php echo esc_html($c['title']); ?></option><?php } ?></select></label>
     <label><?php pvwp_label('filters.availabilityLabel'); ?><select name="availability"><option value=""><?php pvwp_label('filters.allAvailabilities'); ?></option><?php foreach (pvwp_value('filters.availability', array()) as $key => $label) { ?><option value="<?php echo esc_attr($key); ?>" <?php selected($availability, $key); ?>><?php echo esc_html($label); ?></option><?php } ?></select></label>
     <button class="pvn-button pvn-gold" type="submit"><?php pvwp_label('filters.apply'); ?></button><a href="<?php echo esc_url(pvwp_url('perfiles') . '#perfiles'); ?>"><?php pvwp_label('filters.reset'); ?></a></fieldset></form>
+    <?php } ?>
     <?php if (!$profiles) { ?><p class="pvn-empty"><?php pvwp_label('profilesSection.emptyTitle'); ?></p><?php } else {
         $zones = array(); foreach ($profiles as $p) { $key = $p['data']['homeZone'] ?? ($p['data']['cities'][0] ?? ''); $city_record = pvwp_city_record((string) $key); $zone = $city_record['data']['zone'] ?? $key; $zones[$zone][] = $p; }
-        foreach ($zones as $zone => $group) { $zone_record = pvwp_city_record((string) $zone); ?>
-        <section id="zona-<?php echo esc_attr($zone); ?>" class="pvn-profile-zone" data-carousel><div class="pvn-row-heading"><h3><?php echo esc_html($zone_record['title'] ?? $zone); ?></h3><div class="pvn-carousel-controls" hidden><button type="button" data-carousel-prev aria-label="<?php echo esc_attr(pvwp_text('nativeUi.previous')); ?>">←</button><button type="button" data-carousel-play aria-pressed="false"><?php pvwp_label('nativeUi.play'); ?></button><button type="button" data-carousel-next aria-label="<?php echo esc_attr(pvwp_text('nativeUi.next')); ?>">→</button></div></div><div class="pvn-profile-track" data-carousel-track><?php foreach ($group as $profile) { pvwp_profile_card($profile); } ?></div></section>
+        foreach ($zones as $zone => $group) { $zone_record = pvwp_city_record((string) $zone);
+            $display_group = $limit_per_zone > 0 ? array_slice($group, 0, $limit_per_zone) : $group;
+        ?>
+        <section id="zona-<?php echo esc_attr($zone); ?>" class="pvn-profile-zone" data-carousel><div class="pvn-row-heading"><h3><?php echo esc_html($zone_record['title'] ?? $zone); ?></h3><div class="pvn-carousel-controls" hidden><button type="button" data-carousel-prev aria-label="<?php echo esc_attr(pvwp_text('nativeUi.previous')); ?>">←</button><button type="button" data-carousel-play aria-pressed="false"><?php pvwp_label('nativeUi.play'); ?></button><button type="button" data-carousel-next aria-label="<?php echo esc_attr(pvwp_text('nativeUi.next')); ?>">→</button></div></div><div class="pvn-profile-track" data-carousel-track><?php foreach ($display_group as $profile) { pvwp_profile_card($profile); } ?></div></section>
+        <?php }
+        if ($limit_per_zone > 0) { ?>
+        <div class="pvn-centered" style="margin-top: 2rem; margin-bottom: 1rem;"><a class="pvn-button pvn-gold" href="<?php echo esc_url(pvwp_url('perfiles')); ?>"><?php echo esc_html(pvwp_all_profiles_label()); ?> <span aria-hidden="true">→</span></a></div>
         <?php }
     } ?></section><?php
 }
@@ -332,7 +349,7 @@ function pvwp_service(array $service): void {
 
   function pvwp_render_route(array $context): void {
     $kind = $context['route']['kind']; $record = $context['route']['record'] ?? array();
-    if ($kind === 'home') { pvwp_hero(); if (!empty($record['content'])) { echo '<section class="pvn-section">'; pvwp_rich($record); echo '</section>'; } pvwp_coverage(); pvwp_profiles();
+    if ($kind === 'home') { pvwp_hero(); if (!empty($record['content'])) { echo '<section class="pvn-section">'; pvwp_rich($record); echo '</section>'; } pvwp_coverage(); pvwp_profiles(null, 4);
         echo '<section id="servicios" class="pvn-section">'; pvwp_section_heading(pvwp_text('servicesSection.eyebrow'), pvwp_text('servicesSection.title'), pvwp_text('servicesSection.body')); echo '<div class="pvn-service-grid">'; foreach (array_slice(pvc_records('service', $context['locale']), 0, 4) as $service) { pvwp_service_card($service); } echo '</div><a class="pvn-button" href="' . esc_url(pvwp_url('servicios')) . '">' . esc_html(pvwp_text('servicesSection.exploreRoutes')) . ' →</a></section>';
     } elseif ($kind === 'profiles') { if (!empty($record['content'])) { echo '<section class="pvn-section">'; pvwp_rich($record); echo '</section>'; } echo '<h1 class="pvn-listing-title">' . esc_html($record['title']) . '</h1>'; pvwp_profiles(); }
     elseif ($kind === 'services') { pvwp_services($record); }

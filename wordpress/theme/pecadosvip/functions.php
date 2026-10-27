@@ -111,7 +111,7 @@ function pvwp_template_redirect(): void {
     $c = pvwp_context(); if (empty($c['owned'])) { return; }
     remove_action('template_redirect', 'redirect_canonical'); remove_action('template_redirect', 'wp_old_slug_redirect'); remove_action('wp_head', 'rel_canonical');
     if (!headers_sent()) { header('X-Robots-Tag: ' . pvwp_seo_robots(), true); header('X-Content-Type-Options: nosniff', true); header('X-PecadosVip-Content-Revision: ' . (function_exists('pvc_revision') ? (string) pvc_revision() : 'uninstalled'), true); }
-    if (is_user_logged_in()) { if (!defined('DONOTCACHEPAGE')) { define('DONOTCACHEPAGE', true); } nocache_headers(); }
+    if (is_user_logged_in()) { if (!defined('DONOTCACHEPAGE')) { define('DONOTCACHEPAGE', true); } nocache_headers(); } else { header('Cache-Control: public, max-age=600, stale-while-revalidate=3600'); }
     if (isset($c['redirect'])) { wp_safe_redirect(home_url($c['redirect']), $c['status'], 'PecadosVip'); exit; } status_header($c['status'] ?? 404);
 }
 add_action('template_redirect', 'pvwp_template_redirect', 0);
@@ -133,6 +133,32 @@ add_action('wp_head', static function () {
     $site = function_exists('pvc_site') ? pvc_site($c['locale']) : array();
     $icon = $site['icon'] ?? ($site['logo'] ?? null);
     if (!has_site_icon() && !empty($icon['url'])) { echo '<link rel="icon" href="' . esc_url($icon['url']) . '">' . "\n"; }
+    if (($c['route']['kind'] ?? '') === 'home' && function_exists('pvwp_value')) {
+        $hero = pvwp_value('site.hero', array());
+        if (is_numeric($hero) && function_exists('pvc_media')) { $hero = pvc_media((int) $hero); }
+        if (is_array($hero) && !empty($hero['url'])) {
+            echo '<link rel="preload" as="image" href="' . esc_url($hero['url']) . '" fetchpriority="high">' . "\n";
+        }
+    }
+});
+
+// Remove WordPress emoji scripts and styles from frontend for faster rendering
+add_action('init', static function () {
+    if (is_admin()) { return; }
+    remove_action('wp_head', 'print_emoji_detection_script', 7);
+    remove_action('admin_print_scripts', 'print_emoji_detection_script');
+    remove_action('wp_print_styles', 'print_emoji_styles');
+    remove_action('admin_print_styles', 'print_emoji_styles');
+    remove_filter('the_content_feed', 'wp_staticize_emoji');
+    remove_filter('comment_text_rss', 'wp_staticize_emoji');
+    remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
+    add_filter('tiny_mce_plugins', static fn($plugins) => is_array($plugins) ? array_diff($plugins, array('wpemoji')) : array());
+    add_filter('wp_resource_hints', static function ($urls, $relation_type) {
+        if ('dns-prefetch' === $relation_type) {
+            $urls = array_filter($urls, static fn($url) => !str_contains((string) $url, 's.w.org'));
+        }
+        return $urls;
+    }, 10, 2);
 });
 function pvwp_error_copy(string $locale): array {
     $copy = array(
