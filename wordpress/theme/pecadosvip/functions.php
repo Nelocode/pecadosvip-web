@@ -44,34 +44,43 @@ function pvwp_context(): array {
     if ($context !== null) { return $context; }
     if (is_admin() || wp_doing_ajax() || wp_doing_cron() || (defined('REST_REQUEST') && REST_REQUEST) || (defined('XMLRPC_REQUEST') && XMLRPC_REQUEST)) { return $context = array('owned' => false); }
     $uri = isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '/';
-    $routes = array();
-    if (pvwp_ready()) {
-        foreach (array('es', 'en', 'fr', 'it') as $locale) {
-            $copy = pvc_copy($locale); $cities = pvc_records('city', $locale); $services = pvc_records('service', $locale);
-            $allowed = array('city' => array_column($cities, 'key'), 'availability' => array('available', 'limited', 'on-request', 'unavailable'));
-            foreach (array('' => 'home', '/perfiles' => 'profiles', '/servicios' => 'services') as $suffix => $kind) {
-                $page = pvc_record('page', $locale, $kind === 'home' ? 'home' : ($kind === 'profiles' ? 'perfiles' : 'servicios'));
-                if (!$page) { continue; }
-                $routes['/' . $locale . $suffix] = array('kind' => $kind, 'record' => $page, 'title' => $page['title'], 'description' => wp_strip_all_tags($page['excerpt'] ?? ''), 'allowed' => $kind === 'services' ? array('category' => array_values(array_unique(array_filter(array_map(static fn($s) => $s['data']['group'] ?? '', $services))))) : $allowed);
-            }
-            foreach (array('profile', 'service', 'city', 'page') as $type) {
-                // A profile that only exists in Spanish must still resolve in the other
-                // languages, so its route is built from the fallback-aware list.
-                $type_records = $type === 'profile' ? pvc_records_localized($type, $locale) : pvc_records($type, $locale);
-                foreach ($type_records as $record) {
-                    if ($type === 'page' && in_array($record['key'], array('home', 'perfiles', 'servicios'), true)) { continue; }
-                    $path = pvwp_record_path($type, $record);
-                    if (!preg_match('#^[a-z0-9][a-z0-9_/-]*$#D', $path) || strpos($path, '..') !== false || in_array($path, array('perfiles', 'servicios'), true)) { continue; }
-                    $record_allowed = array();
-                    if ($type === 'profile') {
-                        $photos = array();
-                        foreach (($record['gallery'] ?? array()) as $i => $photo) { $photos[] = (string) $i; $photos[] = $i === 0 ? 'cover' : 'gallery-' . str_pad((string) $i, 2, '0', STR_PAD_LEFT); }
-                        if (!$photos && !empty($record['image'])) { $photos = array('0', 'cover'); }
-                        $record_allowed['foto'] = $photos;
+    $routes = null;
+    $cache_key = 'pvwp_routes_' . (function_exists('pvc_revision') ? str_replace('.', '_', (string) pvc_revision()) : '1');
+    if (function_exists('get_transient')) {
+        $cached = get_transient($cache_key);
+        if (is_array($cached)) { $routes = $cached; }
+    }
+    if ($routes === null) {
+        $routes = array();
+        if (pvwp_ready()) {
+            foreach (array('es', 'en', 'fr', 'it') as $locale) {
+                $copy = pvc_copy($locale); $cities = pvc_records('city', $locale); $services = pvc_records('service', $locale);
+                $allowed = array('city' => array_column($cities, 'key'), 'availability' => array('available', 'limited', 'on-request', 'unavailable'));
+                foreach (array('' => 'home', '/perfiles' => 'profiles', '/servicios' => 'services') as $suffix => $kind) {
+                    $page = pvc_record('page', $locale, $kind === 'home' ? 'home' : ($kind === 'profiles' ? 'perfiles' : 'servicios'));
+                    if (!$page) { continue; }
+                    $routes['/' . $locale . $suffix] = array('kind' => $kind, 'record' => $page, 'title' => $page['title'], 'description' => wp_strip_all_tags($page['excerpt'] ?? ''), 'allowed' => $kind === 'services' ? array('category' => array_values(array_unique(array_filter(array_map(static fn($s) => $s['data']['group'] ?? '', $services))))) : $allowed);
+                }
+                foreach (array('profile', 'service', 'city', 'page') as $type) {
+                    $type_records = $type === 'profile' ? pvc_records_localized($type, $locale) : pvc_records($type, $locale);
+                    foreach ($type_records as $record) {
+                        if ($type === 'page' && in_array($record['key'], array('home', 'perfiles', 'servicios'), true)) { continue; }
+                        $path = pvwp_record_path($type, $record);
+                        if (!preg_match('#^[a-z0-9][a-z0-9_/-]*$#D', $path) || strpos($path, '..') !== false || in_array($path, array('perfiles', 'servicios'), true)) { continue; }
+                        $record_allowed = array();
+                        if ($type === 'profile') {
+                            $photos = array();
+                            foreach (($record['gallery'] ?? array()) as $i => $photo) { $photos[] = (string) $i; $photos[] = $i === 0 ? 'cover' : 'gallery-' . str_pad((string) $i, 2, '0', STR_PAD_LEFT); }
+                            if (!$photos && !empty($record['image'])) { $photos = array('0', 'cover'); }
+                            $record_allowed['foto'] = $photos;
+                        }
+                        $routes['/' . $locale . '/' . $path] = array('kind' => $type, 'title' => $record['title'], 'description' => wp_strip_all_tags($record['excerpt'] ?? ''), 'record' => $record, 'allowed' => $record_allowed);
                     }
-                    $routes['/' . $locale . '/' . $path] = array('kind' => $type, 'title' => $record['title'], 'description' => wp_strip_all_tags($record['excerpt'] ?? ''), 'record' => $record, 'allowed' => $record_allowed);
                 }
             }
+        }
+        if (function_exists('set_transient') && !empty($routes)) {
+            set_transient($cache_key, $routes, DAY_IN_SECONDS);
         }
     }
     $context = pvwp_resolve_request($uri, (string) wp_parse_url(home_url('/'), PHP_URL_PATH), array('ready' => pvwp_ready(), 'routes' => $routes));
@@ -101,7 +110,7 @@ function pvwp_template_redirect(): void {
     $c = pvwp_context(); if (empty($c['owned'])) { return; }
     remove_action('template_redirect', 'redirect_canonical'); remove_action('template_redirect', 'wp_old_slug_redirect'); remove_action('wp_head', 'rel_canonical');
     if (!headers_sent()) { header('X-Robots-Tag: ' . pvwp_seo_robots(), true); header('X-Content-Type-Options: nosniff', true); header('X-PecadosVip-Content-Revision: ' . (function_exists('pvc_revision') ? (string) pvc_revision() : 'uninstalled'), true); }
-    if (!defined('DONOTCACHEPAGE')) { define('DONOTCACHEPAGE', true); } nocache_headers();
+    if (is_user_logged_in()) { if (!defined('DONOTCACHEPAGE')) { define('DONOTCACHEPAGE', true); } nocache_headers(); }
     if (isset($c['redirect'])) { wp_safe_redirect(home_url($c['redirect']), $c['status'], 'PecadosVip'); exit; } status_header($c['status'] ?? 404);
 }
 add_action('template_redirect', 'pvwp_template_redirect', 0);
