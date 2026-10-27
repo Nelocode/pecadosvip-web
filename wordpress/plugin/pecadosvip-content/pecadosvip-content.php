@@ -183,12 +183,19 @@ function pvc_records(string $type, string $locale): array {
     $revision = pvc_revision(); if ($generation !== $revision) { $memo = array(); $generation = $revision; }
     $cache_key = $type . ':' . $locale;
     if (array_key_exists($cache_key, $memo)) { return $memo[$cache_key]; }
+    $transient_key = 'pvc_rec_' . md5($cache_key . ':' . (string)$generation);
+    if (function_exists('get_transient')) {
+        $cached = get_transient($transient_key);
+        if (is_array($cached)) { $memo[$cache_key] = $cached; return $cached; }
+    }
     $posts = get_posts(array('post_type' => $type, 'post_status' => 'publish', 'has_password' => false, 'posts_per_page' => -1, 'orderby' => array('menu_order' => 'ASC', 'ID' => 'ASC'), 'meta_query' => array(array('key' => 'pv_locale', 'value' => $locale)), 'suppress_filters' => false));
     $records = array();
     foreach ($posts as $post) { $record = pvc_normalize($post); if (!is_wp_error(pvc_validate($type, $locale, $record['key'], $record['data'], $post->ID, false))) { $records[] = $record; } }
     // One filter, so every public projection agrees: listing, route index, canonical link,
     // REST catalogue and informational records all read this function.
-    $memo[$cache_key] = apply_filters('pvc_records', $records, $type, $locale); return $memo[$cache_key];
+    $memo[$cache_key] = apply_filters('pvc_records', $records, $type, $locale);
+    if (function_exists('set_transient')) { set_transient($transient_key, $memo[$cache_key], DAY_IN_SECONDS); }
+    return $memo[$cache_key];
 }
 function pvc_record(string $type, string $locale, string $key): ?array {
     foreach (pvc_records($type, $locale) as $record) { if ($record['key'] === $key) { return $record; } }
