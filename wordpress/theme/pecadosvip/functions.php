@@ -1,6 +1,7 @@
 <?php
 /** Native WordPress presentation. Content belongs to the separate content plugin. */
 if (!defined('ABSPATH')) { exit; }
+if (!function_exists('get_home_path') && defined('ABSPATH') && file_exists(ABSPATH . 'wp-admin/includes/file.php')) { require_once ABSPATH . 'wp-admin/includes/file.php'; }
 require_once __DIR__ . '/inc/router.php';
 require_once __DIR__ . '/inc/render.php';
 require_once __DIR__ . '/inc/contact-legal.php';
