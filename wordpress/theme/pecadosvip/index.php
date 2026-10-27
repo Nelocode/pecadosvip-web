@@ -2,6 +2,21 @@
 if (!defined('ABSPATH')) { exit; }
 $pvwp_page = pvwp_context(); $pvwp_owned = !empty($pvwp_page['owned']); $pvwp_ready = $pvwp_owned && ($pvwp_page['status'] ?? 404) === 200;
 $pvwp_locale = $pvwp_page['locale'] ?? 'es'; $pvwp_error = pvwp_error_copy($pvwp_locale);
+
+// Native lightweight HTML cache for anonymous visitors
+$pvwp_can_cache = !is_user_logged_in() && $pvwp_ready && empty($pvwp_page['preview']) && empty($_POST) && empty($_GET);
+if ($pvwp_can_cache) {
+    $pvwp_cache_key = 'pvwp_html_' . md5(($_SERVER['REQUEST_URI'] ?? '/') . ':' . (function_exists('pvc_revision') ? (string) pvc_revision() : '1'));
+    if (function_exists('get_transient')) {
+        $pvwp_cached_html = get_transient($pvwp_cache_key);
+        if (is_string($pvwp_cached_html) && $pvwp_cached_html !== '') {
+            echo $pvwp_cached_html;
+            echo "\n<!-- PecadosVip Native Cache (Hit) -->";
+            exit;
+        }
+    }
+    ob_start();
+}
 ?><!doctype html>
 <html <?php if ($pvwp_owned) { echo 'lang="' . esc_attr($pvwp_locale) . '"'; } else { language_attributes(); } ?>>
 <head><meta charset="<?php bloginfo('charset'); ?>"><meta name="viewport" content="width=device-width, initial-scale=1"><?php wp_head(); ?></head>
@@ -17,4 +32,10 @@ $pvwp_locale = $pvwp_page['locale'] ?? 'es'; $pvwp_error = pvwp_error_copy($pvwp
 <?php else : ?>
 <header class="pvwp-native-shell"><a href="<?php echo esc_url(home_url('/')); ?>"><?php bloginfo('name'); ?></a></header><main id="main-content" class="pvwp-native-shell">
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?><article id="post-<?php the_ID(); ?>" <?php post_class(); ?>><h1><?php the_title(); ?></h1><?php the_content(); wp_link_pages(); ?></article><?php endwhile; the_posts_navigation(); else : ?><h1><?php echo esc_html($pvwp_error['notFound']); ?></h1><?php get_search_form(); endif; ?></main><footer class="pvwp-native-shell"><?php bloginfo('name'); ?></footer>
-<?php endif; wp_footer(); ?></body></html>
+<?php endif; wp_footer(); ?></body></html><?php
+if ($pvwp_can_cache && isset($pvwp_cache_key)) {
+    $pvwp_output = ob_get_flush();
+    if (is_string($pvwp_output) && strlen($pvwp_output) > 500 && function_exists('set_transient')) {
+        set_transient($pvwp_cache_key, $pvwp_output, DAY_IN_SECONDS);
+    }
+}
