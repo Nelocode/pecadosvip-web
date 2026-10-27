@@ -8,6 +8,12 @@
  * Text Domain: pecadosvip-content
  */
 if (!defined('ABSPATH')) { exit; }
+if (!function_exists('get_home_path')) {
+    function get_home_path() {
+        if (defined('ABSPATH')) { return ABSPATH; }
+        return '/var/www/html/';
+    }
+}
 define('PVC_VERSION', '1.3.3');
 define('PVC_DIR', __DIR__);
 
