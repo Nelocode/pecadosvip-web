@@ -181,7 +181,7 @@ function pvwp_city_label(string $key): string {
     $record = pvwp_city_record($key);
     return $record ? (string) $record['title'] : ucfirst(str_replace('-', ' ', $key));
 }
-function pvwp_profile_card(array $profile): void {
+function pvwp_profile_card(array $profile, bool $hidden = false): void {
     $data = $profile['data']; $href = pvwp_url('perfiles/' . $profile['key']);
     // The card used to print only the declared cities, so a profile without them showed an empty
     // line while carrying a height, several languages and a list of features. It now prints what
@@ -191,7 +191,7 @@ function pvwp_profile_card(array $profile): void {
     if (!$where && !empty($data['homeZone'])) { $where[] = pvwp_city_label((string) $data['homeZone']); }
     $languages = array_values(array_filter(array_map(static fn($value) => trim((string) $value), (array) ($data['languages'] ?? array()))));
     $features = array_slice(array_values(array_filter(array_merge((array) ($data['tags'] ?? array()), (array) ($data['conceptTags'] ?? array())))), 0, 4);
-    ?><article class="pvn-profile-card" data-record-id="<?php echo (int) $profile['id']; ?>"><a class="pvn-profile-photo" href="<?php echo esc_url($href); ?>" tabindex="-1" aria-hidden="true"><?php pvwp_media($profile['image'] ?? null, '', false, '(max-width:700px) 45vw, 22vw'); ?></a>
+    ?><article class="pvn-profile-card" data-record-id="<?php echo (int) $profile['id']; ?>"<?php if ($hidden) { echo ' hidden'; } ?>><a class="pvn-profile-photo" href="<?php echo esc_url($href); ?>" tabindex="-1" aria-hidden="true"><?php pvwp_media($profile['image'] ?? null, '', false, '(max-width:700px) 45vw, 22vw'); ?></a>
     <div class="pvn-profile-summary"><h3><a href="<?php echo esc_url($href); ?>"><?php echo esc_html($profile['title']); ?></a></h3><?php if ($where) { ?><p class="pvn-card-where"><?php echo esc_html(implode(' · ', $where)); ?></p><?php } ?><ul class="pvn-card-facts"><?php if (!empty($data['age'])) { ?><li><span class="pvn-card-label"><?php pvwp_label('profileFields.age'); ?></span> <?php echo esc_html((string) $data['age']); ?></li><?php } ?><?php if (!empty($data['height'])) { ?><li><span class="pvn-card-label"><?php pvwp_label('profileFields.height'); ?></span> <?php echo esc_html($data['height']); ?></li><?php } ?><?php if ($languages) { ?><li><span class="pvn-card-label"><?php pvwp_label('profileFields.languages'); ?></span> <?php echo esc_html(implode(', ', $languages)); ?></li><?php } ?></ul><?php if ($features) { ?><p class="pvn-card-features"><span class="pvn-card-label"><?php pvwp_label('profileFields.features'); ?></span> <?php echo esc_html(implode(' · ', $features)); ?></p><?php } ?><p class="pvn-availability" data-status="<?php echo esc_attr($data['availability'] ?? 'on-request'); ?>"><?php pvwp_label('filters.availability.' . ($data['availability'] ?? 'on-request')); ?></p><?php if ($data['synthetic'] ?? true) { ?><span class="pvn-disclosure"><?php pvwp_label('profilesSection.cardDisclosureShort'); ?></span><?php } ?><?php if (!empty($profile['fallback'])) { ?><span class="pvn-disclosure pvn-fallback-badge"><?php echo esc_html(pvwp_fallback_copy()['card']); ?></span><?php } ?><a class="pvn-card-link" href="<?php echo esc_url($href); ?>"><?php pvwp_label('profilesSection.viewProfile'); ?> <span aria-hidden="true">→</span></a></div></article><?php
 }
 function pvwp_all_profiles_label(): string {
@@ -218,12 +218,53 @@ function pvwp_profiles(?string $city_override = null, int $limit_per_zone = 0): 
     <?php if (!$profiles) { ?><p class="pvn-empty"><?php pvwp_label('profilesSection.emptyTitle'); ?></p><?php } else {
         $zones = array(); foreach ($profiles as $p) { $key = $p['data']['homeZone'] ?? ($p['data']['cities'][0] ?? ''); $city_record = pvwp_city_record((string) $key); $zone = $city_record['data']['zone'] ?? $key; $zones[$zone][] = $p; }
         foreach ($zones as $zone => $group) { $zone_record = pvwp_city_record((string) $zone);
-            $display_group = $limit_per_zone > 0 ? array_slice($group, 0, $limit_per_zone) : $group;
+            if ($limit_per_zone > 0 && count($group) > 1) { shuffle($group); }
         ?>
-        <section id="zona-<?php echo esc_attr($zone); ?>" class="pvn-profile-zone" data-carousel><div class="pvn-row-heading"><h3><?php echo esc_html($zone_record['title'] ?? $zone); ?></h3><div class="pvn-carousel-controls" hidden><button type="button" data-carousel-prev aria-label="<?php echo esc_attr(pvwp_text('nativeUi.previous')); ?>">←</button><button type="button" data-carousel-play aria-pressed="false"><?php pvwp_label('nativeUi.play'); ?></button><button type="button" data-carousel-next aria-label="<?php echo esc_attr(pvwp_text('nativeUi.next')); ?>">→</button></div></div><div class="pvn-profile-track" data-carousel-track><?php foreach ($display_group as $profile) { pvwp_profile_card($profile); } ?></div></section>
+        <section id="zona-<?php echo esc_attr($zone); ?>" class="pvn-profile-zone" data-carousel><div class="pvn-row-heading"><h3><?php echo esc_html($zone_record['title'] ?? $zone); ?></h3><div class="pvn-carousel-controls" hidden><button type="button" data-carousel-prev aria-label="<?php echo esc_attr(pvwp_text('nativeUi.previous')); ?>">←</button><button type="button" data-carousel-play aria-pressed="false"><?php pvwp_label('nativeUi.play'); ?></button><button type="button" data-carousel-next aria-label="<?php echo esc_attr(pvwp_text('nativeUi.next')); ?>">→</button></div></div><div class="pvn-profile-track" data-carousel-track<?php if ($limit_per_zone > 0) { echo ' data-random-limit="' . (int) $limit_per_zone . '"'; } ?>><?php foreach ($group as $idx => $profile) { pvwp_profile_card($profile, $limit_per_zone > 0 && $idx >= $limit_per_zone); } ?></div></section>
         <?php }
         if ($limit_per_zone > 0) { ?>
         <div class="pvn-centered" style="margin-top: 2rem; margin-bottom: 1rem;"><a class="pvn-button pvn-gold" href="<?php echo esc_url(pvwp_url('perfiles')); ?>"><?php echo esc_html(pvwp_all_profiles_label()); ?> <span aria-hidden="true">→</span></a></div>
+        <script>
+        (() => {
+            const shuffle = (list) => {
+                const copy = list.slice();
+                for (let i = copy.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    const tmp = copy[i]; copy[i] = copy[j]; copy[j] = tmp;
+                }
+                return copy;
+            };
+            document.querySelectorAll('#perfiles [data-random-limit]').forEach((track) => {
+                const limit = parseInt(track.getAttribute('data-random-limit') || '4', 10);
+                const cards = Array.from(track.querySelectorAll(':scope > .pvn-profile-card'));
+                if (cards.length <= limit) return;
+                const zoneId = track.closest('.pvn-profile-zone')?.id || 'default';
+                const storageKey = 'pvn_home_seen_' + zoneId;
+                let seen = [];
+                try { seen = JSON.parse(sessionStorage.getItem(storageKey) || '[]'); if (!Array.isArray(seen)) seen = []; } catch (_) { seen = []; }
+                const unseenCards = shuffle(cards.filter((c) => !seen.includes(c.getAttribute('data-record-id'))));
+                const seenCards = shuffle(cards.filter((c) => seen.includes(c.getAttribute('data-record-id'))));
+                let chosen;
+                if (unseenCards.length >= limit) {
+                    chosen = unseenCards.slice(0, limit);
+                    seen = seen.concat(chosen.map((c) => c.getAttribute('data-record-id')));
+                } else {
+                    const needed = limit - unseenCards.length;
+                    const refill = seenCards.slice(0, needed);
+                    chosen = shuffle(unseenCards.concat(refill));
+                    seen = chosen.map((c) => c.getAttribute('data-record-id'));
+                }
+                try { sessionStorage.setItem(storageKey, JSON.stringify(seen)); } catch (_) {}
+                const chosenSet = new Set(chosen);
+                const rest = cards.filter((c) => !chosenSet.has(c));
+                chosen.concat(rest).forEach((card, idx) => {
+                    card.hidden = idx >= limit;
+                    track.appendChild(card);
+                });
+            });
+            document.currentScript?.remove();
+        })();
+        </script>
         <?php }
     } ?></section><?php
 }
@@ -364,3 +405,4 @@ function pvwp_footer(): void { ?>
     <footer class="pvn-footer"><?php if (function_exists('pvwp_legal_identification') && (pvwp_context()['route']['record']['key'] ?? '') !== 'aviso-legal') { pvwp_legal_identification(); } ?><?php if (function_exists('pvwp_legal_report')) { pvwp_legal_report('footer', true); } ?><p><?php pvwp_label('footer.tagline'); ?></p><nav aria-label="<?php echo esc_attr(pvwp_text('navigation.footerAria')); ?>"><?php pvwp_nav_links(); foreach (pvc_records('page', pvwp_context()['locale']) as $page) { if (!in_array($page['key'], array('home', 'perfiles', 'servicios', 'contacto'), true)) { ?><a href="<?php echo esc_url(pvwp_url(pvwp_record_path('page', $page))); ?>"><?php echo esc_html($page['title']); ?></a><?php } } ?></nav><p class="pvn-muted"><?php pvwp_label('footer.reviewStatus'); ?></p><a href="#inicio"><?php pvwp_label('footer.backToTop'); ?> ↑</a></footer>
     <nav class="pvn-bottom-nav" aria-label="<?php echo esc_attr(pvwp_text('navigation.mobileAria')); ?>"><a href="<?php echo esc_url(pvwp_url()); ?>"><span aria-hidden="true">⌂</span><?php pvwp_label('navigation.home'); ?></a><a href="<?php echo esc_url(pvwp_url() . '#cobertura'); ?>"><span aria-hidden="true">⌖</span><?php pvwp_label('navigation.zones'); ?></a><a href="<?php echo esc_url(pvwp_url('perfiles')); ?>"><span aria-hidden="true">◇</span><?php pvwp_label('navigation.profiles'); ?></a><a href="<?php echo esc_url(pvwp_url('servicios')); ?>"><span aria-hidden="true">♧</span><?php pvwp_label('navigation.services'); ?></a><a href="<?php echo esc_url(pvwp_url() . '#seguridad'); ?>"><span aria-hidden="true">♙</span><?php pvwp_label('navigation.controls'); ?></a></nav>
 <?php }
+
