@@ -8,21 +8,7 @@
  * Origin media denial is enforced separately in Apache, including for editors.
  */
 if (!defined('ABSPATH')) { exit; }
-if (!function_exists('get_home_path')) {
-    function get_home_path() {
-        $home = set_url_scheme(get_option('home'), 'http');
-        $siteurl = set_url_scheme(get_option('siteurl'), 'http');
-        if (!empty($home) && 0 !== strcasecmp($home, $siteurl)) {
-            $wp_path_rel_to_home = str_ireplace($home, '', $siteurl);
-            $pos = strripos(str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']), '/wp-admin/');
-            $home_path = substr($_SERVER['SCRIPT_FILENAME'], 0, $pos);
-            $home_path = trailingslashit($home_path);
-        } else {
-            $home_path = ABSPATH;
-        }
-        return str_replace('\\', '/', $home_path);
-    }
-}
+if (!function_exists('get_home_path') && defined('ABSPATH') && file_exists(ABSPATH . 'wp-admin/includes/file.php')) { require_once ABSPATH . 'wp-admin/includes/file.php'; }
 function pvp_guard_language(string $uri): string {
     $path = parse_url($uri, PHP_URL_PATH);
     if (!is_string($path)) { return 'es'; }
@@ -127,3 +113,4 @@ add_action('admin_menu', function () {
         echo '<div class="wrap"><h1>Protección pública</h1><p>' . esc_html($state) . ' Ninguno de los dos estados equivale a verificación de edad ni a cumplimiento jurídico completo.</p><p>La protección de medios se configura en Apache y debe comprobarse desde el exterior. Los archivos originales se conservan; durante la contención sus URL directas y las miniaturas administrativas quedan bloqueadas.</p><p>Pendientes: datos del titular, textos legales reales, revisión de actividad y publicidad, consentimiento y derechos de imagen, proveedores y verificación de edad.</p></div>';
     });
 });
+

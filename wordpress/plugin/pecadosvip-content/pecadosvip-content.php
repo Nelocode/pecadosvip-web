@@ -8,12 +8,7 @@
  * Text Domain: pecadosvip-content
  */
 if (!defined('ABSPATH')) { exit; }
-if (!function_exists('get_home_path')) {
-    function get_home_path() {
-        if (defined('ABSPATH')) { return ABSPATH; }
-        return '/var/www/html/';
-    }
-}
+if (!function_exists('get_home_path') && defined('ABSPATH') && file_exists(ABSPATH . 'wp-admin/includes/file.php')) { require_once ABSPATH . 'wp-admin/includes/file.php'; }
 define('PVC_VERSION', '1.3.3');
 define('PVC_DIR', __DIR__);
 
@@ -259,3 +254,4 @@ require_once PVC_DIR . '/includes/selective-translation.php';
 require_once PVC_DIR . '/includes/offline-glossary.php';
 require_once PVC_DIR . '/includes/offline-translation.php';
 require_once PVC_DIR . '/includes/auto-translation.php';
+
