@@ -114,7 +114,7 @@ test('beta media catalog contains only unique selected derivatives that exist', 
 
 test('beta media response is same-origin, no-sniff and non-indexable', async () => {
   assert.deepEqual(buildBetaMediaHeaders('image/webp', 12), {
-    'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+    'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
     'Content-Type': 'image/webp',
     'Cross-Origin-Resource-Policy': 'same-origin',
     'X-Content-Type-Options': 'nosniff',
