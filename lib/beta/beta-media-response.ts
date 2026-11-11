@@ -2,6 +2,7 @@ import { lstat, readFile, realpath } from 'node:fs/promises';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
 
 import { NextResponse } from 'next/server.js';
+import sharp from 'sharp';
 
 import {
   betaRuntimeAssetPaths,
@@ -10,13 +11,14 @@ import {
 
 const MAX_BETA_MEDIA_BYTES = 4 * 1024 * 1024;
 const approvedAssetPaths = new Set<string>(betaRuntimeAssetPaths);
+const optimizedBufferCache = new Map<string, { buffer: Uint8Array; contentType: string }>();
 
 export function buildBetaMediaHeaders(
-  contentType: BetaMediaAsset['contentType'],
+  contentType: string,
   contentLength?: number,
 ): Record<string, string> {
   return {
-    'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+    'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
     'Content-Type': contentType,
     'Cross-Origin-Resource-Policy': 'same-origin',
     'X-Content-Type-Options': 'nosniff',
@@ -88,6 +90,31 @@ export async function serveBetaMediaAsset(
       bytes.byteLength !== after.size
     ) {
       return betaMediaNotFound();
+    }
+
+    if (asset.contentType === 'image/png') {
+      const cacheKey = `${asset.sourcePath}:${after.mtimeMs}`;
+      const cached = optimizedBufferCache.get(cacheKey);
+      if (cached) {
+        return new NextResponse(cached.buffer as unknown as BodyInit, {
+          headers: buildBetaMediaHeaders(cached.contentType, cached.buffer.byteLength),
+        });
+      }
+
+      try {
+        const optimizedWebp = await sharp(bytes)
+          .webp({ quality: 85, effort: 4 })
+          .toBuffer();
+        optimizedBufferCache.set(cacheKey, {
+          buffer: optimizedWebp,
+          contentType: 'image/webp',
+        });
+        return new NextResponse(optimizedWebp as unknown as BodyInit, {
+          headers: buildBetaMediaHeaders('image/webp', optimizedWebp.byteLength),
+        });
+      } catch {
+        // Fall back to original bytes if sharp fails
+      }
     }
 
     return new NextResponse(bytes, {

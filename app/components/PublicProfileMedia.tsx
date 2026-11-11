@@ -85,7 +85,9 @@ export default function PublicProfileMedia({
   return (
     <Image
       alt={media.alt}
+      decoding="async"
       fill
+      loading={priority ? 'eager' : 'lazy'}
       priority={priority}
       sizes={sizes}
       src={media.desktopUrl}
